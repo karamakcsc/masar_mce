@@ -137,13 +137,19 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+    "Item": {
+        "after_insert": "masar_mce.custom.Item.item.after_insert",
+        "on_update": "masar_mce.custom.Item.item.on_update",
+    }, 
+    "Blanket Order": {
+        "on_submit" : "masar_mce.custom.blanket_order.blanket_order.on_submit",
+        "on_update_after_submit" : "masar_mce.custom.blanket_order.blanket_order.on_update_after_submit"
+    },
+    "Quality Inspection":{
+        "on_submit": "masar_mce.custom.quality_inspection.quality_inspection.on_submit"
+    }
+}
 
 # Scheduled Tasks
 # ---------------
@@ -241,4 +247,59 @@ app_license = "mit"
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
+fixtures = [
+    {"dt": "Custom Field", "filters": [
+        [
+            "name", "in", [
+                'Blanket Order-custom_special_terms',
+                'Blanket Order-custom_tcs_terms',
+                'Blanket Order-custom_special_terms_tab',
+                'Blanket Order-custom_general_terms',
+                'Blanket Order Item-custom_selling_price',
+                'Blanket Order Item-custom_markup_percentage',
+                'Blanket Order-custom_pricing_type',
+                'Item-custom_supplier',
+                'Terms and Conditions-custom_special_terms',
+                'Blanket Order Item-custom_quality_inspection_remarks',
+                'Blanket Order Item-custom_quality_inspection_status',
+                'Blanket Order Item-custom_column_break_ijewz',
+                'Blanket Order Item-custom_quality_inspection',
+                'Blanket Order Item-custom_section_break_uoh6p',
+                'Stock Entry Detail-custom_quality_inspection_status',
+                'Stock Entry-custom_supplier_agreement',
+                'Blanket Order Item-custom_inspection_required'
 
+            ]
+        ]
+    ]},
+    {"dt": "Translation", "filters": [
+        [
+            "name", "in", [
+                "eu7jh96i2v"
+            ]
+        ]
+    ]
+    },
+    {
+        "doctype": "Property Setter",
+        "filters": [
+            [
+                "name",
+                "in",
+                [
+                'Blanket Order-tc_name-link_filters',
+                'Terms and Conditions-main-field_order',
+                'Blanket Order-main-field_order',
+                'Blanket Order Item-main-field_order',
+                'Blanket Order Item-rate-label',
+                'Item-main-field_order',
+                'Stock Entry Detail-main-field_order',
+                'Blanket Order Item-item_code-link_filters',
+                'Stock Entry-main-field_order',
+                'Blanket Order-blanket_order_type-read_only',
+                'Blanket Order-blanket_order_type-default'
+                ]
+            ]
+                ]
+    }
+]
