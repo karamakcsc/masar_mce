@@ -30,7 +30,7 @@ def get_items_from_blanket_order(doctype, txt, searchfield, start, page_len, fil
     
     
 def check_agreement_items(self):
-    if self.stock_entry_type != "Material Transfer for Inspection":
+    if self.stock_entry_type != "Material Receipt for Inspection":
         return
 
     if not self.custom_supplier_agreement:

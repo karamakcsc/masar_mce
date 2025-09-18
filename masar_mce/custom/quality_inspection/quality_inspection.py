@@ -32,7 +32,7 @@ def qi_on_submit(self):
         return
 
     se = get_doc("Stock Entry", self.reference_name)
-    if se.stock_entry_type == 'Material Transfer for Inspection':
+    if se.stock_entry_type == 'Material Receipt for Inspection':
         for item in se.items:
             exists = db.exists(
                 "Quality Inspection",

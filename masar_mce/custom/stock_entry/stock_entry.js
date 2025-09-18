@@ -11,7 +11,7 @@ frappe.ui.form.on("Stock Entry", {
 });
 function FilterForSupplierAgreement(frm) {
     frm.fields_dict.items.grid.get_field("item_code").get_query = function(doc, cdt, cdn) {
-        if (doc.stock_entry_type === "Material Transfer for Inspection" && doc.custom_supplier_agreement) {
+        if (doc.stock_entry_type === "Material Receipt for Inspection" && doc.custom_supplier_agreement) {
             return {
                 query: "masar_mce.custom.stock_entry.stock_entry.get_items_from_blanket_order",
                 filters: {
