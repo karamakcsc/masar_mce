@@ -43,7 +43,10 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+    "Blanket Order" : "custom/blanket_order/blanket_order.js", 
+    "Stock Entry" : "custom/stock_entry/stock_entry.js"
+    }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -142,12 +145,11 @@ doc_events = {
         "after_insert": "masar_mce.custom.Item.item.after_insert",
         "on_update": "masar_mce.custom.Item.item.on_update",
     }, 
-    "Blanket Order": {
-        "on_submit" : "masar_mce.custom.blanket_order.blanket_order.on_submit",
-        "on_update_after_submit" : "masar_mce.custom.blanket_order.blanket_order.on_update_after_submit"
-    },
-    "Quality Inspection":{
+    "Quality Inspection": {
         "on_submit": "masar_mce.custom.quality_inspection.quality_inspection.on_submit"
+    }, 
+    "Stock Entry":{
+        "on_submit": "masar_mce.custom.stock_entry.stock_entry.on_submit"
     }
 }
 
@@ -258,7 +260,6 @@ fixtures = [
                 'Blanket Order Item-custom_selling_price',
                 'Blanket Order Item-custom_markup_percentage',
                 'Blanket Order-custom_pricing_type',
-                'Item-custom_supplier',
                 'Terms and Conditions-custom_special_terms',
                 'Blanket Order Item-custom_quality_inspection_remarks',
                 'Blanket Order Item-custom_quality_inspection_status',
@@ -266,9 +267,7 @@ fixtures = [
                 'Blanket Order Item-custom_quality_inspection',
                 'Blanket Order Item-custom_section_break_uoh6p',
                 'Stock Entry Detail-custom_quality_inspection_status',
-                'Stock Entry-custom_supplier_agreement',
-                'Blanket Order Item-custom_inspection_required'
-
+                'Stock Entry-custom_supplier_agreement'
             ]
         ]
     ]},
@@ -287,17 +286,15 @@ fixtures = [
                 "name",
                 "in",
                 [
-                'Blanket Order-tc_name-link_filters',
-                'Terms and Conditions-main-field_order',
-                'Blanket Order-main-field_order',
-                'Blanket Order Item-main-field_order',
-                'Blanket Order Item-rate-label',
-                'Item-main-field_order',
-                'Stock Entry Detail-main-field_order',
-                'Blanket Order Item-item_code-link_filters',
-                'Stock Entry-main-field_order',
-                'Blanket Order-blanket_order_type-read_only',
-                'Blanket Order-blanket_order_type-default'
+                    'Blanket Order Item-main-field_order',
+                    'Stock Entry-main-field_order',
+                    'Blanket Order-tc_name-link_filters',
+                    'Terms and Conditions-main-field_order',
+                    'Blanket Order-main-field_order',
+                    'Blanket Order Item-rate-label',
+                    'Stock Entry Detail-main-field_order',
+                    'Blanket Order-blanket_order_type-read_only',
+                    'Blanket Order-blanket_order_type-default'
                 ]
             ]
                 ]

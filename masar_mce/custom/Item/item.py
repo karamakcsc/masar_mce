@@ -1,36 +1,35 @@
-
-
-import frappe
+from frappe import get_all , get_doc , delete_doc
 
 def after_insert(self, method):
-    if self.custom_supplier:
-        create_specific_party(self)
+    sync_specific_parties(self)
 
 def on_update(self, method):
-    if self.custom_supplier:
-        update_specific_party(self)
+    sync_specific_parties(self)
 
-def create_specific_party(self):
-    if frappe.db.exists("Item", self.item_code):
-        specific_party = frappe.get_doc({
-            "doctype": "Party Specific Item",
+def sync_specific_parties(self):
+    if not self.item_code:
+        return
+    current_suppliers = {s.supplier for s in self.supplier_items if s.supplier}
+    existing_rows = get_all(
+        "Party Specific Item",
+        filters={
             "based_on_value": self.item_code,
-            "party": self.custom_supplier,
             "party_type": "Supplier",
             "restrict_based_on": "Item"
-        })
-        specific_party.insert(ignore_permissions=True)
-
-def update_specific_party(self):
-    existing = frappe.db.exists("Party Specific Item", {
-        "based_on_value": self.item_code,
-        "party_type": "Supplier",
-        "restrict_based_on": "Item"
-    })
-    
-    if existing:
-        specific_party = frappe.get_doc("Party Specific Item", existing)
-        specific_party.party = self.custom_supplier
-        specific_party.save(ignore_permissions=True)
-    else:
-        create_specific_party(self)
+        },
+        fields=["name", "party"]
+    )
+    existing_suppliers = {row.party for row in existing_rows}
+    to_add = current_suppliers - existing_suppliers
+    for supplier in to_add:
+        get_doc({
+            "doctype": "Party Specific Item",
+            "based_on_value": self.item_code,
+            "party": supplier,
+            "party_type": "Supplier",
+            "restrict_based_on": "Item"
+        }).insert(ignore_permissions=True)
+    to_delete = existing_suppliers - current_suppliers
+    for row in existing_rows:
+        if row.party in to_delete:
+            delete_doc("Party Specific Item", row.name, ignore_permissions=True)
