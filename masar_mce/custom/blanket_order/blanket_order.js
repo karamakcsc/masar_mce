@@ -19,3 +19,35 @@ function filterBySupplier(frm) {
         };
     };
 }
+frappe.ui.form.on("Blanket Order Item", {
+    qty(frm, cdt, cdn) {
+        CalculateAmount(frm, cdt, cdn);
+    },
+    rate(frm, cdt, cdn) {
+        CalculateAmount(frm, cdt, cdn);
+    }, 
+    items_remove(frm, cdt, cdn) {
+       update_total(frm);
+    }
+});
+
+function CalculateAmount(frm, cdt, cdn) {
+    let row = locals[cdt][cdn];
+    if (row.qty && row.rate) {
+        row.custom_amount = flt(row.qty) * flt(row.rate);
+    } else {
+        row.custom_amount = 0;
+    }
+    frm.refresh_field("items");
+    let total = 0;
+    (frm.doc.items || []).forEach(d => {
+        total += flt(d.custom_amount);
+    });
+
+    frm.set_value("custom_total", total);
+}
+function update_total(frm) {
+    let total = 0;
+    (frm.doc.items || []).forEach(d => total += flt(d.custom_amount));
+    frm.set_value("custom_total", total);
+}

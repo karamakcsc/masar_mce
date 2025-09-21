@@ -45,7 +45,8 @@ app_license = "mit"
 # include js in doctype views
 doctype_js = {
     "Blanket Order" : "custom/blanket_order/blanket_order.js", 
-    "Stock Entry" : "custom/stock_entry/stock_entry.js"
+    "Stock Entry" : "custom/stock_entry/stock_entry.js", 
+    "Purchase Order" : "custom/purchase_order/purchase_order.js"
     }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -150,6 +151,9 @@ doc_events = {
     }, 
     "Stock Entry":{
         "on_submit": "masar_mce.custom.stock_entry.stock_entry.on_submit"
+    }, 
+    "Blanket Order" : {
+        "validate" : "masar_mce.custom.blanket_order.blanket_order.validate"
     }
 }
 
@@ -253,21 +257,25 @@ fixtures = [
     {"dt": "Custom Field", "filters": [
         [
             "name", "in", [
-                'Blanket Order-custom_special_terms',
-                'Blanket Order-custom_tcs_terms',
-                'Blanket Order-custom_special_terms_tab',
-                'Blanket Order-custom_general_terms',
-                'Blanket Order Item-custom_selling_price',
-                'Blanket Order Item-custom_markup_percentage',
-                'Blanket Order-custom_pricing_type',
-                'Terms and Conditions-custom_special_terms',
-                'Blanket Order Item-custom_quality_inspection_remarks',
-                'Blanket Order Item-custom_quality_inspection_status',
-                'Blanket Order Item-custom_column_break_ijewz',
-                'Blanket Order Item-custom_quality_inspection',
-                'Blanket Order Item-custom_section_break_uoh6p',
-                'Stock Entry Detail-custom_quality_inspection_status',
-                'Stock Entry-custom_supplier_agreement'
+            'Purchase Order Item-custom_blanket_order_item',
+            'Blanket Order-custom_special_terms',
+            'Blanket Order-custom_tcs_terms',
+            'Blanket Order-custom_special_terms_tab',
+            'Blanket Order-custom_general_terms',
+            'Stock Entry Detail-custom_quality_inspection_status',
+            'Blanket Order Item-custom_quality_inspection_remarks',
+            'Blanket Order Item-custom_quality_inspection_status',
+            'Blanket Order Item-custom_column_break_ijewz',
+            'Blanket Order Item-custom_quality_inspection',
+            'Blanket Order Item-custom_section_break_uoh6p',
+            'Blanket Order Item-custom_selling_price',
+            'Blanket Order Item-custom_markup_percentage',
+            'Blanket Order-custom_pricing_type',
+            'Terms and Conditions-custom_special_terms',
+            'Stock Entry-custom_supplier_agreement',
+            'Purchase Order-custom_supplier_agreement',
+            'Blanket Order Item-custom_amount',
+            'Blanket Order-custom_total'
             ]
         ]
     ]},
@@ -286,15 +294,19 @@ fixtures = [
                 "name",
                 "in",
                 [
-                    'Blanket Order Item-main-field_order',
+                   'Supplier-naming_series-hidden',
+                    'Supplier-naming_series-reqd',
+                    'Purchase Order Item-main-field_order',
                     'Stock Entry-main-field_order',
+                    'Blanket Order Item-main-field_order',
                     'Blanket Order-tc_name-link_filters',
                     'Terms and Conditions-main-field_order',
                     'Blanket Order-main-field_order',
                     'Blanket Order Item-rate-label',
                     'Stock Entry Detail-main-field_order',
                     'Blanket Order-blanket_order_type-read_only',
-                    'Blanket Order-blanket_order_type-default'
+                    'Blanket Order-blanket_order_type-default',
+                    'Purchase Order-main-field_order'
                 ]
             ]
                 ]
