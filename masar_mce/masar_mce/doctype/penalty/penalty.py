@@ -6,4 +6,11 @@ from frappe.model.document import Document
 
 
 class Penalty(Document):
-	pass
+	def validate(self):
+		self.check_type_and_field()
+  
+	def check_type_and_field(self):
+		if self.penalty_type == 'Fixed Value':
+			self.penalty_formula = None 
+		else: 
+			self.penalty_amount = 0 

@@ -12,6 +12,9 @@
   "disabled",
   "default",
   "section_break_qqqr",
+  "account",
+  "formula_doctype",
+  "column_break_gjtd",
   "penalty_amount",
   "penalty_formula",
   "section_break_jlmz",
@@ -78,12 +81,30 @@
    "fieldname": "description",
    "fieldtype": "Text Editor",
    "label": "Description"
+  },
+  {
+   "fieldname": "account",
+   "fieldtype": "Link",
+   "label": "Revenue Account",
+   "link_filters": "[[\"Account\",\"is_group\",\"=\",0],[\"Account\",\"disabled\",\"=\",0],[\"Account\",\"account_type\",\"in\",[\"Expense Account\",\"Income Account\",null]]]",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_gjtd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "formula_doctype",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Formula Doctype"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-21 11:56:02.287296",
+ "modified": "2025-09-22 16:33:07.964489",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Penalty",

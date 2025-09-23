@@ -13,4 +13,16 @@ def get_rate_and_name_blanket_order_item(parent , item_code):
     if result: 
         return result[0]
     return False
-    
+
+@frappe.whitelist()
+def get_all_items_from_supplier_agreement(supplier_agreement):
+    if supplier_agreement is None : 
+        return 
+    return  frappe.db.sql(f"""
+               SELECT
+                    item_code , 
+                    qty , 
+                    rate 
+                FROM `tabBlanket Order Item`
+                WHERE parent = '{supplier_agreement}'
+                         """ , as_dict=True)

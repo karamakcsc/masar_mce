@@ -8,6 +8,9 @@ frappe.ui.form.on("Purchase Order", {
     onload(frm) {
         FilterItems(frm);
     }, 
+    custom_get_all_items(frm) {
+        GetAllItemsFromSupplierAgreement(frm);
+    }
 });
 
 function FilterItems(frm) {
@@ -61,4 +64,32 @@ function GetItemDetails(frm , cdt , cdn){
                 }
             }
         });
+}
+function GetAllItemsFromSupplierAgreement(frm) {
+    frappe.call({
+        method:"masar_mce.custom.purchase_order.purchase_order.get_all_items_from_supplier_agreement", 
+        args : {
+            supplier_agreement : frm.doc.custom_supplier_agreement
+        }, 
+        callback:function(r) { 
+           if (r.message) {
+                frm.clear_table("items");
+                r.message.forEach(function (d) {
+                    let row = frm.add_child("items");
+                    frappe.model.set_value(row.doctype, row.name, "item_code", d.item_code);
+                    row.item_code = d.item_code;
+                    frappe.model.set_value({
+                        doctype: row.doctype,
+                        name: row.name,
+                        fieldname: "rate",
+                        value: d.rate,
+                        force_set: true
+                    });
+                    row.rate = d.rate;
+                    row.qty = d.qty;
+                });
+                frm.refresh_field("items");
+            }
+        }
+    })
 }

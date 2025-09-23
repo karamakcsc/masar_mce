@@ -257,25 +257,31 @@ fixtures = [
     {"dt": "Custom Field", "filters": [
         [
             "name", "in", [
-            'Purchase Order Item-custom_blanket_order_item',
-            'Blanket Order-custom_special_terms',
-            'Blanket Order-custom_tcs_terms',
-            'Blanket Order-custom_special_terms_tab',
-            'Blanket Order-custom_general_terms',
-            'Stock Entry Detail-custom_quality_inspection_status',
-            'Blanket Order Item-custom_quality_inspection_remarks',
-            'Blanket Order Item-custom_quality_inspection_status',
-            'Blanket Order Item-custom_column_break_ijewz',
-            'Blanket Order Item-custom_quality_inspection',
-            'Blanket Order Item-custom_section_break_uoh6p',
-            'Blanket Order Item-custom_selling_price',
-            'Blanket Order Item-custom_markup_percentage',
-            'Blanket Order-custom_pricing_type',
-            'Terms and Conditions-custom_special_terms',
-            'Stock Entry-custom_supplier_agreement',
-            'Purchase Order-custom_supplier_agreement',
-            'Blanket Order Item-custom_amount',
-            'Blanket Order-custom_total'
+                'Blanket Order-custom_column_break_bqf6r',
+                'Blanket Order-custom_total_quantity',
+                'Blanket Order-custom_section_break_a5ugk',
+                'Purchase Order Item-custom_blanket_order_item',
+                'Blanket Order-custom_special_terms',
+                'Blanket Order-custom_tcs_terms',
+                'Blanket Order-custom_special_terms_tab',
+                'Blanket Order-custom_general_terms',
+                'Blanket Order-custom_total',
+                'Stock Entry Detail-custom_quality_inspection_status',
+                'Blanket Order Item-custom_quality_inspection_remarks',
+                'Blanket Order Item-custom_quality_inspection_status',
+                'Blanket Order Item-custom_column_break_ijewz',
+                'Blanket Order Item-custom_quality_inspection',
+                'Blanket Order Item-custom_amount',
+                'Blanket Order Item-custom_section_break_uoh6p',
+                'Blanket Order Item-custom_selling_price',
+                'Purchase Order-custom_supplier_agreement',
+                'Blanket Order Item-custom_markup_percentage',
+                'Blanket Order-custom_pricing_type',
+                'Terms and Conditions-custom_special_terms',
+                'Stock Entry-custom_supplier_agreement',
+                'Purchase Order-custom_get_all_items',
+                'Blanket Order-custom_penalties',
+                'Blanket Order-custom_penalties_tab'
             ]
         ]
     ]},
@@ -306,7 +312,8 @@ fixtures = [
                     'Stock Entry Detail-main-field_order',
                     'Blanket Order-blanket_order_type-read_only',
                     'Blanket Order-blanket_order_type-default',
-                    'Purchase Order-main-field_order'
+                    'Purchase Order-main-field_order', 
+                    'Blanket Order-main-protect_attached_files'
                 ]
             ]
                 ]

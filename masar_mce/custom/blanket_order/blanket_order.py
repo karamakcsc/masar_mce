@@ -15,9 +15,11 @@ def get_items_by_supplier(doctype, txt, searchfield, start, page_len, filters):
     """)
 
 def calculate_amounts_and_total(self):
-    total = 0 
+    total , total_qty  = 0  , 0 
     for i in self.items:
         amount = flt(i.qty) * flt(i.rate)
         i.custom_amount = amount
         total += amount
+        total_qty += i.qty
+    self.custom_total_quantity = total_qty
     self.custom_total = total
