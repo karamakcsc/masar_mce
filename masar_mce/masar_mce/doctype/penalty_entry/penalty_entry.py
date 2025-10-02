@@ -7,10 +7,11 @@ from frappe import throw, bold, get_doc, get_value
 from frappe.utils.safe_exec import safe_eval
 from erpnext.accounts.general_ledger import make_gl_entries
 from erpnext.controllers.accounts_controller import AccountsController
-
+from frappe.utils import flt
 class PenaltyEntry(AccountsController):
     def validate(self): 
         self.check_penalties()
+        self.calculate_formula_values()
     
     def on_submit(self): 
         self.create_gl_entry()
@@ -18,6 +19,22 @@ class PenaltyEntry(AccountsController):
         self.cancel_gl_entry()
         self.cancel_payment_ledger_entry()
 
+    def calculate_formula_values(self):
+        for row in self.penalties:
+            if row.penalty_type == "Fixed Value":
+                continue
+            else:
+                document = get_value('Penalty', row.penalty, 'formula_doctype')
+                if document is None:
+                    continue
+                if document == 'Purchase Receipt' and self.purchase_receipt is None:
+                    continue
+                try:
+                    doc = get_doc(document, self.supplier_agreement if document == 'Blanket Order' else self.purchase_receipt).as_dict()
+                    amount = safe_eval(row.formula, None, doc)
+                    row.amount = flt(amount)
+                except Exception as e:
+                    frappe.throw(f"Error in formula for penalty '{row.penalty}': {str(e)}")
     @frappe.whitelist()
     def get_penalties_from_supplier_agreement(self):
         if not self.supplier_agreement:

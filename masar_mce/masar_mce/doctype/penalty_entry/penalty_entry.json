@@ -48,7 +48,7 @@
    "fieldname": "supplier_agreement",
    "fieldtype": "Link",
    "label": "Supplier Agreement",
-   "link_filters": "[[\"Blanket Order\",\"supplier\",\"=\",\"eval: doc.supplier\"]]",
+   "link_filters": "[[\"Blanket Order\",\"supplier\",\"=\",\"eval: doc.supplier\"],[\"Blanket Order\",\"docstatus\",\"=\",\"1\"]]",
    "options": "Blanket Order",
    "reqd": 1
   },
@@ -56,7 +56,7 @@
    "fieldname": "purchase_receipt",
    "fieldtype": "Link",
    "label": "Purchase Receipt",
-   "link_filters": "[[\"Purchase Receipt\",\"supplier\",\"=\",\"eval: doc.supplier\"]]",
+   "link_filters": "[[\"Purchase Receipt\",\"supplier\",\"=\",\"eval: doc.supplier\"],[\"Purchase Receipt\",\"docstatus\",\"=\",\"1\"]]",
    "options": "Purchase Receipt"
   },
   {
@@ -95,7 +95,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-23 10:01:17.614479",
+ "modified": "2025-10-01 10:53:56.004149",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Penalty Entry",

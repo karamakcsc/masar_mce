@@ -313,7 +313,9 @@ fixtures = [
                     'Blanket Order-blanket_order_type-read_only',
                     'Blanket Order-blanket_order_type-default',
                     'Purchase Order-main-field_order', 
-                    'Blanket Order-main-protect_attached_files'
+                    'Blanket Order-main-protect_attached_files' , 
+                    'Blanket Order-blanket_order_type-hidden' , 
+                    'Blanket Order-order_no-hidden'
                 ]
             ]
                 ]

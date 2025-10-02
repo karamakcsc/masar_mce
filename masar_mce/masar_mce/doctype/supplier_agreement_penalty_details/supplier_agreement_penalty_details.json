@@ -71,7 +71,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Revenue Account",
+   "label": "Income Account",
    "options": "Account",
    "read_only": 1
   }
@@ -80,7 +80,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-22 16:55:45.704686",
+ "modified": "2025-10-01 11:04:32.389741",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Supplier Agreement Penalty Details",

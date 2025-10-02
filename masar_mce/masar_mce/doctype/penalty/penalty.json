@@ -85,8 +85,8 @@
   {
    "fieldname": "account",
    "fieldtype": "Link",
-   "label": "Revenue Account",
-   "link_filters": "[[\"Account\",\"is_group\",\"=\",0],[\"Account\",\"disabled\",\"=\",0],[\"Account\",\"account_type\",\"in\",[\"Expense Account\",\"Income Account\",null]]]",
+   "label": "Income Account",
+   "link_filters": "[[\"Account\",\"is_group\",\"=\",0],[\"Account\",\"disabled\",\"=\",0],[\"Account\",\"account_type\",\"=\",\"Income Account\"]]",
    "options": "Account",
    "reqd": 1
   },
@@ -104,7 +104,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-22 16:33:07.964489",
+ "modified": "2025-09-30 15:35:42.700511",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Penalty",

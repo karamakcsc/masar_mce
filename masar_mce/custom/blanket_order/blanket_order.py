@@ -42,6 +42,6 @@ def get_default_penalty(self):
             'penalty': p.name,
             'penalty_type': p.penalty_type,
             'account': p.account,
-            'penalty_amount': p.penalty_amount,
-            'penalty_formula': p.penalty_formula
+            'amount': p.penalty_amount,
+            'formula': p.penalty_formula
         })
