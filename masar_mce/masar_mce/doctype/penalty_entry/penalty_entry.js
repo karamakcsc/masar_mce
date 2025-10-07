@@ -21,7 +21,7 @@ frappe.ui.form.on("Penalty Entry", {
 
 function fetch_penalties(frm) {
     if (frm.doc.docstatus === 0 ){
-        frm.add_custom_button(__("Penalties"), function () {
+        frm.add_custom_button(__("Get Penalties"), function () {
             frappe.call({
                 method: "get_penalties_from_supplier_agreement",
                 doc: frm.doc,
@@ -40,7 +40,7 @@ function fetch_penalties(frm) {
                     }
                 }
             });
-        }, __("Get"));
+        });
     }
 }
 

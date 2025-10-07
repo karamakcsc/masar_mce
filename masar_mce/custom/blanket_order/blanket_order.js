@@ -44,10 +44,10 @@ function CalculateAmount(frm, cdt, cdn) {
         total += flt(d.custom_amount);
     });
 
-    frm.set_value("custom_total", total);
+    frm.set_value("custom_agreement_total", total);
 }
 function update_total(frm) {
     let total = 0;
     (frm.doc.items || []).forEach(d => total += flt(d.custom_amount));
-    frm.set_value("custom_total", total);
+    frm.set_value("custom_agreement_total", total);
 }

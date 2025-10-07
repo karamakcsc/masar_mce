@@ -24,7 +24,7 @@ def calculate_amounts_and_total(self):
         total += amount
         total_qty += i.qty
     self.custom_total_quantity = total_qty
-    self.custom_total = total
+    self.custom_agreement_total = total
     
 def get_default_penalty(self):
     all_penalty = frappe.db.sql(

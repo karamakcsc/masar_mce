@@ -1,8 +1,9 @@
 import frappe 
 
 def on_submit(self , method):
-    check_agreement_items(self)
-    create_quality_inspection(self)
+    if self.stock_entry_type == "Material Receipt for Inspection":
+        check_agreement_items(self)
+        create_quality_inspection(self)
     
 def create_quality_inspection(self):
     exist_items = list()

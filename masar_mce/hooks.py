@@ -46,7 +46,8 @@ app_license = "mit"
 doctype_js = {
     "Blanket Order" : "custom/blanket_order/blanket_order.js", 
     "Stock Entry" : "custom/stock_entry/stock_entry.js", 
-    "Purchase Order" : "custom/purchase_order/purchase_order.js"
+    "Purchase Order" : "custom/purchase_order/purchase_order.js", 
+    "Purchase Receipt" : "custom/purchase_receipt/purchase_receipt.js"
     }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -257,16 +258,19 @@ fixtures = [
     {"dt": "Custom Field", "filters": [
         [
             "name", "in", [
+                # Blanket Order / Supplier Agreement
                 'Blanket Order-custom_column_break_bqf6r',
                 'Blanket Order-custom_total_quantity',
                 'Blanket Order-custom_section_break_a5ugk',
-                'Purchase Order Item-custom_blanket_order_item',
                 'Blanket Order-custom_special_terms',
                 'Blanket Order-custom_tcs_terms',
                 'Blanket Order-custom_special_terms_tab',
                 'Blanket Order-custom_general_terms',
                 'Blanket Order-custom_total',
-                'Stock Entry Detail-custom_quality_inspection_status',
+                'Blanket Order-custom_pricing_type',  
+                'Blanket Order-custom_penalties',
+                'Blanket Order-custom_penalties_tab',    
+                # Blanket Order / Supplier Agreement - Item Table           
                 'Blanket Order Item-custom_quality_inspection_remarks',
                 'Blanket Order Item-custom_quality_inspection_status',
                 'Blanket Order Item-custom_column_break_ijewz',
@@ -274,14 +278,21 @@ fixtures = [
                 'Blanket Order Item-custom_amount',
                 'Blanket Order Item-custom_section_break_uoh6p',
                 'Blanket Order Item-custom_selling_price',
-                'Purchase Order-custom_supplier_agreement',
                 'Blanket Order Item-custom_markup_percentage',
-                'Blanket Order-custom_pricing_type',
-                'Terms and Conditions-custom_special_terms',
-                'Stock Entry-custom_supplier_agreement',
+                # Purchase Order
                 'Purchase Order-custom_get_all_items',
-                'Blanket Order-custom_penalties',
-                'Blanket Order-custom_penalties_tab'
+                'Purchase Order-custom_supplier_agreement',
+                # Purchase Order - Item Table
+                'Purchase Order Item-custom_blanket_order_item',
+                
+                # purchase Receipt
+                'Purchase Receipt-custom_supplier_agreement',
+                # Stock Entry
+                'Stock Entry-custom_supplier_agreement',
+                # Stock Entry - Item Table
+                'Stock Entry Detail-custom_quality_inspection_status',
+                # Terms and Conditions
+                'Terms and Conditions-custom_special_terms',
             ]
         ]
     ]},
@@ -315,7 +326,28 @@ fixtures = [
                     'Purchase Order-main-field_order', 
                     'Blanket Order-main-protect_attached_files' , 
                     'Blanket Order-blanket_order_type-hidden' , 
-                    'Blanket Order-order_no-hidden'
+                    'Blanket Order-order_no-hidden',
+                    'Purchase Receipt-main-field_order',
+                    'Purchase Receipt-main-protect_attached_files',
+                    'Blanket Order Item-ordered_qty-in_list_view',
+                    'Blanket Order Item-ordered_qty-hidden', 
+                    'Purchase Order Item-apply_tds-hidden', 
+                    'Purchase Order Item-manufacturer_part_no-hidden', 
+                    'Purchase Order Item-manufacturer-hidden',
+                    'Purchase Order Item-manufacture_details-hidden',
+                    'Purchase Order Item-sales_order_packed_item-hidden',
+                    'Purchase Order Item-sales_order-hidden',
+                    'Purchase Order Item-main-field_order',
+                    'Purchase Order-is_internal_supplier-hidden',
+                    'Purchase Order-additional_info_section-hidden', 
+                    'Purchase Order-to_date-read_only',
+                    'Purchase Order-from_date-read_only',
+                    'Purchase Order-subscription_section-hidden',
+                    'Purchase Order-incoterm-hidden',
+                    'Purchase Order-shipping_rule-hidden',
+                    'Purchase Order-is_subcontracted-hidden',
+                    'Purchase Order-apply_tds-hidden',
+                    'Purchase Order-get_items_from_open_material_requests-hidden'
                 ]
             ]
                 ]
