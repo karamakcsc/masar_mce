@@ -26,3 +26,16 @@ def get_all_items_from_supplier_agreement(supplier_agreement):
                 FROM `tabBlanket Order Item`
                 WHERE parent = '{supplier_agreement}'
                          """ , as_dict=True)
+    
+@frappe.whitelist()
+def get_terms_and_penalities_from_supplier_agreement(agreement = None): 
+    if agreement is None: 
+        return False
+    agreement_doc = frappe.get_doc('Blanket Order', agreement)
+    return {
+        'g_terms' : agreement_doc.tc_name,
+        'g_terms_and_cond' : agreement_doc.terms,
+        's_terms' : agreement_doc.custom_tcs_terms,
+        's_terms_and_cond' : agreement_doc.custom_special_terms,
+        'penalties' : agreement_doc.custom_penalties
+    }

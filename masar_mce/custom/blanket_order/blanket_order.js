@@ -7,6 +7,21 @@ frappe.ui.form.on("Blanket Order", {
     },
     setup:  function(frm) {
         filterBySupplier(frm);
+    },
+    custom_tcs_terms(frm) {
+       
+        if (frm.doc.custom_tcs_terms) {
+            frappe.db.get_value("Terms and Conditions", frm.doc.custom_tcs_terms, "terms")
+                .then(r => {
+                    if (r && r.message.terms) {
+                        frm.set_value("custom_special_terms", r.message.terms);
+                    } else {
+                        frm.set_value("custom_special_terms", "");
+                    }
+                });
+        } else {
+            frm.set_value("custom_special_terms", "");
+        }
     }
 });
 function filterBySupplier(frm) {

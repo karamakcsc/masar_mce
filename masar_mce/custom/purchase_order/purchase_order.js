@@ -10,6 +10,9 @@ frappe.ui.form.on("Purchase Order", {
     }, 
     custom_get_all_items(frm) {
         GetAllItemsFromSupplierAgreement(frm);
+    },
+    custom_supplier_agreement(frm){
+        GetTermsandPenalitesFromAgreement(frm);
     }
 });
 
@@ -32,6 +35,10 @@ function FilterItems(frm) {
             return item_code_field.original_get_query ? item_code_field.original_get_query() : {};
         }
     };
+    setTimeout(() => {
+          cur_frm.page.remove_inner_button(__('Payment'),  __('Create'));
+          cur_frm.page.remove_inner_button(__('Payment Request'),  __('Create'));
+        },100);
 }
 frappe.ui.form.on('Purchase Order Item', {
     item_code: function(frm, cdt, cdn) {
@@ -92,4 +99,37 @@ function GetAllItemsFromSupplierAgreement(frm) {
             }
         }
     })
+}
+function GetTermsandPenalitesFromAgreement(frm) {
+    if (frm.doc.custom_supplier_agreement) {
+    frappe.call({
+        method:"masar_mce.custom.purchase_order.purchase_order.get_terms_and_penalities_from_supplier_agreement", 
+        args : {
+            agreement : frm.doc.custom_supplier_agreement
+        }, 
+        callback: function(r){
+             if (r.message) {
+                const data = r.message;
+                frm.set_value("tc_name", data.g_terms);
+                frm.set_value("terms", data.g_terms_and_cond);
+                frm.set_value("custom_special_terms", data.s_terms);
+                frm.set_value("custom_special_terms_and_conditions", data.s_terms_and_cond);
+                frm.set_value("custom_penalties", data.penalties);
+             }
+             else {
+                frm.set_value("tc_name", "");
+                frm.set_value("terms", "");
+                frm.set_value("custom_special_terms", "");
+                frm.set_value("custom_special_terms_and_conditions", "");
+                frm.set_value("custom_penalties", []);
+             }
+        }
+    });
+    } else {
+        frm.set_value("tc_name", "");
+        frm.set_value("terms", "");
+        frm.set_value("custom_special_terms", "");
+        frm.set_value("custom_special_terms_and_conditions", "");
+        frm.set_value("custom_penalties", []);
+    }
 }

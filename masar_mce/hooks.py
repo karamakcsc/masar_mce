@@ -282,6 +282,11 @@ fixtures = [
                 # Purchase Order
                 'Purchase Order-custom_get_all_items',
                 'Purchase Order-custom_supplier_agreement',
+                'Purchase Order-custom_section_break_ab14w',
+                'Purchase Order-custom_special_terms',
+                'Purchase Order-custom_special_terms_and_conditions',
+                'Purchase Order-custom_tab_7',
+                'Purchase Order-custom_penalties',
                 # Purchase Order - Item Table
                 'Purchase Order Item-custom_blanket_order_item',
                 
@@ -292,7 +297,7 @@ fixtures = [
                 # Stock Entry - Item Table
                 'Stock Entry Detail-custom_quality_inspection_status',
                 # Terms and Conditions
-                'Terms and Conditions-custom_special_terms',
+                'Terms and Conditions-custom_special_terms'
             ]
         ]
     ]},
@@ -347,7 +352,12 @@ fixtures = [
                     'Purchase Order-shipping_rule-hidden',
                     'Purchase Order-is_subcontracted-hidden',
                     'Purchase Order-apply_tds-hidden',
-                    'Purchase Order-get_items_from_open_material_requests-hidden'
+                    'Purchase Order-get_items_from_open_material_requests-hidden', 
+                    'Purchase Order-terms_section_break-label',
+                    'Purchase Order-tc_name-label',
+                    'Purchase Order-tc_name-read_only',
+                    'Purchase Order-terms-label',
+                    'Purchase Order-terms-read_only' 
                 ]
             ]
                 ]
