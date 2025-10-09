@@ -35,9 +35,11 @@ function FilterItems(frm) {
             return item_code_field.original_get_query ? item_code_field.original_get_query() : {};
         }
     };
+    
     setTimeout(() => {
-          cur_frm.page.remove_inner_button(__('Payment'),  __('Create'));
-          cur_frm.page.remove_inner_button(__('Payment Request'),  __('Create'));
+            frm.page.wrapper.find('.inner-group-button[data-label="Get%20Items%20From"]').hide();
+            cur_frm.page.remove_inner_button(__('Payment'),  __('Create'));
+            cur_frm.page.remove_inner_button(__('Payment Request'),  __('Create'));
         },100);
 }
 frappe.ui.form.on('Purchase Order Item', {
@@ -112,15 +114,15 @@ function GetTermsandPenalitesFromAgreement(frm) {
                 const data = r.message;
                 frm.set_value("tc_name", data.g_terms);
                 frm.set_value("terms", data.g_terms_and_cond);
-                frm.set_value("custom_special_terms", data.s_terms);
-                frm.set_value("custom_special_terms_and_conditions", data.s_terms_and_cond);
+                frm.set_value("custom_tcs_terms", data.s_terms);
+                frm.set_value("custom_special_terms", data.s_terms_and_cond);
                 frm.set_value("custom_penalties", data.penalties);
              }
              else {
                 frm.set_value("tc_name", "");
                 frm.set_value("terms", "");
+                frm.set_value("custom_tcs_terms", "");
                 frm.set_value("custom_special_terms", "");
-                frm.set_value("custom_special_terms_and_conditions", "");
                 frm.set_value("custom_penalties", []);
              }
         }
@@ -128,8 +130,8 @@ function GetTermsandPenalitesFromAgreement(frm) {
     } else {
         frm.set_value("tc_name", "");
         frm.set_value("terms", "");
+        frm.set_value("custom_tcs_terms", "");
         frm.set_value("custom_special_terms", "");
-        frm.set_value("custom_special_terms_and_conditions", "");
         frm.set_value("custom_penalties", []);
     }
 }

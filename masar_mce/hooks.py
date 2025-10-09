@@ -194,9 +194,9 @@ doc_events = {
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
-# override_doctype_dashboards = {
-# 	"Task": "masar_mce.task.get_dashboard_data"
-# }
+override_doctype_dashboards = {
+	"Blanket Order": "masar_mce.custom.blanket_order.blanket_order_dashboard.custom_blanket_order_dashboard"
+}
 
 # exempt linked doctypes from being automatically cancelled
 #
@@ -357,7 +357,9 @@ fixtures = [
                     'Purchase Order-tc_name-label',
                     'Purchase Order-tc_name-read_only',
                     'Purchase Order-terms-label',
-                    'Purchase Order-terms-read_only' 
+                    'Purchase Order-terms-read_only' ,
+                    'Purchase Order-schedule_date-default', 
+                    'Purchase Order Item-schedule_date-default'
                 ]
             ]
                 ]

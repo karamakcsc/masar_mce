@@ -25,13 +25,22 @@ frappe.ui.form.on("Blanket Order", {
     }
 });
 function filterBySupplier(frm) {
-    frm.fields_dict.items.grid.get_field('item_code').get_query = function(doc, cdt, cdn) {
+    const grid = frm.fields_dict.items.grid;
+    const item_code_field = grid.get_field("item_code");
+    if (!item_code_field) return;
+    if (!item_code_field.hasOwnProperty('original_get_query')) {
+        item_code_field.original_get_query = item_code_field.get_query;
+    }
+    item_code_field.get_query = function() {
+        const filters = {};
+        if (frm.doc.supplier) {
+            filters.supplier = frm.doc.supplier;
+        }
+        
         return {
             query: "masar_mce.custom.blanket_order.blanket_order.get_items_by_supplier",
-            filters: {
-                supplier: frm.doc.supplier
-            }
-        };
+            filters: filters
+        };   
     };
 }
 frappe.ui.form.on("Blanket Order Item", {

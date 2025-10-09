@@ -6,16 +6,33 @@ def validate(self , method):
     if self.is_new():
         get_default_penalty(self)
 
+import frappe
+from frappe import _
+
 @frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
 def get_items_by_supplier(doctype, txt, searchfield, start, page_len, filters):
     supplier = filters.get("supplier")
-    return frappe.db.sql(f"""
-        SELECT DISTINCT parent as name 
-        FROM `tabItem Supplier`
-        WHERE supplier = '{supplier}'
-        ORDER BY parent
-    """)
-
+    if not supplier:
+        return []
+    query = """
+        SELECT DISTINCT 
+            item_supplier.parent as item_code,
+            item.item_name
+        FROM `tabItem Supplier` item_supplier
+        INNER JOIN `tabItem` item ON item_supplier.parent = item.name
+        WHERE item_supplier.supplier = %(supplier)s
+        AND item.disabled = 0
+        AND (item_supplier.parent LIKE %(txt)s OR item.item_name LIKE %(txt)s)
+        ORDER BY item_supplier.parent
+        LIMIT %(start)s, %(page_len)s
+    """
+    return frappe.db.sql(query, {
+        'supplier': supplier,
+        'txt': f"%{txt}%",
+        'start': start,
+        'page_len': page_len
+    })
 def calculate_amounts_and_total(self):
     total , total_qty  = 0  , 0 
     for i in self.items:
