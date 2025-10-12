@@ -36,10 +36,12 @@ function FilterItems(frm) {
         }
     };
     
-    setTimeout(() => {
-            frm.page.wrapper.find('.inner-group-button[data-label="Get%20Items%20From"]').hide();
+    setTimeout(() => {    
             cur_frm.page.remove_inner_button(__('Payment'),  __('Create'));
             cur_frm.page.remove_inner_button(__('Payment Request'),  __('Create'));
+            cur_frm.page.remove_inner_button(__('Product Bundle'),  __('Get Items From'));
+            cur_frm.page.remove_inner_button(__('Material Request'),  __('Get Items From'));
+            cur_frm.page.remove_inner_button(__('Supplier Quotation'),  __('Get Items From'));
         },100);
 }
 frappe.ui.form.on('Purchase Order Item', {
