@@ -292,12 +292,23 @@ fixtures = [
                 
                 # purchase Receipt
                 'Purchase Receipt-custom_supplier_agreement',
+                'Purchase Receipt-custom_section_break_gteyt',
+                'Purchase Receipt-custom_tcs_terms', 
+                'Purchase Receipt-custom_special_terms', 
+                'Purchase Receipt-custom_tab_6',
+                'Purchase Receipt-custom_penalties',
                 # Stock Entry
                 'Stock Entry-custom_supplier_agreement',
                 # Stock Entry - Item Table
                 'Stock Entry Detail-custom_quality_inspection_status',
                 # Terms and Conditions
-                'Terms and Conditions-custom_special_terms'
+                'Terms and Conditions-custom_special_terms',
+                # Purchase Invoice 
+                'Purchase Invoice-custom_section_break_xg1lm' ,
+                'Purchase Invoice-custom_tsc_terms', 
+                'Purchase Invoice-custom_special_terms', 
+                'Purchase Invoice-custom_tab_7',
+                'Purchase Invoice-custom_penalties'
             ]
         ]
     ]},
@@ -359,9 +370,65 @@ fixtures = [
                     'Purchase Order-terms-label',
                     'Purchase Order-terms-read_only' ,
                     'Purchase Order-schedule_date-default', 
-                    'Purchase Order Item-schedule_date-default'
+                    'Purchase Order Item-schedule_date-default',
+                    'Stock Entry Detail-accounting_dimensions_section-hidden',
+                    'Stock Entry Detail-serial_no_batch-hidden',
+                    'Stock Entry Detail-is_scrap_item-hidden',
+                    'Stock Entry Detail-is_finished_item-hidden',
+                    'Stock Entry Detail-main-field_order',
+                    'Stock Entry-accounting_dimensions_section-hidden',
+                    'Stock Entry-bom_info_section-hidden',
+                    'Stock Entry-apply_putaway_rule-hidden',
+                    'Purchase Invoice Item-accounting_dimensions_section-hidden',
+                    'Purchase Invoice Item-deferred_expense_account-hidden',
+                    'Purchase Invoice Item-deferred_expense_section-hidden',
+                    'Purchase Invoice Item-wip_composite_asset-hidden',
+                    'Purchase Invoice Item-manufacture_details-hidden',
+                    'Purchase Invoice Item-landed_cost_voucher_amount-hidden',
+                    'Purchase Invoice Item-apply_tds-hidden',
+                    'Purchase Invoice Item-base_price_list_rate-hidden',
+                    'Purchase Invoice Item-sec_break1-hidden',
+                    'Purchase Receipt Item-accounting_dimensions_section-hidden',
+                    'Purchase Receipt Item-provisional_expense_account-hidden',
+                    'Purchase Receipt Item-wip_composite_asset-hidden',
+                    'Purchase Receipt Item-manufacture_details-hidden',
+                    'Purchase Receipt Item-section_break_45-hidden',
+                    'Purchase Receipt Item-landed_cost_voucher_amount-hidden',
+                    'Purchase Receipt Item-retain_sample-hidden',
+                    'Purchase Receipt-is_internal_supplier-hidden',
+                    'Purchase Receipt-raw_material_details-hidden',
+                    'Purchase Receipt-incoterm-hidden',
+                    'Purchase Receipt-shipping_rule-hidden',
+                    'Purchase Receipt-is_subcontracted-hidden',
+                    'Purchase Receipt-currency_and_price_list-hidden',
+                    'Purchase Receipt-accounting_dimensions_section-hidden',
+                    'Purchase Receipt-apply_putaway_rule-hidden',
+                    'Purchase Invoice-is_internal_supplier-hidden',
+                    'Purchase Invoice-sb_14-hidden',
+                    'Purchase Invoice-subscription_section-hidden',
+                    'Purchase Invoice-is_opening-hidden',
+                    'Purchase Invoice-payments_tab-hidden',
+                    'Purchase Invoice-is_subcontracted-hidden',
+                    'Purchase Invoice-ignore_pricing_rule-hidden',
+                    'Purchase Invoice-buying_price_list-hidden',
+                    'Purchase Invoice-conversion_rate-hidden',
+                    'Purchase Invoice-currency-hidden',
+                    'Purchase Invoice-currency_and_price_list-hidden',
+                    'Purchase Invoice-apply_tds-hidden',
+                    'Purchase Invoice-tc_name-read_only', 
+                    'Purchase Invoice-terms-read_only', 
+                    'Purchase Invoice-terms_section_break-label',
+                    'Purchase Invoice-tc_name-label',
+                    'Purchase Invoice-terms-label',
+                    'Purchase Invoice-main-field_order', 
+                    'Purchase Receipt-tc_name-label', 
+                    'Purchase Receipt-tc_name-read_only',
+                    'Purchase Receipt-terms-label',
+                    'Purchase Receipt-terms-read_only',
+                    'Blanket Order-to_date-allow_on_submit', 
+                    'Purchase Order-order_confirmation_no-hidden'
                 ]
             ]
-                ]
+        ]
     }
 ]

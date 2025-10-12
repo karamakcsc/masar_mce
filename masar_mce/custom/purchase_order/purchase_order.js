@@ -67,9 +67,7 @@ function GetItemDetails(frm , cdt , cdn){
                     frappe.model.set_value(cdt, cdn, 'against_blanket_order' , 1);
                     frappe.model.set_value(cdt, cdn, 'blanket_order', data.parent);
                     frappe.model.set_value(cdt, cdn,'custom_blanket_order_item', data.name ) ;
-                    if (row.rate === 0 ){
-                        frappe.model.set_value(cdt, cdn, 'rate', data.rate);
-                    }
+                    frappe.model.set_value(cdt, cdn, 'rate', data.rate);
                 }
             }
         });
