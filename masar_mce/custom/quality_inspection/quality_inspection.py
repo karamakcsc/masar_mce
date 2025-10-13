@@ -26,13 +26,15 @@ def update_blanket_order(self , sa_name):
                     'custom_quality_inspection' : self.name , 
                     'custom_quality_inspection_status' : self.status , 
                     'custom_quality_inspection_remarks' : self.remarks , 
-                    'custom_quality_inspection_quantity' : self.sample_size} 
+                    'custom_quality_inspection_quantity' : self.sample_size,
+                    'custom_inspection_is_required' : 1} 
                 )
             else: 
                 i.custom_quality_inspection = self.name
                 i.custom_quality_inspection_status =  self.status 
                 i.custom_quality_inspection_remarks =  self.remarks
                 i.custom_quality_inspection_quantity = self.sample_size
+                i.custom_inspection_is_required = 1
                 sa_doc.save()
                 
 

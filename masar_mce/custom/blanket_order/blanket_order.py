@@ -6,7 +6,7 @@ def validate(self , method):
     calculate_amounts_and_total(self)
     if self.is_new():
         get_default_penalty(self)
-    if self.custom_submit_after_inspection:
+    if self.custom_submit_after_inspection and self.docstatus == 1:
         check_inspection_result(self)
 
 
