@@ -75,3 +75,10 @@ function update_total(frm) {
     (frm.doc.items || []).forEach(d => total += flt(d.custom_amount));
     frm.set_value("custom_agreement_total", total);
 }
+frappe.form.link_formatters['Item'] = function(value, doc) {
+    if(doc.item_code && doc.item_name !== value) {
+        return doc.item_code;
+    } else {
+        return value;
+    }
+};

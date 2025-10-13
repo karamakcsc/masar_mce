@@ -111,3 +111,10 @@ function GetTermsandPenalitesFromAgreement(frm) {
         frm.set_value("custom_penalties", []);
     }
 }
+frappe.form.link_formatters['Item'] = function(value, doc) {
+    if(doc.item_code && doc.item_name !== value) {
+        return doc.item_code;
+    } else {
+        return value;
+    }
+};

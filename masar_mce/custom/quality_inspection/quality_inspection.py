@@ -10,7 +10,7 @@ def update_stock_entry(self):
     se_doc = get_doc(self.reference_type , self.reference_name)
     for i in se_doc.items:
         if i.item_code == self.item_code:
-            db.set_value(i.doctype , i.name , {'quality_inspection' : self.name , 'custom_quality_inspection_status' : self.status} )
+            db.set_value(i.doctype , i.name , {'quality_inspection' : self.name , 'custom_quality_inspection_status' : self.status , 'custom_quality_inspection_quantity' : self.sample_size} )
             
     update_blanket_order(self , se_doc.custom_supplier_agreement)
     
@@ -24,7 +24,8 @@ def update_blanket_order(self , sa_name):
             db.set_value(i.doctype , i.name , {
                 'custom_quality_inspection' : self.name , 
                 'custom_quality_inspection_status' : self.status , 
-                'custom_quality_inspection_remarks' : self.remarks} 
+                'custom_quality_inspection_remarks' : self.remarks , 
+                'custom_quality_inspection_quantity' : self.sample_size} 
             )
 
 def qi_on_submit(self):
@@ -32,7 +33,7 @@ def qi_on_submit(self):
         return
 
     se = get_doc("Stock Entry", self.reference_name)
-    if se.stock_entry_type == 'Material Receipt for Inspection':
+    if se.stock_entry_type in ['Material Receipt for Inspection' , 'سند إستلام لفحص الجودة' ]:
         for item in se.items:
             exists = db.exists(
                 "Quality Inspection",

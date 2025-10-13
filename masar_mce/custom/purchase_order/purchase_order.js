@@ -39,6 +39,7 @@ function FilterItems(frm) {
     setTimeout(() => {    
             cur_frm.page.remove_inner_button(__('Payment'),  __('Create'));
             cur_frm.page.remove_inner_button(__('Payment Request'),  __('Create'));
+            cur_frm.page.remove_inner_button(__('Purchase Order'),  __('Create'));
             cur_frm.page.remove_inner_button(__('Product Bundle'),  __('Get Items From'));
             cur_frm.page.remove_inner_button(__('Material Request'),  __('Get Items From'));
             cur_frm.page.remove_inner_button(__('Supplier Quotation'),  __('Get Items From'));
@@ -135,3 +136,10 @@ function GetTermsandPenalitesFromAgreement(frm) {
         frm.set_value("custom_penalties", []);
     }
 }
+frappe.form.link_formatters['Item'] = function(value, doc) {
+    if(doc.item_code && doc.item_name !== value) {
+        return doc.item_code;
+    } else {
+        return value;
+    }
+};
