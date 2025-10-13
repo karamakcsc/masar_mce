@@ -21,12 +21,20 @@ def update_blanket_order(self , sa_name):
     sa_doc = get_doc('Blanket Order' , sa_name)
     for i in sa_doc.items:
         if i.item_code == self.item_code:
+            if sa_doc.docstatus:
             db.set_value(i.doctype , i.name , {
                 'custom_quality_inspection' : self.name , 
                 'custom_quality_inspection_status' : self.status , 
                 'custom_quality_inspection_remarks' : self.remarks , 
                 'custom_quality_inspection_quantity' : self.sample_size} 
             )
+            else: 
+                i.custom_quality_inspection = self.name
+                i.custom_quality_inspection_status =  self.status 
+                i.custom_quality_inspection_remarks =  self.remarks
+                i.custom_quality_inspection_quantity = self.sample_size
+                sa_doc.save()
+                
 
 def qi_on_submit(self):
     if self.reference_type != "Stock Entry":

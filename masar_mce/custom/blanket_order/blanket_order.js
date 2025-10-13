@@ -1,12 +1,15 @@
 frappe.ui.form.on("Blanket Order", {
     onload: function(frm) {
         filterBySupplier(frm);
+        CreateRequiredInspectionButton(frm);
     },
     refresh:  function(frm) {
         filterBySupplier(frm);
+        CreateRequiredInspectionButton(frm);
     },
     setup:  function(frm) {
         filterBySupplier(frm);
+        CreateRequiredInspectionButton(frm);
     },
     custom_tcs_terms(frm) {
        
@@ -82,3 +85,13 @@ frappe.form.link_formatters['Item'] = function(value, doc) {
         return value;
     }
 };
+function CreateRequiredInspectionButton(frm) {
+    if (frm.doc.docstatus === 0 && !frm.is_new()) {
+            frm.add_custom_button(__('Material Receipt for Inspection'), function() {
+                frappe.model.open_mapped_doc({
+                    method: 'masar_mce.custom.blanket_order.blanket_order.create_stock_entry_for_inspection',
+                    source_name: frm.doc.name
+                });
+            }, __('Create'));
+        }
+}

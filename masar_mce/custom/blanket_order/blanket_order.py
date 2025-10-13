@@ -1,13 +1,14 @@
-import frappe 
+import frappe , json
 from frappe.utils import flt
-
+from frappe.model.mapper import get_mapped_doc
+from frappe import _
 def validate(self , method):
     calculate_amounts_and_total(self)
     if self.is_new():
         get_default_penalty(self)
+    if self.custom_submit_after_inspection:
+        check_inspection_result(self)
 
-import frappe
-from frappe import _
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
@@ -62,3 +63,75 @@ def get_default_penalty(self):
             'amount': p.penalty_amount,
             'formula': p.penalty_formula
         })
+
+@frappe.whitelist()
+def create_stock_entry_for_inspection(source_name, target_doc=None, args=None):
+    if args is None:
+        args = {}
+    if isinstance(args, str):
+        args = json.loads(args)
+    source_doc = frappe.get_doc("Blanket Order", source_name)
+    
+    inspection_items = [d for d in source_doc.items if d.custom_inspection_is_required]
+    if not inspection_items:
+        frappe.throw("There are no items with <b>'Inspection is Required'</b> checked.")
+
+    def condition(d):
+        return d.custom_inspection_is_required
+
+    doclist = get_mapped_doc(
+        "Blanket Order",
+        source_name,
+        {
+            "Blanket Order": {
+                "doctype": "Stock Entry",
+                "field_map": {
+                    "name": "custom_blanket_order",
+                    "supplier": "custom_supplier",
+                    "transaction_date": "posting_date"
+                },
+                "validation": {
+                    "docstatus": ["=", 0]
+                }
+            },
+            "Blanket Order Item": {
+                "doctype": "Stock Entry Detail",
+                "field_map": {
+                    "item_code": "item_code",
+                    "item_name": "item_name",
+                    "custom_quality_inspection_quantity": "qty"
+                },
+                "condition": condition,
+                "postprocess": update_item
+            },
+        },
+        target_doc,
+        set_missing_values,
+    )
+
+    return doclist
+
+
+def update_item(source_doc, target_doc, source_parent):
+    target_doc.qty = source_doc.custom_quality_inspection_quantity or 0
+
+
+def set_missing_values(source, target):
+    target.purpose = "Material Receipt"
+    target.stock_entry_type = "سند إستلام لفحص الجودة"
+    
+
+
+
+def check_inspection_result(self):
+    inspection_required_items = [i for i in self.items if i.custom_inspection_is_required]
+
+    if not inspection_required_items:
+        frappe.throw("No items require inspection in this supplier agreement.")
+
+    for item in inspection_required_items:
+        if item.custom_quality_inspection_status != 'Accepted':
+            frappe.throw(
+                f"Item {item.item_code} has not passed inspection. "
+                "Please complete the inspection before proceeding."
+            )
