@@ -88,7 +88,7 @@
   "is_virtual": 0,
   "label": "Supplier Agreement",
   "length": 0,
-  "link_filters": "[[\"Blanket Order\",\"docstatus\",\"=\",\"1\"],[\"Blanket Order\",\"supplier\",\"=\",\"eval: doc.custom_supplier\"]]",
+  "link_filters": "[[\"Blanket Order\",\"docstatus\",\"!=\",\"2\"],[\"Blanket Order\",\"supplier\",\"=\",\"eval: doc.custom_supplier\"]]",
   "mandatory_depends_on": "eval: doc.stock_entry_type == 'Material Receipt for Inspection' || doc.stock_entry_type == 'سند إستلام لفحص الجودة'",
   "modified": "2025-09-16 15:51:20.320682",
   "module": null,
