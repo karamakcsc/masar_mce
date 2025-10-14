@@ -48,7 +48,8 @@ doctype_js = {
     "Stock Entry" : "custom/stock_entry/stock_entry.js", 
     "Purchase Order" : "custom/purchase_order/purchase_order.js", 
     "Purchase Receipt" : "custom/purchase_receipt/purchase_receipt.js",
-    "Purchase Invoice" : "custom/purchase_invoice/purchase_invoice.js"
+    "Purchase Invoice" : "custom/purchase_invoice/purchase_invoice.js", 
+    "Material Request" : "custom/material_request/material_request.js"
     }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -188,15 +189,16 @@ doc_events = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "masar_mce.event.get_events"
-# }
+override_whitelisted_methods = {
+	"erpnext.stock.doctype.material_request.material_request.make_stock_entry": "masar_mce.override._material_request.make_stock_entry"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
 override_doctype_dashboards = {
-	"Blanket Order": "masar_mce.custom.blanket_order.blanket_order_dashboard.custom_blanket_order_dashboard"
+	"Blanket Order": "masar_mce.custom.blanket_order.blanket_order_dashboard.custom_blanket_order_dashboard", 
+    "Material Request" : "masar_mce.custom.material_request.material_request_dashboard.custom_material_request_dashboard"
 }
 
 # exempt linked doctypes from being automatically cancelled
@@ -267,7 +269,9 @@ fixtures = [
                 'Stock Entry',
                 'Stock Entry Detail',
                 'Terms and Conditions',
-                'Purchase Invoice'
+                'Purchase Invoice',
+                'Material Request',
+                'Material Request Item'
             ]
         ]
     ]},
@@ -297,7 +301,9 @@ fixtures = [
                     'Purchase Invoice Item',
                     'Stock Entry',
                     'Stock Entry Detail',
-                    'Terms and Conditions'
+                    'Terms and Conditions',
+                    'Material Request',
+                    'Material Request Item'
                 ]
             ]
         ]

@@ -10,6 +10,10 @@ frappe.ui.form.on("Stock Entry", {
     }
 });
 function FilterForSupplierAgreement(frm) {
+    setTimeout(() => {    
+            cur_frm.page.remove_inner_button(__('Purchase Invoice'),  __('Get Items From'));
+            cur_frm.page.remove_inner_button(__('Bill of Materials'),  __('Get Items From'));
+        },100);
     const grid = frm.fields_dict.items.grid;
     const item_code_field = grid.get_field("item_code");
     if (!item_code_field.hasOwnProperty("original_get_query")) {
