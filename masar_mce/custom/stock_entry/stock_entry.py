@@ -1,5 +1,5 @@
 import frappe 
-
+from frappe import _
 def on_submit(self , method):
     if self.stock_entry_type  in ['Material Receipt for Inspection' , 'سند إستلام لفحص الجودة' ]:
         check_agreement_items(self)
@@ -53,7 +53,7 @@ def check_agreement_items(self):
         return
 
     if not self.custom_supplier_agreement:
-        frappe.throw("Please select a Blanket Order in Custom Supplier Agreement.")
+        frappe.throw(_("Please select a Blanket Order in Custom Supplier Agreement."))
 
     allowed_items = frappe.get_all(
         "Blanket Order Item",
@@ -64,5 +64,22 @@ def check_agreement_items(self):
     for row in self.items:
         if row.item_code not in allowed_items:
             frappe.throw(
-                f"Item {row.item_code} is not in Blanket Order {self.custom_supplier_agreement}"
+                _("Item {0} is not in Blanket Order {1}").format(row.item_code, self.custom_supplier_agreement)
             )
+
+            
+    for row in self.items:
+        sa_row = frappe.db.sql(f"""
+            SELECT r.name  , sa.docstatus
+            FROM `tabBlanket Order` sa
+            INNER JOIN `tabBlanket Order Item` r ON r.parent = sa.name
+            WHERE r.item_code = '{row.item_code}'
+            AND sa.name = '{self.custom_supplier_agreement}'
+        """ , as_dict= True)
+        if sa_row and sa_row[0]:
+            frappe.db.set_value('Blanket Order Item'  , sa_row[0]['name'] , 'custom_inspection_is_required' , 1)
+            frappe.db.set_value('Blanket Order Item'  , sa_row[0]['name'] , 'custom_quality_inspection_quantity' , row.qty)
+            
+            
+            
+        

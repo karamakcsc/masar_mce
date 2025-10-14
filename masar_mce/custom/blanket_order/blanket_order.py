@@ -127,11 +127,9 @@ def check_inspection_result(self):
     inspection_required_items = [i for i in self.items if i.custom_inspection_is_required]
 
     if not inspection_required_items:
-        frappe.throw("No items require inspection in this supplier agreement.")
+        frappe.throw(_("No items require inspection in this supplier agreement."))
+
 
     for item in inspection_required_items:
         if item.custom_quality_inspection_status != 'Accepted':
-            frappe.throw(
-                f"Item {item.item_code} has not passed inspection. "
-                "Please complete the inspection before proceeding."
-            )
+            frappe.throw(_("Item {0} has not passed inspection. Please complete the inspection before proceeding.").format(item.item_code))
