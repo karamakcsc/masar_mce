@@ -74,7 +74,7 @@ def create_stock_entry_for_inspection(source_name, target_doc=None, args=None):
     
     inspection_items = [d for d in source_doc.items if d.custom_inspection_is_required]
     if not inspection_items:
-        frappe.throw("There are no items with <b>'Inspection is Required'</b> checked.")
+        frappe.throw(_("There are no items with 'Inspection is Required' checked."))
 
     def condition(d):
         return d.custom_inspection_is_required
