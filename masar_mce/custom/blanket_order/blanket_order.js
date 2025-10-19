@@ -2,14 +2,17 @@ frappe.ui.form.on("Blanket Order", {
     onload: function(frm) {
         filterBySupplier(frm);
         CreateRequiredInspectionButton(frm);
+        CloseandHoldButton(frm);
     },
     refresh:  function(frm) {
         filterBySupplier(frm);
         CreateRequiredInspectionButton(frm);
+        CloseandHoldButton(frm);
     },
     setup:  function(frm) {
         filterBySupplier(frm);
         CreateRequiredInspectionButton(frm);
+        CloseandHoldButton(frm);
     },
     custom_tcs_terms(frm) {
        
@@ -25,6 +28,9 @@ frappe.ui.form.on("Blanket Order", {
         } else {
             frm.set_value("custom_special_terms", "");
         }
+    }, 
+    custom_pricing_type(frm) {
+        ResetSellingPrice(frm);
     }
 });
 function filterBySupplier(frm) {
@@ -55,6 +61,10 @@ frappe.ui.form.on("Blanket Order Item", {
     }, 
     items_remove(frm, cdt, cdn) {
        update_total(frm);
+    }, 
+    custom_markup_percentage(frm , cdt , cdn) {
+        CalculateSellingPrice(frm , cdt , cdn);
+        ResetSellingPrice(frm);
     }
 });
 
@@ -72,6 +82,21 @@ function CalculateAmount(frm, cdt, cdn) {
     });
 
     frm.set_value("custom_agreement_total", total);
+}
+function CalculateSellingPrice(frm , cdt , cdn){
+    let row = locals[cdt][cdn];
+    if (row.custom_markup_percentage && row.rate) {
+        row.custom_selling_price = flt(row.rate) + (flt(row.rate) * flt(row.custom_markup_percentage) /100);
+    } else {
+        row.custom_selling_price = 0;
+    }
+    frm.refresh_field("items");
+}
+function ResetSellingPrice(frm){
+    if (frm.doc.custom_pricing_type == 'Selling Price Basis'){
+    (frm.doc.items || []).forEach(d => d.custom_markup_percentage = 0);
+    frm.refresh_field("items");
+    }
 }
 function update_total(frm) {
     let total = 0;
@@ -94,4 +119,78 @@ function CreateRequiredInspectionButton(frm) {
                 });
             }, __('Create'));
         }
+}
+function CloseandHoldButton(frm) {
+    if (frm.doc.docstatus === 1 && frm.doc.custom_status === 'Active' ) {
+        frm.add_custom_button(__('Close'), function () {
+            frappe.call({
+                method: 'frappe.client.set_value',
+                args: {
+                    doctype: frm.doctype,
+                    name: frm.doc.name,
+                    fieldname: 'custom_status',
+                    value: 'Closed'
+                },
+                callback: function(r) {
+                    if (!r.exc) {
+                        frm.doc.custom_status = 'Closed';
+                        frm.refresh_fields();
+                        frm.reload_doc();
+                        frappe.show_alert({
+                            message: __('Status updated to Closed'),
+                            indicator: 'green'
+                        });
+                    }
+                }
+            });
+        }, __('Status'));
+
+        frm.add_custom_button(__('Hold'), function () {
+            frappe.call({
+                method: 'frappe.client.set_value',
+                args: {
+                    doctype: frm.doctype,
+                    name: frm.doc.name,
+                    fieldname: 'custom_status',
+                    value: 'On Hold'
+                },
+                callback: function(r) {
+                    if (!r.exc) {
+                        frm.doc.custom_status = 'On Hold';
+                        frm.refresh_fields();
+                        frm.reload_doc();
+                        frappe.show_alert({
+                            message: __('Status updated to On Hold'),
+                            indicator: 'green'
+                        });
+                    }
+                }
+            });
+        }, __('Status'));
+    }
+
+    if (frm.doc.docstatus === 1 && frm.doc.custom_status === 'On Hold') {
+        frm.add_custom_button(__('Re-Open'), function () {
+            frappe.call({
+                method: 'frappe.client.set_value',
+                args: {
+                    doctype: frm.doctype,
+                    name: frm.doc.name,
+                    fieldname: 'custom_status',
+                    value: 'Active'
+                },
+                callback: function(r) {
+                    if (!r.exc) {
+                        frm.doc.custom_status = 'Active';
+                        frm.refresh_fields();
+                        frm.reload_doc();
+                        frappe.show_alert({
+                            message: __('Status updated to Active'),
+                            indicator: 'green'
+                        });
+                    }
+                }
+            });
+        }, __('Status'));
+    }
 }

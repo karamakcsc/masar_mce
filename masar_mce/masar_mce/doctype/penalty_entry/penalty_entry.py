@@ -7,11 +7,11 @@ from frappe import throw, bold, get_doc, get_value
 from frappe.utils.safe_exec import safe_eval
 from erpnext.accounts.general_ledger import make_gl_entries
 from erpnext.controllers.accounts_controller import AccountsController
-from frappe.utils import flt
+from frappe.utils import flt, date_diff, getdate
+
 class PenaltyEntry(AccountsController):
     def validate(self): 
-        self.check_penalties()
-        self.calculate_formula_values()
+        self.calculate_amount_values()
     
     def on_submit(self): 
         self.create_gl_entry()
@@ -19,46 +19,24 @@ class PenaltyEntry(AccountsController):
         self.cancel_gl_entry()
         self.cancel_payment_ledger_entry()
 
-    def calculate_formula_values(self):
+    def calculate_amount_values(self):
         for row in self.penalties:
+            penalty_doc = frappe.get_doc('Penalty', row.penalty)
             if row.penalty_type == "Fixed Value":
-                continue
+                p_amount = frappe.db.get_value('Penalty' , row.penalty , 'penalty_amount')
             else:
-                document = get_value('Penalty', row.penalty, 'formula_doctype')
-                if document is None:
-                    continue
-                if document == 'Purchase Receipt' and self.purchase_receipt is None:
-                    continue
-                try:
-                    doc = get_doc(document, self.supplier_agreement if document == 'Blanket Order' else self.purchase_receipt).as_dict()
-                    amount = safe_eval(row.formula, None, doc)
-                    row.amount = flt(amount)
-                except Exception as e:
-                    frappe.throw(f"Error in formula for penalty '{row.penalty}': {str(e)}")
-    @frappe.whitelist()
-    def get_penalties_from_supplier_agreement(self):
-        if not self.supplier_agreement:
-            return 
-        res = frappe.db.sql("""
-                SELECT penalty as name, penalty_type, account, amount, formula
-                FROM `tabSupplier Agreement Penalty Details`
-                WHERE parent = %s
-        """, (self.supplier_agreement), as_dict=True)
-        return res
+                p_amount  = flt(self.pr_total) *  flt(get_value('Penalty', row.penalty, 'penalty_percentage')) / 100 
+                
+            if penalty_doc.based_on_days:
+                pr_doc = frappe.get_doc('Purchase Receipt' , self.purchase_receipt)
+                if pr_doc.posting_date > pr_doc.custom_delivery_date:
+                    extra_days = date_diff(getdate(pr_doc.posting_date), getdate(pr_doc.custom_delivery_date))
+                    if extra_days > 0:
+                        p_amount = p_amount * extra_days
+                else: 
+                    p_amount = 0
+            row.amount = p_amount
     
-    def check_penalties(self):
-        sa_penalties = [i.name for i in 
-                        frappe.db.sql(
-                            f"""
-                            SELECT penalty as name 
-                            FROM `tabSupplier Agreement Penalty Details`
-                            WHERE parent = '{self.supplier_agreement}'
-                            """
-                        , as_dict=True) 
-        ]
-        for r in self.penalties: 
-            if r.penalty not in sa_penalties:
-                throw(f"Row{bold(r.idx)}: Penalty {bold(r.penalty)} Not exist in Supplier Agreement {bold(self.supplier_agreement)}")
                 
     def create_gl_entry(self): 
         def get_debit_account():
@@ -87,21 +65,20 @@ class PenaltyEntry(AccountsController):
             )
         gl_entries = []
         for row in self.penalties:
+            penalty_doc = frappe.get_doc('Penalty', row.penalty)
             if row.penalty_type == "Fixed Value":
-                amount = row.amount
+                amount = frappe.db.get_value('Penalty' , row.penalty , 'penalty_amount')
             else:
-                document = get_value('Penalty', row.penalty, 'formula_doctype')
-                if document is None:
-                    frappe.throw(f'Row {row.idx}: Penalty {row.penalty} need update in formula.')
-                if document == 'Purchase Receipt' and self.purchase_receipt is None:
-                    frappe.throw("Purchase Receipt needed for formula.")
-                try:
-                    doc = get_doc(document, self.supplier_agreement if document == 'Blanket Order' else self.purchase_receipt).as_dict()
-                    amount = safe_eval(row.formula, None, doc)
-                    if amount is None:
-                        frappe.throw(f"Formula returned None for penalty '{row.penalty}'. Please set a valid value.")
-                except Exception as e:
-                    frappe.throw(f"Error in formula for penalty '{row.penalty}': {str(e)}")
+                amount  = flt(self.pr_total) *  flt(get_value('Penalty', row.penalty, 'penalty_percentage')) / 100 
+                
+            if penalty_doc.based_on_days:
+                pr_doc = frappe.get_doc('Purchase Receipt' , self.purchase_receipt)
+                if pr_doc.posting_date > pr_doc.custom_delivery_date:
+                    extra_days = date_diff(getdate(pr_doc.posting_date), getdate(pr_doc.custom_delivery_date))
+                    if extra_days > 0:
+                        amount = amount * extra_days
+                else: 
+                    amount = 0
 
             if not amount or amount == 0:
                 continue

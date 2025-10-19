@@ -1,13 +1,20 @@
 frappe.ui.form.on("Stock Entry", {
     onload: function(frm) {
         FilterForSupplierAgreement(frm);
+        FilterWarehouseForInspection(frm);
     }, 
     refresh:function(frm) {
         FilterForSupplierAgreement(frm);
+        FilterWarehouseForInspection(frm);
     }, 
     setup: function(frm) {
+        FilterWarehouseForInspection(frm);
         FilterForSupplierAgreement(frm);
-    }
+    },
+    stock_entry_type: function(frm) {
+        FilterWarehouseForInspection(frm);
+        FilterForSupplierAgreement(frm);
+    },
 });
 function FilterForSupplierAgreement(frm) {
     setTimeout(() => {    
@@ -46,4 +53,28 @@ frappe.form.link_formatters['Item'] = function(value, doc) {
         return value;
     }
 };
-
+function FilterWarehouseForInspection(frm) {
+    const isInspection =
+        frm.doc.stock_entry_type === "Material Receipt for Inspection" ||
+        frm.doc.stock_entry_type === "سند إستلام لفحص الجودة";
+    const grid = frm.fields_dict["items"].grid;
+    const tWarehouseField = grid.get_field("t_warehouse");
+    if (!frm._original_to_warehouse_query) {
+        frm._original_to_warehouse_query = frm.fields_dict.to_warehouse.get_query;
+    }
+    if (!tWarehouseField.original_get_query) {
+        tWarehouseField.original_get_query = tWarehouseField.get_query;
+    }
+    if (isInspection) {
+        frm.set_query("to_warehouse", function() {
+            return { filters: { warehouse_type: 'فحص' } };
+        });
+        tWarehouseField.get_query = function() {
+            return { filters: { warehouse_type: 'فحص' } };
+        };
+    } 
+    else {
+        frm.fields_dict.to_warehouse.get_query = frm._original_to_warehouse_query || null;
+        tWarehouseField.get_query = tWarehouseField.original_get_query || null;
+    }
+}

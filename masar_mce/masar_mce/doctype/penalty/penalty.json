@@ -11,12 +11,13 @@
   "column_break_lvot",
   "disabled",
   "default",
+  "based_on_days",
+  "auto",
   "section_break_qqqr",
   "account",
-  "formula_doctype",
   "column_break_gjtd",
   "penalty_amount",
-  "penalty_formula",
+  "penalty_percentage",
   "section_break_jlmz",
   "description"
  ],
@@ -67,13 +68,6 @@
    "label": "Disabled"
   },
   {
-   "depends_on": "eval: doc.penalty_type == 'Variable Value'",
-   "fieldname": "penalty_formula",
-   "fieldtype": "Code",
-   "label": "Penalty Formula",
-   "mandatory_depends_on": "eval: doc.penalty_type == 'Variable Value'"
-  },
-  {
    "fieldname": "section_break_jlmz",
    "fieldtype": "Section Break"
   },
@@ -95,16 +89,31 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "formula_doctype",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Formula Doctype"
+   "depends_on": "eval: doc.penalty_type == 'Variable Value'",
+   "fieldname": "penalty_percentage",
+   "fieldtype": "Percent",
+   "label": "Penalty Percentage",
+   "mandatory_depends_on": "eval: doc.penalty_type == 'Variable Value'"
+  },
+  {
+   "default": "0",
+   "depends_on": "based_on_days",
+   "fieldname": "auto",
+   "fieldtype": "Check",
+   "label": "Automatically"
+  },
+  {
+   "default": "0",
+   "description": "The penalty amount or percentage will be multiplied by the number of delay days.",
+   "fieldname": "based_on_days",
+   "fieldtype": "Check",
+   "label": "Based on days"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-30 15:35:42.700511",
+ "modified": "2025-10-19 15:47:25.933867",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Penalty",

@@ -92,14 +92,12 @@ function GetTermsandPenalitesFromAgreement(frm) {
                 frm.set_value("terms", data.g_terms_and_cond);
                 frm.set_value("custom_tcs_terms", data.s_terms);
                 frm.set_value("custom_special_terms", data.s_terms_and_cond);
-                frm.set_value("custom_penalties", data.penalties);
              }
              else {
                 frm.set_value("tc_name", "");
                 frm.set_value("terms", "");
                 frm.set_value("custom_tcs_terms", "");
                 frm.set_value("custom_special_terms", "");
-                frm.set_value("custom_penalties", []);
              }
         }
     });
@@ -108,7 +106,6 @@ function GetTermsandPenalitesFromAgreement(frm) {
         frm.set_value("terms", "");
         frm.set_value("custom_tcs_terms", "");
         frm.set_value("custom_special_terms", "");
-        frm.set_value("custom_penalties", []);
     }
 }
 frappe.form.link_formatters['Item'] = function(value, doc) {

@@ -8,12 +8,12 @@
   "section_break_umc0",
   "supplier",
   "supplier_name",
-  "supplier_agreement",
+  "purchase_receipt",
   "column_break_pmvp",
   "company",
   "posting_date",
-  "purchase_receipt",
   "amended_from",
+  "pr_total",
   "section_break_trrw",
   "penalties"
  ],
@@ -45,19 +45,12 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "supplier_agreement",
-   "fieldtype": "Link",
-   "label": "Supplier Agreement",
-   "link_filters": "[[\"Blanket Order\",\"supplier\",\"=\",\"eval: doc.supplier\"],[\"Blanket Order\",\"docstatus\",\"=\",\"1\"]]",
-   "options": "Blanket Order",
-   "reqd": 1
-  },
-  {
    "fieldname": "purchase_receipt",
    "fieldtype": "Link",
    "label": "Purchase Receipt",
    "link_filters": "[[\"Purchase Receipt\",\"supplier\",\"=\",\"eval: doc.supplier\"],[\"Purchase Receipt\",\"docstatus\",\"=\",\"1\"]]",
-   "options": "Purchase Receipt"
+   "options": "Purchase Receipt",
+   "reqd": 1
   },
   {
    "fetch_from": "supplier.supplier_name",
@@ -89,13 +82,20 @@
    "fieldtype": "Table",
    "label": "Penalties",
    "options": "Supplier Agreement Penalty Details"
+  },
+  {
+   "fetch_from": "purchase_receipt.grand_total",
+   "fieldname": "pr_total",
+   "fieldtype": "Currency",
+   "label": "Purchase Receipt Total",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-01 10:53:56.004149",
+ "modified": "2025-10-19 15:23:10.548231",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Penalty Entry",

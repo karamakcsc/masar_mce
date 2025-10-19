@@ -156,20 +156,25 @@ doc_events = {
         "on_submit": "masar_mce.custom.stock_entry.stock_entry.on_submit"
     }, 
     "Blanket Order" : {
-        "validate" : "masar_mce.custom.blanket_order.blanket_order.validate"
+        "validate" : "masar_mce.custom.blanket_order.blanket_order.validate", 
+        "on_submit" : "masar_mce.custom.blanket_order.blanket_order.on_submit", 
+        "before_update_after_submit" : "masar_mce.custom.blanket_order.blanket_order.before_update_after_submit"
+    }, 
+    "Purchase Receipt" : {
+        "on_submit" : "masar_mce.custom.purchase_receipt.purchase_receipt.on_submit"
     }
 }
 
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+scheduler_events = {
 # 	"all": [
 # 		"masar_mce.tasks.all"
 # 	],
-# 	"daily": [
-# 		"masar_mce.tasks.daily"
-# 	],
+	"daily": [
+		"masar_mce.utils.check_expierd_supplier_agrrement"
+	],
 # 	"hourly": [
 # 		"masar_mce.tasks.hourly"
 # 	],
@@ -179,7 +184,7 @@ doc_events = {
 # 	"monthly": [
 # 		"masar_mce.tasks.monthly"
 # 	],
-# }
+}
 
 # Testing
 # -------
@@ -271,7 +276,8 @@ fixtures = [
                 'Terms and Conditions',
                 'Purchase Invoice',
                 'Material Request',
-                'Material Request Item'
+                'Material Request Item', 
+                'Item Price'
             ]
         ]
     ]},
@@ -303,7 +309,8 @@ fixtures = [
                     'Stock Entry Detail',
                     'Terms and Conditions',
                     'Material Request',
-                    'Material Request Item'
+                    'Material Request Item',
+                    'Item Price'
                 ]
             ]
         ]
