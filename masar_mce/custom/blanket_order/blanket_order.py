@@ -146,13 +146,14 @@ def check_inspection_result(self):
             frappe.throw(_("Item {0} has not passed inspection. Please complete the inspection before proceeding.").format(item.item_code))
             
 def create_price_list_for_selling(self):
-    selling_price_list = frappe.new_doc('Price List').update({'selling_price_list': self.name , 'selling' : 1}).insert(ignore_permissions=True)
+    selling_price_list = frappe.new_doc('Price List').update({'name': self.name , 'price_list_name': self.name , 'selling' : 1})
+    selling_price_list.insert(ignore_permissions=True).save()
+    price_list = selling_price_list.name
     for i in self.items:
         selling_price = flt(i.custom_selling_price)
-        price_list_name = selling_price_list
         price_list_rate_doc = frappe.new_doc('Item Price')
         price_list_rate_doc.item_code = i.item_code
-        price_list_rate_doc.price_list = price_list_name
+        price_list_rate_doc.price_list = price_list
         price_list_rate_doc.price_list_rate = selling_price
         price_list_rate_doc.custom_supplier_agreement = self.name
         price_list_rate_doc.save(ignore_permissions=True)
@@ -169,14 +170,15 @@ def close_valid_date_in_item_price(self):
     price_list.save()
         
 def revalid_date_in_item_price(self):
+    price_list = frappe.get_doc('Price List' , self.name)
+    price_list.enabled = 1 
+    price_list.save()   
     item_price_list = frappe.db.get_list('Item Price' , filters={'custom_supplier_agreement': self.name},pluck='name' )
     for i in item_price_list: 
         ip_doc = frappe.get_doc('Item Price' , i)
         ip_doc.valid_upto =None
         ip_doc.save()
-    price_list = frappe.get_doc('Price List' , self.name)
-    price_list.enabled = 1 
-    price_list.save()        
+     
 def validate_duplicate_item_in_active_blanket_orders(self):
     current_items = [d.item_code for d in self.items]
     if not current_items:

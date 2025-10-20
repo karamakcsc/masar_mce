@@ -18,7 +18,7 @@ def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_l
         INNER JOIN `tabItem` item ON poi.item_code = item.name
         WHERE po.supplier = %(supplier)s
           AND po.docstatus = 1
-          AND po.status NOT IN ('Closed', 'On Hold')
+          AND po.status NOT IN ('Closed', 'Hold')
           AND item.disabled = 0
           AND (poi.item_code LIKE %(txt)s OR item.item_name LIKE %(txt)s)
         -- HAVING available_qty > 0
@@ -53,13 +53,14 @@ def get_po_details_for_item(item_code, supplier, used_pos=None):
     query = f"""
         SELECT
             po.name AS purchase_order,
-            poi.name AS purchase_order_item
+            poi.name AS purchase_order_item, 
+            poi.rate
         FROM `tabPurchase Order` po
         INNER JOIN `tabPurchase Order Item` poi ON po.name = poi.parent
         INNER JOIN `tabItem` item ON poi.item_code = item.name
         WHERE po.supplier = '{supplier}'
           AND po.docstatus = 1
-          AND po.status NOT IN ('Closed', 'On Hold')
+          AND po.status NOT IN ('Closed', 'Hold')
           AND poi.item_code = '{item_code}'
           AND (poi.qty - IFNULL(poi.received_qty,0) + poi.qty * IFNULL(item.over_delivery_receipt_allowance,0)) > 0
     """

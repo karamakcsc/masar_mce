@@ -65,9 +65,11 @@ frappe.ui.form.on('Purchase Receipt Item', {
                 if (r.message) {
                     frappe.model.set_value(cdt, cdn, "purchase_order", r.message.purchase_order);
                     frappe.model.set_value(cdt, cdn, "purchase_order_item", r.message.purchase_order_item);
+                    frappe.model.set_value(cdt, cdn, "rate", r.message.rate);
                 } else {
                     frappe.model.set_value(cdt, cdn, "purchase_order", null);
                     frappe.model.set_value(cdt, cdn, "purchase_order_item", null);
+                    frappe.model.set_value(cdt, cdn, "rate", 0);
                 }
             }
         });
