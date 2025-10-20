@@ -58,49 +58,53 @@ frappe.ui.form.on("Blanket Order Item", {
     },
     rate(frm, cdt, cdn) {
         CalculateAmount(frm, cdt, cdn);
-    }, 
-    items_remove(frm, cdt, cdn) {
-       update_total(frm);
-    }, 
-    custom_markup_percentage(frm , cdt , cdn) {
-        CalculateSellingPrice(frm , cdt , cdn);
-        ResetSellingPrice(frm);
+        CalculateSellingPrice(frm, cdt, cdn);
+        CalculateMarkupPercentage(frm, cdt, cdn);
+    },
+    items_remove(frm) {
+        update_total(frm);
+    },
+    custom_markup_percentage(frm, cdt, cdn) {
+        CalculateSellingPrice(frm, cdt, cdn);
+    },
+    custom_selling_price(frm, cdt, cdn) {
+        CalculateMarkupPercentage(frm, cdt, cdn);
     }
 });
-
 function CalculateAmount(frm, cdt, cdn) {
     let row = locals[cdt][cdn];
-    if (row.qty && row.rate) {
-        row.custom_amount = flt(row.qty) * flt(row.rate);
-    } else {
-        row.custom_amount = 0;
-    }
+    row.custom_amount = (flt(row.qty) || 0) * (flt(row.rate) || 0);
     frm.refresh_field("items");
-    let total = 0;
-    (frm.doc.items || []).forEach(d => {
-        total += flt(d.custom_amount);
-    });
 
-    frm.set_value("custom_agreement_total", total);
+    update_total(frm);
 }
-function CalculateSellingPrice(frm , cdt , cdn){
+function CalculateSellingPrice(frm, cdt, cdn) {
     let row = locals[cdt][cdn];
-    if (row.custom_markup_percentage && row.rate) {
-        row.custom_selling_price = flt(row.rate) + (flt(row.rate) * flt(row.custom_markup_percentage) /100);
-    } else {
-        row.custom_selling_price = 0;
+    if (frm.doc.custom_pricing_type === 'Buying Price Basis') {
+        if (flt(row.rate) && flt(row.custom_markup_percentage)) {
+            row.custom_selling_price = flt(row.rate) + (flt(row.rate) * flt(row.custom_markup_percentage) / 100);
+        } else {
+            row.custom_selling_price = 0;
+        }
+        frm.refresh_field("items");
     }
-    frm.refresh_field("items");
 }
-function ResetSellingPrice(frm){
-    if (frm.doc.custom_pricing_type == 'Selling Price Basis'){
-    (frm.doc.items || []).forEach(d => d.custom_markup_percentage = 0);
-    frm.refresh_field("items");
+function CalculateMarkupPercentage(frm, cdt, cdn) {
+    let row = locals[cdt][cdn];
+    if (frm.doc.custom_pricing_type === 'Selling Price Basis') {
+        if (flt(row.rate) && flt(row.custom_selling_price)) {
+            row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.rate)) / flt(row.rate)) * 100;
+        } else {
+            row.custom_markup_percentage = 0;
+        }
+        frm.refresh_field("items");
     }
 }
 function update_total(frm) {
     let total = 0;
-    (frm.doc.items || []).forEach(d => total += flt(d.custom_amount));
+    (frm.doc.items || []).forEach(d => {
+        total += flt(d.custom_amount);
+    });
     frm.set_value("custom_agreement_total", total);
 }
 frappe.form.link_formatters['Item'] = function(value, doc) {
@@ -152,15 +156,15 @@ function CloseandHoldButton(frm) {
                     doctype: frm.doctype,
                     name: frm.doc.name,
                     fieldname: 'custom_status',
-                    value: 'On Hold'
+                    value: 'Hold'
                 },
                 callback: function(r) {
                     if (!r.exc) {
-                        frm.doc.custom_status = 'On Hold';
+                        frm.doc.custom_status = 'Hold';
                         frm.refresh_fields();
                         frm.reload_doc();
                         frappe.show_alert({
-                            message: __('Status updated to On Hold'),
+                            message: __('Status updated to Hold'),
                             indicator: 'green'
                         });
                     }
@@ -169,8 +173,8 @@ function CloseandHoldButton(frm) {
         }, __('Status'));
     }
 
-    if (frm.doc.docstatus === 1 && frm.doc.custom_status === 'On Hold') {
-        frm.add_custom_button(__('Re-Open'), function () {
+    if (frm.doc.docstatus === 1 && frm.doc.custom_status === 'Hold') {
+        frm.add_custom_button(__('Resume'), function () {
             frappe.call({
                 method: 'frappe.client.set_value',
                 args: {
