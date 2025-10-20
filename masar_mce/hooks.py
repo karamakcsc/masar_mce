@@ -272,6 +272,7 @@ fixtures = [
                 'Purchase Order',
                 'Purchase Order Item',
                 'Purchase Receipt',
+                'Purchase Receipt Item',
                 'Stock Entry',
                 'Stock Entry Detail',
                 'Terms and Conditions',

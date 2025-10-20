@@ -21,7 +21,7 @@ def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_l
           AND po.status NOT IN ('Closed', 'Hold')
           AND item.disabled = 0
           AND (poi.item_code LIKE %(txt)s OR item.item_name LIKE %(txt)s)
-        -- HAVING available_qty > 0
+        HAVING available_qty > 0
         ORDER BY poi.item_code , po.transaction_date
         LIMIT %(start)s, %(page_len)s
     """
