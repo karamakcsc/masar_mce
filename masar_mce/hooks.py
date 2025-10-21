@@ -285,14 +285,14 @@ fixtures = [
             ]
         ]
     ]},
-    # {"dt": "Translation", "filters": [
-    #     [
-    #         "name", "in", [
-    #             "eu7jh96i2v"
-    #         ]
-    #     ]
-    # ]
-    # },
+    {"dt": "Translation", "filters": [
+        [
+            "name", "in", [
+                "eu7jh96i2v"
+            ]
+        ]
+    ]
+    },
     {
         "doctype": "Property Setter",
         "filters": [
@@ -318,6 +318,5 @@ fixtures = [
                 ]
             ]
         ]
-    },
-    "Workflow", "Workflow State", "Workflow Action Master"
+    }
 ]
