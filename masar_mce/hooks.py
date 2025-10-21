@@ -285,14 +285,14 @@ fixtures = [
             ]
         ]
     ]},
-    {"dt": "Translation", "filters": [
-        [
-            "name", "in", [
-                "eu7jh96i2v"
-            ]
-        ]
-    ]
-    },
+    # {"dt": "Translation", "filters": [
+    #     [
+    #         "name", "in", [
+    #             "eu7jh96i2v"
+    #         ]
+    #     ]
+    # ]
+    # },
     {
         "doctype": "Property Setter",
         "filters": [
@@ -318,74 +318,6 @@ fixtures = [
                 ]
             ]
         ]
-    }, 
-    {
-        "doctype": "Workflow",
-        "filters": [
-            [
-                "name",
-                "in", 
-                [
-                    "Purchase Receipt WF"
-                ]
-            ]
-        ]
-    }, 
-    {
-        "doctype": "Workflow Document State",
-        "filters": [
-            [
-                "parent",
-                "in", 
-                [
-                    "Purchase Receipt WF"
-                ]
-            ]
-        ]
     },
-    {
-        "doctype": "Workflow Action Master",
-        "filters": [
-            [
-                "name",
-                "in", 
-                [
-                    "Approve",
-                    "Cancel",
-                    "Reject",
-                    "Request",
-                    "Review"
-                ]
-            ]
-        ]
-    },
-    {
-        "doctype": "Workflow State",
-        "filters": [
-            [
-                "name",
-                "in", 
-                [
-                    "Approved",
-                    "Cancel",
-                    "Pending",
-                    "Purchase Receipt",
-                    "Purchase Request",
-                    "Rejected"
-                ]
-            ]
-        ]
-    },
-    {
-        "doctype": "Workflow Transition",
-        "filters": [
-            [
-                "parent",
-                "in", 
-                [
-                    "Purchase Receipt WF"
-                ]
-            ]
-        ]
-    },
+    "Workflow", "Workflow State", "Workflow Action Master"
 ]

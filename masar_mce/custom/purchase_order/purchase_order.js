@@ -1,12 +1,15 @@
 frappe.ui.form.on("Purchase Order", {
     setup(frm) {
         FilterItems(frm);
+        CreatePurchaseRequest(frm);
     }, 
     refresh(frm) {
         FilterItems(frm);
+        CreatePurchaseRequest(frm);
     }, 
     onload(frm) {
         FilterItems(frm);
+        CreatePurchaseRequest(frm);
     }, 
     supplier(frm){
         FilterItems(frm);
@@ -80,3 +83,14 @@ frappe.form.link_formatters['Item'] = function(value, doc) {
         return value;
     }
 };
+function CreatePurchaseRequest(frm) {
+    if (frm.doc.docstatus === 1 ) {
+            frm.add_custom_button(__('Purchase Request'), function() {
+                frappe.model.open_mapped_doc({
+                    method: "masar_mce.custom.purchase_order.purchase_order.create_purchase_request_from_purchase_order",
+                    frm: cur_frm,
+                    freeze_message: __("Creating Purchase Request ..."),
+                });
+            }, __('Create'));
+        }
+}
