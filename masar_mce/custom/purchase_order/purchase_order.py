@@ -65,12 +65,12 @@ def create_purchase_request_from_purchase_order(source_name, target_doc=None, ar
 		return has_unit_price_items and source.qty == 0
 
 	def update_item(obj, target, source_parent):
-		target.custom_request_quantity , target.qty = flt(obj.qty) if is_unit_price_row(obj) else flt(obj.qty) - flt(obj.received_qty),0
-		# target.stock_qty = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.conversion_factor)
-		# target.amount = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate)
-		# target.base_amount = (
-		# 	(flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate) * flt(source_parent.conversion_rate)
-		# )
+		target.custom_request_quantity , target.qty ,obj.qty= flt(obj.qty) if is_unit_price_row(obj) else flt(obj.qty) - flt(obj.received_qty),1,1
+		target.stock_qty = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.conversion_factor)
+		target.amount = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate)
+		target.base_amount = (
+			(flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate) * flt(source_parent.conversion_rate)
+		)
 
 	def select_item(d):
 		filtered_items = args.get("filtered_children", [])
