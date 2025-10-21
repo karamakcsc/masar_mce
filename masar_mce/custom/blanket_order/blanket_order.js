@@ -30,7 +30,9 @@ frappe.ui.form.on("Blanket Order", {
         }
     }, 
     custom_pricing_type(frm) {
-        ResetSellingPrice(frm);
+        frm.refresh_field("items");
+        CalculateSellingPrice(frm, cdt, cdn);
+        CalculateMarkupPercentage(frm, cdt, cdn);
     }
 });
 function filterBySupplier(frm) {

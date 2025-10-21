@@ -17,7 +17,7 @@ def before_update_after_submit(self , method) :
         revalid_date_in_item_price(self)
         
 def on_submit(self , method): 
-    self.custom_status = 'Active'
+    self.db_set('custom_status', 'Active')
     validate_duplicate_item_in_active_blanket_orders(self)
     create_price_list_for_selling(self)
     

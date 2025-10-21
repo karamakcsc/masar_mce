@@ -1,4 +1,6 @@
 import frappe 
+from frappe.utils import getdate
+
 def on_submit(self , method): 
     create_auto_penalty_entry(self)
 @frappe.whitelist()
@@ -77,7 +79,9 @@ def get_po_details_for_item(item_code, supplier, used_pos=None):
     return result[0] if result else {}
 
 def create_auto_penalty_entry(self): 
-    if self.posting_date > self.custom_delivery_date:
+    posting_date = getdate(self.posting_date)
+    delivery_date = getdate(self.custom_delivery_date)
+    if posting_date > delivery_date:
         penalties = frappe.db.sql("""
             SELECT name as penalty, penalty_type , account , penalty_percentage
             FROM `tabPenalty`

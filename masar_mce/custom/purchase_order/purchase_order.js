@@ -32,8 +32,9 @@ function FilterItems(frm) {
             return item_code_field.original_get_query ? item_code_field.original_get_query() : {};
         }
     };
-    
     setTimeout(() => {    
+            frm.remove_custom_button("Link to Material Request", "Tools");
+            frm.remove_custom_button("Update Rate as per Last Purchase", "Tools");
             cur_frm.page.remove_inner_button(__('Payment'),  __('Create'));
             cur_frm.page.remove_inner_button(__('Payment Request'),  __('Create'));
             cur_frm.page.remove_inner_button(__('Purchase Invoice'),  __('Create'));

@@ -26,10 +26,12 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/masar_mce/css/masar_mce.css"
+app_include_css = "/assets/masar_mce/css/theme.css"
 # app_include_js = "/assets/masar_mce/js/masar_mce.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/masar_mce/css/masar_mce.css"
+web_include_css = "/assets/masar_mce/css/theme.css"
 # web_include_js = "/assets/masar_mce/js/masar_mce.js"
 
 # include custom scss in every website theme (without file extension ".scss")
@@ -316,5 +318,74 @@ fixtures = [
                 ]
             ]
         ]
-    }
+    }, 
+    {
+        "doctype": "Workflow",
+        "filters": [
+            [
+                "name",
+                "in", 
+                [
+                    "Purchase Receipt WF"
+                ]
+            ]
+        ]
+    }, 
+    {
+        "doctype": "Workflow Document State",
+        "filters": [
+            [
+                "parent",
+                "in", 
+                [
+                    "Purchase Receipt WF"
+                ]
+            ]
+        ]
+    },
+    {
+        "doctype": "Workflow Action Master",
+        "filters": [
+            [
+                "name",
+                "in", 
+                [
+                    "Approve",
+                    "Cancel",
+                    "Reject",
+                    "Request",
+                    "Review"
+                ]
+            ]
+        ]
+    },
+    {
+        "doctype": "Workflow State",
+        "filters": [
+            [
+                "name",
+                "in", 
+                [
+                    "Approved",
+                    "Cancel",
+                    "Pending",
+                    "Purchase Receipt",
+                    "Purchase Request",
+                    "Rejected"
+                ]
+            ]
+        ]
+    },
+    {
+        "doctype": "Workflow Transition",
+        "filters": [
+            [
+                "parent",
+                "in", 
+                [
+                    "Purchase Receipt WF"
+                ]
+            ]
+        ]
+    },
 ]
