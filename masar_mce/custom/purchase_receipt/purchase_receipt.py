@@ -1,8 +1,9 @@
 import frappe 
-from frappe.utils import getdate
+from frappe.utils import getdate , flt
 
 def on_submit(self , method): 
     create_auto_penalty_entry(self)
+    check_rquest_to_accepted_qty(self)
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_len, filters):
@@ -56,7 +57,7 @@ def get_po_details_for_item(item_code, supplier, used_pos=None):
         SELECT
             po.name AS purchase_order,
             poi.name AS purchase_order_item, 
-            poi.rate AS rate
+            10 AS rate
         FROM `tabPurchase Order` po
         INNER JOIN `tabPurchase Order Item` poi ON po.name = poi.parent
         INNER JOIN `tabItem` item ON poi.item_code = item.name
@@ -98,8 +99,13 @@ def create_auto_penalty_entry(self):
             }
             frappe.new_doc('Penalty Entry').update(entry).insert(ignore_permissions = True).submit()
 
-@frappe.whitelist()
-def get_po_item_rate(purchase_order_item=None):
-    if purchase_order_item : 
-        return frappe.db.get_value('Purchase Order Item' , purchase_order_item , 'rate')
-    return 0 
+def check_rquest_to_accepted_qty(self): 
+    for i in self.items: 
+        if flt(i.qty) + flt(i.rejected_qty) > flt(i.custom_request_quantity):
+            frappe.throw(
+                """The total of Accepted Qty ({0}) and Rejected Qty ({1}) "
+                cannot exceed the Requested Quantity ({2}) for item {3}.
+                """.format(flt(i.qty) ,flt(i.rejected_qty) , flt(i.custom_request_quantity) , i.item_code)
+            )
+
+        

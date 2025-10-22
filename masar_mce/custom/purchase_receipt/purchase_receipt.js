@@ -63,29 +63,14 @@ frappe.ui.form.on('Purchase Receipt Item', {
             },
             callback: function(r) {
                 if (r.message) {
-                    frappe.msgprint(`${r.message.rate}`);
-                    frappe.model.set_value(cdt, cdn, "purchase_order", r.message.purchase_order);
-                    frappe.model.set_value(cdt, cdn, "purchase_order_item", r.message.purchase_order_item);
-                    frappe.model.set_value(cdt, cdn, "rate", r.message.rate);
+                    frappe.model.set_value(cdt, cdn, {
+                        purchase_order: r.message.purchase_order,
+                        purchase_order_item: r.message.purchase_order_item,
+                        rate: r.message.rate
+                    });
                 } else {
                     frappe.model.set_value(cdt, cdn, "purchase_order", null);
                     frappe.model.set_value(cdt, cdn, "purchase_order_item", null);
-                    frappe.model.set_value(cdt, cdn, "rate", 0);
-                }
-            }
-        });
-    }, 
-    purchase_order_item(frm){
-        const row = locals[cdt][cdn];
-        frappe.call({
-            method: "masar_mce.custom.purchase_receipt.purchase_receipt.get_po_item_rate",
-            args: {
-                purchase_order_item : row.purchase_order_item
-            },
-            callback: function(r) {
-                if (r.message) {
-                    frappe.model.set_value(cdt, cdn, "rate", r.message);
-                } else {
                     frappe.model.set_value(cdt, cdn, "rate", 0);
                 }
             }
