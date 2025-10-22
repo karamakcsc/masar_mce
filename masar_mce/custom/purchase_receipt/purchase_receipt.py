@@ -56,7 +56,7 @@ def get_po_details_for_item(item_code, supplier, used_pos=None):
         SELECT
             po.name AS purchase_order,
             poi.name AS purchase_order_item, 
-            poi.rate
+            poi.rate AS rate
         FROM `tabPurchase Order` po
         INNER JOIN `tabPurchase Order Item` poi ON po.name = poi.parent
         INNER JOIN `tabItem` item ON poi.item_code = item.name
@@ -97,3 +97,9 @@ def create_auto_penalty_entry(self):
                 'penalties' : penalties
             }
             frappe.new_doc('Penalty Entry').update(entry).insert(ignore_permissions = True).submit()
+
+@frappe.whitelist()
+def get_po_item_rate(purchase_order_item=None):
+    if purchase_order_item : 
+        return frappe.db.get_value('Purchase Order Item' , purchase_order_item , 'rate')
+    return 0 
