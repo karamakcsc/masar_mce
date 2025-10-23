@@ -1,6 +1,13 @@
 import frappe 
-from frappe.utils import getdate , flt
+from frappe import _
+from frappe.utils import flt, get_link_to_form, getdate
+from erpnext.controllers.status_updater import StatusUpdater
 
+check_overflow_with_allowance = StatusUpdater.check_overflow_with_allowance
+limits_crossed_error = StatusUpdater.limits_crossed_error
+def validate(self , method ):
+    validate_qty(self)
+    
 def on_submit(self , method): 
     create_auto_penalty_entry(self)
     check_rquest_to_accepted_qty(self)
@@ -57,7 +64,7 @@ def get_po_details_for_item(item_code, supplier, used_pos=None):
         SELECT
             po.name AS purchase_order,
             poi.name AS purchase_order_item, 
-            10 AS rate
+            poi.rate AS rate
         FROM `tabPurchase Order` po
         INNER JOIN `tabPurchase Order Item` poi ON po.name = poi.parent
         INNER JOIN `tabItem` item ON poi.item_code = item.name
@@ -109,3 +116,59 @@ def check_rquest_to_accepted_qty(self):
             )
 
         
+def validate_qty(self):
+    """Validates qty at row level"""
+    self.item_allowance = {}
+    self.global_qty_allowance = None
+    self.global_amount_allowance = None
+
+    for args in self.status_updater:
+        if "target_ref_field" not in args:
+            # if target_ref_field is not specified, the programmer does not want to validate qty / amount
+            continue
+        # get unique transactions to update
+        for d in self.get_all_children():
+            if hasattr(d, "qty") and d.qty < 0 and not self.get("is_return"):
+                frappe.throw(_("For an item {0}, quantity must be positive number").format(d.item_code))
+
+            if hasattr(d, "qty") and d.qty > 0 and self.get("is_return"):
+                frappe.throw(_("For an item {0}, quantity must be negative number").format(d.item_code))
+
+            if not frappe.db.get_single_value("Selling Settings", "allow_negative_rates_for_items"):
+                if hasattr(d, "item_code") and hasattr(d, "rate") and flt(d.rate) < 0:
+                    frappe.throw(
+                        _(
+                            "For item {0}, rate must be a positive number. To Allow negative rates, enable {1} in {2}"
+                        ).format(
+                            frappe.bold(d.item_code),
+                            frappe.bold(_("`Allow Negative rates for Items`")),
+                            get_link_to_form("Selling Settings", "Selling Settings"),
+                        ),
+                    )
+
+            if d.doctype == args["source_dt"] and d.get(args["join_field"]):
+                args["name"] = d.get(args["join_field"])
+
+                # get all qty where qty > target_field
+                item = frappe.db.sql(
+                    """select item_code, `{target_ref_field}`,
+                    `{target_field}`, parenttype, parent from `tab{target_dt}`
+                    where name=%s and docstatus=1""".format(**args),
+                    args["name"],
+                    as_dict=1,
+                )
+                if item:
+                    item = item[0]
+                    item["idx"] = d.idx
+                    item["target_ref_field"] = args["target_ref_field"].replace("_", " ")
+                    item["received_qty"] = flt(d.get("custom_request_quantity"))
+                   
+                    # if not item[args['target_ref_field']]:
+                    # 	msgprint(_("Note: System will not check over-delivery and over-booking for Item {0} as quantity or amount is 0").format(item.item_code))
+                    if args.get("no_allowance"):
+                        item["reduce_by"] = item[args["target_field"]] - item[args["target_ref_field"]]
+                        if item["reduce_by"] > 0.01:
+                            limits_crossed_error(self , args, item, "qty")
+
+                    elif item[args["target_ref_field"]]:
+                        check_overflow_with_allowance(self , item, args)

@@ -164,7 +164,8 @@ doc_events = {
         "on_cancel" : "masar_mce.custom.blanket_order.blanket_order.on_cancel"
     }, 
     "Purchase Receipt" : {
-        "on_submit" : "masar_mce.custom.purchase_receipt.purchase_receipt.on_submit"
+        "on_submit" : "masar_mce.custom.purchase_receipt.purchase_receipt.on_submit", 
+        "validate" :  "masar_mce.custom.purchase_receipt.purchase_receipt.validate"
     }
 }
 
