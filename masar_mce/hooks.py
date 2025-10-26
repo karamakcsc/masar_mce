@@ -321,3 +321,7 @@ fixtures = [
         ]
     }
 ]
+
+from erpnext.buying import utils as buying_utils
+from masar_mce.override._utils import validate_stock_item_warehouse
+buying_utils.validate_stock_item_warehouse = validate_stock_item_warehouse

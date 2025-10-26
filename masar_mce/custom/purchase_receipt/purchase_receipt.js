@@ -10,6 +10,13 @@ frappe.ui.form.on("Purchase Receipt", {
     onload(frm) {
         set_item_code_query(frm);
         hide_buttons(frm);
+    }, 
+    workflow_state(frm) {
+        if (frm.doc.docstatus === 0) {
+            frm.refresh_fields();
+            frm.fields_dict["items"].grid.refresh();
+            frm.trigger("refresh");
+        }
     }
 });
 
