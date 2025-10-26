@@ -1,19 +1,37 @@
 :root {
-	--bg-color:  #e5e8eb;
+	--bg-color: #e5e8eb;
 	--btn-primary: #045909;
 	--btn-secondary: #04590980;
 	--secondary: #045909;
 	--navbar-bg: #045909;
-	--text-btn-color: rgb(255, 255, 255);
+	--text-btn-color: #ffffff;
+	--text-color: #000000;
 	--table-border-color: #04590940;
-	--btn-default-hover-bg: white;
+	--btn-default-hover-bg: #ffffff;
 	--sidebar-select-color: #04590920;
-	--checkbox-gradient: linear-gradient(180deg, var(--btn-primary) -124.51%, var(--btn-primary) 100%);
+	--checkbox-gradient: linear-gradient(180deg, var(--btn-primary) 0%, var(--btn-primary) 100%);
 	--text-base: 14px;
+	--green-400: #4caf50;
+	--green-600: #2e7d32;
+	--green-800: #1b5e20;
+	--gray-300: #e0e0e0;
+	--gray-400: #bdbdbd;
+	--red-400: #ef5350;
+	--white-overlay-400: rgba(255, 255, 255, 0.4);
 }
 
-/* login page */
+/* =========================================================
+   TEXT SELECTION STYLE
+   ========================================================= */
+::selection {
+	background-color: #045909 !important; /* خلفية خضراء داكنة */
+	color: #ffffff !important; /* النص أبيض واضح */
+	font-weight: 700 !important; /* النص غامق أثناء التحديد */
+}
 
+/* =========================================================
+   LOGIN PAGE
+   ========================================================= */
 [data-path="login"] .navbar-light {
 	border-bottom: 1px solid var(--green-400) !important;
 	background: white;
@@ -27,13 +45,13 @@
 	border: 1px solid var(--green-400) !important;
 }
 
-.for-login .btn-login{
+.for-login .btn-login {
 	background-color: var(--green-800) !important;
 	border: none !important;
 	color: white;
 }
 
-.for-login .btn-login:hover{
+.for-login .btn-login:hover {
 	background-color: var(--green-600) !important;
 	border: none !important;
 	color: white;
@@ -43,12 +61,13 @@
 	color: black !important;
 }
 
-.for-login .form-control, .for-login .form-control{
+.for-login .form-control {
 	background-color: white !important;
 	border: solid 1px var(--green-400) !important;
 }
 
-.for-login .form-control:focus, .for-login .form-control:hover{
+.for-login .form-control:focus,
+.for-login .form-control:hover {
 	box-shadow: 0 0 0 1px var(--green-300) !important;
 }
 
@@ -56,74 +75,64 @@
 	color: var(--green-600) !important;
 }
 
-/* NAVBAR DESIGNE */
-
-.navbar .navbar-expand span, 
+/* =========================================================
+   NAVBAR DESIGN
+   ========================================================= */
+.navbar .navbar-expand span,
 .navbar .navbar-expand li a,
 #navbar-breadcrumbs a,
-.navbar .nav-item button.nav-link{ 
+.navbar .nav-item button.nav-link {
 	color: var(--btn-default-hover-bg) !important;
-
 }
 
 #navbar-breadcrumbs li.disabled a {
-  color: var(--white-overlay-400) !important;
+	color: var(--white-overlay-400) !important;
 }
 
-.nav-tabs{ 
-	border:none;
+.nav-tabs {
+	border: none;
 }
 
 .search-bar span {
-	color: var(--neutral-black) !important;
+	color: var(--text-color) !important;
 }
 
-/* PAGE DESIGN */
-
-body, .page-container { 
+/* =========================================================
+   PAGE DESIGN
+   ========================================================= */
+body,
+.page-container {
 	background-color: var(--bg-color) !important;
 }
 
-.page-head { 
+.page-head {
 	background-color: white !important;
 }
 
-/* Arabic Font Override */
-html[lang="ar"], 
-html[lang="ar"] body, 
+/* =========================================================
+   ARABIC FONT
+   ========================================================= */
+html[lang="ar"],
+html[lang="ar"] body,
 html[lang="ar"] * {
-	font-family: Calibri, 'Segoe UI', Tahoma, Geneva, sans-serif !important;
+	font-family: "Cairo", Calibri, 'Segoe UI', Tahoma, Geneva, sans-serif !important;
 }
 
-.es-icon {
-	@extend .icon;
-	fill :  #04590980 !important; 
-	stroke:  #04590980 !important;
-}
-
-.page-content .layout-main-section{
-        background-color: white;
-}
-
-.datatable .dt-cell {
-  background-color: #fff !important;
-}
-
-/* DASHBOARD DESIGN */
-.desk-sidebar-item{
-	line-height: 2.2;
-}
-
-.widget.links-widget-box, .widget.dashboard-widget-box {
+/* =========================================================
+   DASHBOARD WIDGETS
+   ========================================================= */
+.widget.links-widget-box,
+.widget.dashboard-widget-box {
 	border: 1px solid #04590980;
+	border-radius: 6px;
 }
 
-.widget.links-widget-box .widget-head .widget-label .widget-title{
+.widget.links-widget-box .widget-head .widget-label .widget-title {
 	background-color: white;
 	color: #045909 !important;
 }
 
-.widget-body .link-item{
+.widget-body .link-item {
 	margin-bottom: 5px !important;
 }
 
@@ -140,212 +149,235 @@ a.onboard-spotlight .link-content:hover {
 	color: var(--btn-secondary) !important;
 }
 
-.dropdown-notifications .es-icon{
-	@extend .icon;
-	fill :  white !important; 
-	stroke:  white !important;
+.dropdown-notifications .es-icon {
+	fill: white !important;
+	stroke: white !important;
 }
 
-/* LIST GRID DESIGN */
-
-.list-filters .form-control, .standard-filter-section .form-control, .standard-filter-section .form-control {
+/* =========================================================
+   LIST GRID DESIGN
+   ========================================================= */
+.list-filters .form-control,
+.standard-filter-section .form-control {
 	box-shadow: 0 0 0 1px rgba(124, 124, 124, 0.25) !important;
 }
 
-.level.list-row-head, .level.list-row-head .level-item {
-	font-weight:bold;
+.level.list-row-head,
+.level.list-row-head .level-item {
+	font-weight: bold;
 	background-color: var(--gray-300);
 }
-.list-row-container .list-row:hover{
+
+.list-row-container .list-row:hover {
 	background-color: var(--sidebar-select-color);
+	cursor: pointer;
 }
 
-.list-filters .form-control:focus, .list-filters .form-control:hover,
-.standard-filter-section .form-control:focus, .standard-filter-section .form-control:hover {
+.list-filters .form-control:focus,
+.list-filters .form-control:hover,
+.standard-filter-section .form-control:focus,
+.standard-filter-section .form-control:hover {
 	box-shadow: 0 0 0 2px rgba(124, 124, 124, 0.25) !important;
 }
 
-/*  FORM DESIGN  */
-.form-control, .frappe-control .ql-editor:not(.read-mode){
+/* =========================================================
+   FORM DESIGN
+   ========================================================= */
+.form-control,
+.frappe-control .ql-editor:not(.read-mode) {
 	box-shadow: 0 0 0 1px rgba(124, 124, 124, 0.25) !important;
+	transition: box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .ace_editor {
 	box-shadow: 0 0 0 1px rgba(124, 124, 124, 0.25) !important;
 }
 
-.ql-editor:focus, .ace_editor:focus{
+.ql-editor:focus,
+.ace_editor:focus {
 	box-shadow: 0 0 0 2px rgba(124, 124, 124, 0.25) !important;
 }
 
-.form-control:focus, .form-control:hover{
+.form-control:focus,
+.form-control:hover {
 	box-shadow: 0 0 0 2px #04590980 !important;
-}
-
-.form-control:focus {
 	background-color: #04590925;
 }
 
 .frappe-control:not([data-fieldtype="MultiSelectPills"]):not([data-fieldtype="Table MultiSelect"]).has-error input:hover,
-.frappe-control:not([data-fieldtype="MultiSelectPills"]):not([data-fieldtype="Table MultiSelect"]).has-error input:focus
-{
+.frappe-control:not([data-fieldtype="MultiSelectPills"]):not([data-fieldtype="Table MultiSelect"]).has-error input:focus {
 	box-shadow: 0 0 0 2px #bbd6fc !important;
 }
 
-.frappe-control:not([data-fieldtype="MultiSelectPills"]):not([data-fieldtype="Table MultiSelect"]).has-error input{
-	box-shadow: none !important;
-}
-
 option {
-	 background-color: white !important;
-}
-
-.grid-heading-row .filter-row, .awesomplete [role="listbox"] {
 	background-color: white !important;
 }
 
-.grid-row-open{
+.grid-heading-row .filter-row,
+.awesomplete [role="listbox"] {
+	background-color: white !important;
+}
+
+.grid-row-open {
 	box-shadow: 0 0 0 3px #045909 !important;
 }
 
-.awesomplete [role="option"]:hover,  .awesomplete li:hover{
+.awesomplete [role="option"]:hover,
+.awesomplete li:hover {
 	background-color: var(--gray-300) !important;
 }
 
 input[type="checkbox"]:checked {
 	background-color: var(--btn-secondary) !important;
-	background-image: url("data:image/svg+xml, <svg viewBox='0 0 8 7' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M1 4.00001L2.66667 5.80001L7 1.20001' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>"),var(--checkbox-gradient) !important;
+	background-image: url("data:image/svg+xml,<svg viewBox='0 0 8 7' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M1 4.00001L2.66667 5.80001L7 1.20001' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>"), var(--checkbox-gradient) !important;
 }
 
 .datepicker {
-	 background-color: var(--bg-color) !important;
+	background-color: var(--bg-color) !important;
 }
 
-/* BUTTONS DESIGN */ 
-.btn{
+/* =========================================================
+   BUTTONS DESIGN
+   ========================================================= */
+.btn {
 	border-radius: 0.25rem !important;
 }
 
-.btn.btn-primary{
+.btn.btn-primary {
 	color: var(--text-btn-color);
 	border: solid 2px #045909 !important;
+	background-color: #045909 !important;
 }
 
 .btn.btn-primary:hover {
 	background: var(--btn-default-hover-bg) !important;
 	border: solid 2px #045909 !important;
 	color: var(--text-color);
-  }
+}
 
-.standard-actions .btn.btn-secondary{
+.standard-actions .btn.btn-secondary,
+.custom-actions .btn.btn-default {
 	background: var(--secondary) !important;
-        border: solid 2px var(--secondary) !important;
+	border: solid 2px var(--secondary) !important;
 	color: var(--text-btn-color);
 }
 
-.standard-actions .btn.btn-secondary:hover{
+.standard-actions .btn.btn-secondary:hover,
+.custom-actions .btn.btn-default:hover {
 	background: var(--btn-default-hover-bg) !important;
-    	border: solid 2px var(--secondary) !important;
+	border: solid 2px var(--secondary) !important;
 	color: var(--text-color);
-}
-
-.custom-actions .btn.btn-default{
-	background: var(--secondary) !important;
-        border: solid 2px var(--secondary) !important;
-	color: var(--text-btn-color);
-}
-
-.custom-actions .btn.btn-default:hover{
-	background: var(--btn-default-hover-bg) !important;
-    	border: solid 2px var(--secondary) !important;
-	color: var(--text-color);
-}
-
-.btn.btn-secondary .es-icon{
-	@extend .icon;
-	fill :  white !important; 
-	stroke:  white !important;
 }
 
 .btn.btn-default {
 	background: var(--btn-default-hover-bg) !important;
-    border: solid 1px var(--btn-secondary) !important;
-    color: var(--text-color);
+	border: solid 1px var(--btn-secondary) !important;
+	color: var(--text-color);
 }
 
-.btn.grid-add-row{
+.btn.grid-add-row {
 	background: var(--btn-default-hover-bg) !important;
-    border: solid 1px var(--btn-secondary) !important;
-    color: var(--text-color);
+	border: solid 1px var(--btn-secondary) !important;
+	color: var(--text-color);
 }
 
-.btn.btn-new-doc{
+.btn.btn-new-doc {
 	background-color: #045909 !important;
 	color: var(--text-btn-color);
 	border: solid 2px #045909 !important;
 }
 
-.btn.btn-new-doc:hover{
+.btn.btn-new-doc:hover {
 	background: var(--btn-default-hover-bg) !important;
 	border: solid 2px #045909 !important;
 	color: var(--text-color);
 }
 
-.custom-actions .btn{
+.custom-actions .btn {
 	font-size: 12px !important;
 }
 
-.btn-group > .btn:not(:last-child):not(.dropdown-toggle), div#driver-popover-item .driver-popover-footer .btn-group > button:not(:last-child):not(.dropdown-toggle), .btn-group > .btn-group:not(:last-child) > .btn, div#driver-popover-item .driver-popover-footer .btn-group > .btn-group:not(:last-child) > button {
+.btn-group > .btn:not(:last-child):not(.dropdown-toggle),
+.btn-group > .btn-group:not(:last-child) > .btn {
 	border-top-right-radius: 0 !important;
-	border-bottom-right-radius: 0 !important;  
+	border-bottom-right-radius: 0 !important;
 }
 
-.btn-group > .btn:not(:first-child), div#driver-popover-item .driver-popover-footer .btn-group > button:not(:first-child), .btn-group > .btn-group:not(:first-child) > .btn, div#driver-popover-item .driver-popover-footer .btn-group > .btn-group:not(:first-child) > button {
+.btn-group > .btn:not(:first-child),
+.btn-group > .btn-group:not(:first-child) > .btn {
 	border-top-left-radius: 0 !important;
 	border-bottom-left-radius: 0 !important;
 }
 
-/* POS DESIGN */
-
-.point-of-sale-app section { 
+/* =========================================================
+   POS DESIGN
+   ========================================================= */
+.point-of-sale-app section {
 	min-height: 40rem !important;
 }
 
 .client-wrapper ul {
 	padding-left: 22px;
-	margin-top: 0; 
-	margin-bottom:0;
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 .client-wrapper li {
-  float: left;
-  list-style-type: none;
+	float: left;
+	list-style-type: none;
 }
 
-.client-wrapper li a { 
+.client-wrapper li a {
 	display: inline-block;
 	text-decoration: none;
-	width: 100%; 
-	background-color: var(--gray-300) !important; 
-	color: black; 
+	width: 100%;
+	background-color: var(--gray-300) !important;
+	color: black;
 	text-align: center;
 }
 
-.client-wrapper li a.plus-pos, .client-wrapper li a.plus-pos:focus, .client-wrapper li a.plus-pos:hover{
-        background-color: var(--gray-400) !important;
+.client-wrapper li a.plus-pos,
+.client-wrapper li a.plus-pos:focus,
+.client-wrapper li a.plus-pos:hover {
+	background-color: var(--gray-400) !important;
 }
 
-.client-wrapper li a.minus-pos, .client-wrapper li a.minus-pos:focus, .client-wrapper li a.minus-pos:hover{
+.client-wrapper li a.minus-pos,
+.client-wrapper li a.minus-pos:focus,
+.client-wrapper li a.minus-pos:hover {
 	background-color: var(--red-400) !important;
 }
 
 .client-wrapper li a:focus,
 .client-wrapper li a:hover {
-  background-color: var(--gray-400) !important;
-  color: black;
+	background-color: var(--gray-400) !important;
+	color: black;
 }
 
 .client-wrapper li a.active {
-  background-color:  white !important;
-  color: black;
+	background-color: white !important;
+	color: black;
+}
+
+/* =========================================================
+   FILTER / PILL HIGHLIGHT
+   ========================================================= */
+.frappe-control[data-fieldtype="Select"] option:checked,
+.frappe-control[data-fieldtype="MultiSelectPills"] .pill.selected,
+.frappe-control[data-fieldtype="Link"] option:checked,
+.standard-filter-section .pill.selected,
+.list-filters .pill.selected {
+	background-color: var(--btn-primary) !important; /* أخضر داكن */
+	color: var(--text-btn-color) !important;        /* نص أبيض */
+	font-weight: 700 !important;                     /* نص غامق */
+	box-shadow: 0 0 0 1px var(--btn-primary) !important;
+}
+
+.frappe-control[data-fieldtype="MultiSelectPills"] .pill:hover,
+.standard-filter-section .pill:hover,
+.list-filters .pill:hover {
+	background-color: var(--btn-secondary) !important; /* أخضر شفاف */
+	color: var(--text-btn-color) !important;
+	font-weight: 700 !important;
+	cursor: pointer;
 }

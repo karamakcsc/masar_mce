@@ -99,18 +99,12 @@ frappe.ui.form.on('Purchase Receipt Item', {
 });
 function ChangeLabels(frm) {
     const isReturn = frm.doc.is_return === 1;
-    frm.set_df_property("custom_request_date", "label", isReturn ? "Return Date" : "Request Date");
-    if (frm.fields_dict["items"]) {
-            frm.fields_dict["items"].grid.update_docfield_property(
-                "custom_request_quantity", "label",
-                isReturn ? "Return Quantity" : "Request Quantity"
-            );
-        }
-        
+    frm.set_df_property("custom_delivery_date", "label", isReturn ? "Expected Return Date" : "Expected Delivery Date");
+    frm.set_df_property("posting_date", "label", isReturn ? "Return Date" : "Receipt Date");
     frm.refresh_fields();
     frappe.after_ajax(() => {
-        $('[data-fieldname="custom_section_break_dvar1"] .section-head').text(
-            isReturn ? "Return Details" : "Request Details"
+        $('[data-fieldname="custom_section_break_btshv"] .section-head').text(
+            isReturn ? "Return Details" : "Receipt Details"
         );
     });
 }
