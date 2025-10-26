@@ -15,8 +15,6 @@ def on_submit(self , method):
 @frappe.validate_and_sanitize_search_inputs
 def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_len, filters):
     supplier = filters.get("supplier")
-    if not supplier:
-        return []
     query = """
         SELECT
             poi.item_code,

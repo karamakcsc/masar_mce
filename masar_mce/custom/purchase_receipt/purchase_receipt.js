@@ -2,15 +2,21 @@ frappe.ui.form.on("Purchase Receipt", {
     setup(frm) {
         set_item_code_query(frm);
         hide_buttons(frm);
+        ChangeLabels(frm);
     }, 
     refresh(frm) {
         set_item_code_query(frm);
         hide_buttons(frm);
+        ChangeLabels(frm);
     }, 
     onload(frm) {
         set_item_code_query(frm);
         hide_buttons(frm);
+        ChangeLabels(frm);
     }, 
+    supplier(frm) {
+        set_item_code_query(frm);
+    },
     workflow_state(frm) {
         if (frm.doc.docstatus === 0) {
             frm.refresh_fields();
@@ -24,7 +30,7 @@ frappe.ui.form.on("Purchase Receipt", {
             frm.fields_dict["items"].grid.refresh();
             frm.trigger("refresh");
         }
-    }
+    },
 });
 
 function hide_buttons(frm) {
@@ -91,3 +97,20 @@ frappe.ui.form.on('Purchase Receipt Item', {
         });
     }
 });
+function ChangeLabels(frm) {
+    const isReturn = frm.doc.is_return === 1;
+    frm.set_df_property("custom_request_date", "label", isReturn ? "Return Date" : "Request Date");
+    if (frm.fields_dict["items"]) {
+            frm.fields_dict["items"].grid.update_docfield_property(
+                "custom_request_quantity", "label",
+                isReturn ? "Return Quantity" : "Request Quantity"
+            );
+        }
+        
+    frm.refresh_fields();
+    frappe.after_ajax(() => {
+        $('[data-fieldname="custom_section_break_dvar1"] .section-head').text(
+            isReturn ? "Return Details" : "Request Details"
+        );
+    });
+}
