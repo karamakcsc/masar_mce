@@ -26,7 +26,7 @@
 ::selection {
 	background-color: #045909 !important; /* خلفية خضراء داكنة */
 	color: #ffffff !important; /* النص أبيض واضح */
-	font-weight: 700 !important; /* النص غامق أثناء التحديد */
+	font-weight: 700 !important; /* يجعل النص غامق أثناء التحديد */
 }
 
 /* =========================================================
@@ -357,27 +357,4 @@ input[type="checkbox"]:checked {
 .client-wrapper li a.active {
 	background-color: white !important;
 	color: black;
-}
-
-/* =========================================================
-   FILTER / PILL HIGHLIGHT
-   ========================================================= */
-.frappe-control[data-fieldtype="Select"] option:checked,
-.frappe-control[data-fieldtype="MultiSelectPills"] .pill.selected,
-.frappe-control[data-fieldtype="Link"] option:checked,
-.standard-filter-section .pill.selected,
-.list-filters .pill.selected {
-	background-color: var(--btn-primary) !important; /* أخضر داكن */
-	color: var(--text-btn-color) !important;        /* نص أبيض */
-	font-weight: 700 !important;                     /* نص غامق */
-	box-shadow: 0 0 0 1px var(--btn-primary) !important;
-}
-
-.frappe-control[data-fieldtype="MultiSelectPills"] .pill:hover,
-.standard-filter-section .pill:hover,
-.list-filters .pill:hover {
-	background-color: var(--btn-secondary) !important; /* أخضر شفاف */
-	color: var(--text-btn-color) !important;
-	font-weight: 700 !important;
-	cursor: pointer;
 }
