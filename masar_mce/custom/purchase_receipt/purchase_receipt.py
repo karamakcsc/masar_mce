@@ -9,8 +9,9 @@ def validate(self , method ):
     validate_qty(self)
     
 def on_submit(self , method): 
-    create_auto_penalty_entry(self)
-    check_rquest_to_accepted_qty(self)
+    if self.is_return == 0 :
+        create_auto_penalty_entry(self)
+        check_rquest_to_accepted_qty(self)
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_len, filters):
@@ -42,8 +43,7 @@ def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_l
     return [
         (
             row.item_code,
-            f"Qty:{row.available_qty} ",
-            row.purchase_order
+            f"<b>PO:</b> {row.purchase_order},<b>Qty:</b> {frappe.utils.fmt_money(row.available_qty, currency=None)}<br>"
         )
         for row in result
     ]
@@ -122,9 +122,7 @@ def validate_qty(self):
 
     for args in self.status_updater:
         if "target_ref_field" not in args:
-            # if target_ref_field is not specified, the programmer does not want to validate qty / amount
             continue
-        # get unique transactions to update
         for d in self.get_all_children():
             if hasattr(d, "qty") and d.qty < 0 and not self.get("is_return"):
                 frappe.throw(_("For an item {0}, quantity must be positive number").format(d.item_code))
@@ -143,11 +141,8 @@ def validate_qty(self):
                             get_link_to_form("Selling Settings", "Selling Settings"),
                         ),
                     )
-
             if d.doctype == args["source_dt"] and d.get(args["join_field"]):
                 args["name"] = d.get(args["join_field"])
-
-                # get all qty where qty > target_field
                 item = frappe.db.sql(
                     """select item_code, `{target_ref_field}`,
                     `{target_field}`, parenttype, parent from `tab{target_dt}`
@@ -160,13 +155,9 @@ def validate_qty(self):
                     item["idx"] = d.idx
                     item["target_ref_field"] = args["target_ref_field"].replace("_", " ")
                     item["received_qty"] = flt(d.get("custom_request_quantity"))
-                   
-                    # if not item[args['target_ref_field']]:
-                    # 	msgprint(_("Note: System will not check over-delivery and over-booking for Item {0} as quantity or amount is 0").format(item.item_code))
                     if args.get("no_allowance"):
                         item["reduce_by"] = item[args["target_field"]] - item[args["target_ref_field"]]
                         if item["reduce_by"] > 0.01:
                             limits_crossed_error(self , args, item, "qty")
-
                     elif item[args["target_ref_field"]]:
                         check_overflow_with_allowance(self , item, args)

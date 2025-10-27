@@ -2717,7 +2717,7 @@
   "property": "depends_on",
   "property_type": "Data",
   "row_name": null,
-  "value": "eval:doc.docstatus==0 &&( doc.workflow_state == 'Purchase Receipt' ||  doc.workflow_state == 'Purchase Return')"
+  "value": "eval:doc.docstatus==0 &&( doc.workflow_state == 'Purchase Receipt' ||  doc.workflow_state == 'Receipt Return')"
  },
  {
   "default_value": null,
@@ -2733,7 +2733,7 @@
   "property": "depends_on",
   "property_type": "Data",
   "row_name": null,
-  "value": "eval: doc.workflow_state == 'Purchase Receipt' || doc.docstatus != 0 || doc.workflow_state == 'Purchase Return' "
+  "value": "eval: doc.workflow_state == 'Purchase Receipt' || doc.docstatus != 0 || doc.workflow_state == 'Receipt Return' "
  },
  {
   "default_value": null,
@@ -2749,7 +2749,7 @@
   "property": "depends_on",
   "property_type": "Data",
   "row_name": null,
-  "value": "eval: doc.workflow_state == 'Purchase Receipt' || doc.docstatus != 0 || doc.workflow_state == 'Purchase Return' "
+  "value": "eval: doc.workflow_state == 'Purchase Receipt' || doc.docstatus != 0 || doc.workflow_state == 'Receipt Return' "
  },
  {
   "default_value": null,
@@ -2765,7 +2765,7 @@
   "property": "depends_on",
   "property_type": "Data",
   "row_name": null,
-  "value": "eval: doc.workflow_state == 'Purchase Receipt' || doc.docstatus != 0 || doc.workflow_state == 'Purchase Return' "
+  "value": "eval: doc.workflow_state == 'Purchase Receipt' || doc.docstatus != 0 || doc.workflow_state == 'Receipt Return' "
  },
  {
   "default_value": null,
@@ -2781,7 +2781,7 @@
   "property": "read_only_depends_on",
   "property_type": "Data",
   "row_name": null,
-  "value": "eval: parent.workflow_state != 'Purchase Receipt' || parent.workflow_state != 'Purchase Return'"
+  "value": "eval: parent.workflow_state != 'Purchase Receipt' || parent.workflow_state != 'Receipt Return'"
  },
  {
   "default_value": null,
@@ -2797,7 +2797,7 @@
   "property": "read_only_depends_on",
   "property_type": "Data",
   "row_name": null,
-  "value": "eval: parent.workflow_state != 'Purchase Receipt' || parent.workflow_state != 'Purchase Return'"
+  "value": "eval: parent.workflow_state != 'Purchase Receipt' || parent.workflow_state != 'Receipt Return'"
  },
  {
   "default_value": null,
@@ -2813,6 +2813,6 @@
   "property": "read_only_depends_on",
   "property_type": "Data",
   "row_name": null,
-  "value": "eval: parent.workflow_state != 'Purchase Receipt' || parent.workflow_state != 'Purchase Return'"
+  "value": "eval: parent.workflow_state != 'Purchase Receipt' || parent.workflow_state != 'Receipt Return'"
  }
 ]
