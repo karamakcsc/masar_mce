@@ -14,6 +14,7 @@ def before_update_after_submit(self , method) :
     if self.custom_status != 'Active': 
         close_valid_date_in_item_price(self)
     else:
+        validate_duplicate_item_in_active_blanket_orders(self)
         revalid_date_in_item_price(self)
         
 def on_submit(self , method): 

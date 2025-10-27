@@ -124,10 +124,10 @@ def validate_qty(self):
         if "target_ref_field" not in args:
             continue
         for d in self.get_all_children():
-            if hasattr(d, "qty") and d.qty < 0 and not self.get("is_return"):
+            if (hasattr(d, "qty") and d.qty < 0 and not self.get("is_return")) or hasattr(d, "custom_request_quantity") and d.custom_request_quantity < 0 and not self.get("is_return"):
                 frappe.throw(_("For an item {0}, quantity must be positive number").format(d.item_code))
 
-            if hasattr(d, "qty") and d.qty > 0 and self.get("is_return"):
+            if (hasattr(d, "qty") and d.qty > 0 and self.get("is_return")) or hasattr(d, "custom_request_quantity") and d.custom_request_quantity > 0 and self.get("is_return"):
                 frappe.throw(_("For an item {0}, quantity must be negative number").format(d.item_code))
 
             if not frappe.db.get_single_value("Selling Settings", "allow_negative_rates_for_items"):

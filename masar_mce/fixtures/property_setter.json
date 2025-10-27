@@ -2781,7 +2781,7 @@
   "property": "read_only_depends_on",
   "property_type": "Data",
   "row_name": null,
-  "value": "eval: parent.workflow_state != 'Purchase Receipt' || parent.workflow_state != 'Receipt Return'"
+  "value": "eval: ['Purchase Receipt', 'Receipt Return'].indexOf(parent.workflow_state) === -1"
  },
  {
   "default_value": null,
@@ -2797,7 +2797,7 @@
   "property": "read_only_depends_on",
   "property_type": "Data",
   "row_name": null,
-  "value": "eval: parent.workflow_state != 'Purchase Receipt' || parent.workflow_state != 'Receipt Return'"
+  "value": "eval: ['Purchase Receipt', 'Receipt Return'].indexOf(parent.workflow_state) === -1"
  },
  {
   "default_value": null,
@@ -2813,6 +2813,6 @@
   "property": "read_only_depends_on",
   "property_type": "Data",
   "row_name": null,
-  "value": "eval: parent.workflow_state != 'Purchase Receipt' || parent.workflow_state != 'Receipt Return'"
+  "value": "eval: ['Purchase Receipt', 'Receipt Return'].indexOf(parent.workflow_state) === -1"
  }
 ]

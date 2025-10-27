@@ -3,16 +3,19 @@ frappe.ui.form.on("Blanket Order", {
         filterBySupplier(frm);
         CreateRequiredInspectionButton(frm);
         CloseandHoldButton(frm);
+        hide_buttons(frm);
     },
     refresh:  function(frm) {
         filterBySupplier(frm);
         CreateRequiredInspectionButton(frm);
         CloseandHoldButton(frm);
+        hide_buttons(frm);
     },
     setup:  function(frm) {
         filterBySupplier(frm);
         CreateRequiredInspectionButton(frm);
         CloseandHoldButton(frm);
+        hide_buttons(frm);
     },
     custom_tcs_terms(frm) {
        
@@ -116,6 +119,13 @@ frappe.form.link_formatters['Item'] = function(value, doc) {
         return value;
     }
 };
+function hide_buttons(frm) {
+    setTimeout(() => {
+        if(frm.doc.custom_status != 'Active') {
+            cur_frm.page.remove_inner_button(__('Purchase Order'), __('Create'));
+        }
+    }, 100);
+}
 function CreateRequiredInspectionButton(frm) {
     if (frm.doc.docstatus === 0 && !frm.is_new()) {
             frm.add_custom_button(__('Material Receipt for Inspection'), function() {

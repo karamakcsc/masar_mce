@@ -13,26 +13,37 @@ frappe.ui.form.on("Purchase Receipt", {
         set_item_code_query(frm);
         hide_buttons(frm);
         ChangeLabels(frm);
+        if (frm.doc.is_return && frm.doc.docstatus === 0 && frm.is_new()) {
+            frm.doc.items.forEach(row => {
+                row.custom_request_quantity = row.qty;
+                row.qty = -1;
+                row.received_qty = -1;
+            });
+            frm.refresh_field("items");
+        }
     }, 
     supplier(frm) {
         set_item_code_query(frm);
     },
     workflow_state(frm) {
         if (frm.doc.docstatus === 0) {
-            frm.refresh_fields();
-            frm.fields_dict["items"].grid.refresh();
-            frm.trigger("refresh");
+            refresh_item_fields(frm);   
         }
     },
     after_workflow_action(frm) {
         if (frm.doc.docstatus === 0) {
-            frm.refresh_fields();
-            frm.fields_dict["items"].grid.refresh();
-            frm.trigger("refresh");
+            refresh_item_fields(frm);   
         }
     },
 });
 
+function refresh_item_fields(frm) {
+    frm.fields_dict["items"].grid.update_docfield_property("rejected_qty", "read_only", ['Purchase Receipt', 'Receipt Return'].indexOf(frm.doc.workflow_state) === -1);
+    frm.fields_dict["items"].grid.update_docfield_property("qty", "read_only", ['Purchase Receipt', 'Receipt Return'].indexOf(frm.doc.workflow_state) === -1);
+    frm.fields_dict["items"].grid.update_docfield_property("received_qty", "read_only", ['Purchase Receipt', 'Receipt Return'].indexOf(frm.doc.workflow_state) === -1);
+    frm.fields_dict["items"].grid.update_docfield_property("custom_request_quantity", "read_only", ['Purchase Receipt', 'Receipt Return'].indexOf(frm.doc.workflow_state) === 1);
+    frm.refresh_field("items");
+}
 function hide_buttons(frm) {
     setTimeout(() => {
         cur_frm.page.remove_inner_button(__('Purchase Invoice'), __('Get Items From'));
