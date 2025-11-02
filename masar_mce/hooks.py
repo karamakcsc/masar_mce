@@ -270,6 +270,7 @@ fixtures = [
     {"dt": "Custom Field", "filters": [
         [
             "dt", "in", [
+                'Supplier',
                 'Blanket Order',
                 'Blanket Order Item',
                 'Purchase Order',
