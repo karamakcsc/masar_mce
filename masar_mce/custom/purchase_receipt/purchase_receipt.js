@@ -75,7 +75,14 @@ function set_item_code_query(frm) {
 
 frappe.ui.form.on('Purchase Receipt Item', {
     item_code(frm, cdt, cdn) {
-        const row = locals[cdt][cdn];
+        GetItemDetails(frm , cdt , cdn)
+    },
+    rate(frm, cdt, cdn) {
+        GetItemDetails(frm , cdt , cdn)
+    }
+});
+function GetItemDetails(frm , cdt , cdn){
+    const row = locals[cdt][cdn];
         if (!row.item_code || !frm.doc.supplier) return;
         
         let used_pos = [];
@@ -107,7 +114,6 @@ frappe.ui.form.on('Purchase Receipt Item', {
             }
         });
     }
-});
 function ChangeLabels(frm) {
     const isReturn = frm.doc.is_return === 1;
     frm.set_df_property("custom_delivery_date", "label", isReturn ? "Expected Return Date" : "Expected Delivery Date");

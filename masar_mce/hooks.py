@@ -271,7 +271,10 @@ fixtures = [
         [
             "dt", "in", [
                 'Supplier',
+                'Item Supplier',
+                'Quality Inspection',
                 'Blanket Order',
+                'Territory',
                 'Blanket Order Item',
                 'Purchase Order',
                 'Purchase Order Item',
@@ -303,6 +306,9 @@ fixtures = [
                 "in",
                 [
                     'Supplier',
+                    'Item Supplier',
+                    'Quality Inspection',
+                    'Territory',
                     'Blanket Order',
                     'Blanket Order Item',
                     'Purchase Order', 

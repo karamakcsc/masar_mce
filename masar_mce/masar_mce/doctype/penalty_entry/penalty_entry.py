@@ -73,9 +73,11 @@ class PenaltyEntry(AccountsController):
                 
             if penalty_doc.based_on_days:
                 pr_doc = frappe.get_doc('Purchase Receipt' , self.purchase_receipt)
-                if pr_doc.posting_date > pr_doc.custom_delivery_date:
-                    extra_days = date_diff(getdate(pr_doc.posting_date), getdate(pr_doc.custom_delivery_date))
-                    if extra_days > 0:
+                warehouse = frappe.get_doc('Warehouse', pr_doc.set_warehouse)
+                allowed_days = warehouse.custom_number_of_days
+                if pr_doc.posting_date > pr_doc.custom_request_date:
+                    extra_days = date_diff(getdate(pr_doc.posting_date), getdate(pr_doc.custom_request_date))
+                    if extra_days > allowed_days:
                         amount = amount * extra_days
                 else: 
                     amount = 0

@@ -14,6 +14,7 @@ def create_quality_inspection(self):
         frappe.new_doc("Quality Inspection").update({
             "inspection_type":"Incoming",
             "reference_type":"Stock Entry",
+            "custom_supplier_agreement": self.custom_supplier_agreement,
             "reference_name":self.name,
             "item_code":i.item_code,
             "inspected_by" : frappe.session.user,

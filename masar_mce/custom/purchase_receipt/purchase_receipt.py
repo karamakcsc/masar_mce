@@ -1,6 +1,6 @@
 import frappe 
 from frappe import _
-from frappe.utils import flt, get_link_to_form, getdate
+from frappe.utils import flt, get_link_to_form, getdate , date_diff
 from erpnext.controllers.status_updater import StatusUpdater
 
 check_overflow_with_allowance = StatusUpdater.check_overflow_with_allowance
@@ -86,8 +86,12 @@ def get_po_details_for_item(item_code, supplier, used_pos=None):
 
 def create_auto_penalty_entry(self): 
     posting_date = getdate(self.posting_date)
-    delivery_date = getdate(self.custom_delivery_date)
-    if posting_date > delivery_date:
+    request_date = getdate(self.custom_request_date)
+    diff_days = date_diff(posting_date, request_date)
+    if self.set_warehouse is None or self.set_warehouse == "":
+        frappe.throw(_("Please set 'Accepted Warehouse' before submitting the Purchase Receipt."))
+    allowed_days = frappe.db.get_value('Warehouse' , self.set_warehouse , 'custom_number_of_days')
+    if diff_days > allowed_days:
         penalties = frappe.db.sql("""
             SELECT name as penalty, penalty_type , account , penalty_percentage
             FROM `tabPenalty`

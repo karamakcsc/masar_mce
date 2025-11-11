@@ -85,25 +85,22 @@ function CalculateAmount(frm, cdt, cdn) {
 }
 function CalculateSellingPrice(frm, cdt, cdn) {
     let row = locals[cdt][cdn];
-    if (frm.doc.custom_pricing_type === 'Buying Price Basis') {
-        if (flt(row.rate) && flt(row.custom_markup_percentage)) {
-            row.custom_selling_price = flt(row.rate) + (flt(row.rate) * flt(row.custom_markup_percentage) / 100);
-        } else {
-            row.custom_selling_price = 0;
-        }
-        frm.refresh_field("items");
+    if (flt(row.rate) && flt(row.custom_markup_percentage)) {
+        row.custom_selling_price = flt(row.rate) + (flt(row.rate) * flt(row.custom_markup_percentage) / 100);
+    } else {
+        row.custom_selling_price = 0;
     }
+    frm.refresh_field("items");
+
 }
 function CalculateMarkupPercentage(frm, cdt, cdn) {
     let row = locals[cdt][cdn];
-    if (frm.doc.custom_pricing_type === 'Selling Price Basis') {
-        if (flt(row.rate) && flt(row.custom_selling_price)) {
-            row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.rate)) / flt(row.rate)) * 100;
-        } else {
-            row.custom_markup_percentage = 0;
-        }
-        frm.refresh_field("items");
+    if (flt(row.rate) && flt(row.custom_selling_price)) {
+        row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.rate)) / flt(row.rate)) * 100;
+    } else {
+        row.custom_markup_percentage = 0;
     }
+    frm.refresh_field("items");
 }
 function update_total(frm) {
     let total = 0;
