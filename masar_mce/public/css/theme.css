@@ -1,360 +1,607 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+
 :root {
-	--bg-color: #e5e8eb;
-	--btn-primary: #045909;
-	--btn-secondary: #04590980;
-	--secondary: #045909;
-	--navbar-bg: #045909;
-	--text-btn-color: #ffffff;
-	--text-color: #000000;
-	--table-border-color: #04590940;
-	--btn-default-hover-bg: #ffffff;
-	--sidebar-select-color: #04590920;
-	--checkbox-gradient: linear-gradient(180deg, var(--btn-primary) 0%, var(--btn-primary) 100%);
-	--text-base: 14px;
-	--green-400: #4caf50;
-	--green-600: #2e7d32;
-	--green-800: #1b5e20;
-	--gray-300: #e0e0e0;
-	--gray-400: #bdbdbd;
-	--red-400: #ef5350;
-	--white-overlay-400: rgba(255, 255, 255, 0.4);
+    /* Define the LTR font stack (e.g., for English) */
+    --banking-font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    
+    /* Define a specific font stack for Arabic/RTL contexts */
+    --banking-font-arabic: 'Cairo', 'Traditional Arabic', sans-serif;
+
+    /* Primary Colors (Green Theme) */
+    --banking-primary: #0A7F3F;               /* Main green */
+    --banking-primary-light: #11A857;         /* Lighter green */
+    --banking-primary-dark: #065A2B;          /* Dark green */
+    --banking-primary-gradient: linear-gradient(135deg, #0A7F3F 0%, #11A857 100%);
+
+    /* Secondary Colors (Natural earthy tones) */
+    --banking-secondary: #A88F4F;             /* olive-gold */
+    --banking-secondary-dark: #8A743C;
+    --banking-accent: #6C5E3A;                /* warm earthy accent */
+
+    /* Status Colors – harmonized with green theme */
+    --banking-success: #0A7F3F;              /* success = primary green */
+    --banking-success-light: #D4F2E3;
+    --banking-danger: #DC2626;
+    --banking-danger-light: #FEE2E2;
+    --banking-warning: #D97706;
+    --banking-warning-light: #FEF3C7;
+    --banking-info: #0284C7;
+    --banking-info-light: #DBEAFE;
+
+    /* Backgrounds */
+    --banking-bg-page: #F4FAF7;
+    --banking-bg-card: #ffffff;
+    --banking-bg-hover: #E6F4EB;              /* subtle green tint */
+    --banking-bg-sidebar: #ffffff;
+
+    /* Borders & Dividers */
+    --banking-border: #D9E8DF;
+    --banking-border-dark: #AAC8BA;
+    --banking-divider: #E8F2EC;
+
+    /* Text Colors */
+    --banking-text-primary: #1e293b;
+    --banking-text-secondary: #475569;
+    --banking-text-muted: #94a3b8;
+    --banking-text-inverse: #ffffff;
 }
 
-/* =========================================================
-   TEXT SELECTION STYLE
-   ========================================================= */
-::selection {
-	background-color: #045909 !important; /* خلفية خضراء داكنة */
-	color: #ffffff !important; /* النص أبيض واضح */
-	font-weight: 700 !important; /* يجعل النص غامق أثناء التحديد */
+/* --- Global Base Styles --- */
+body {
+    color: var(--banking-text-primary);
+    font-family: var(--banking-font-body);
 }
 
-/* =========================================================
-   LOGIN PAGE
-   ========================================================= */
-[data-path="login"] .navbar-light {
-	border-bottom: 1px solid var(--green-400) !important;
-	background: white;
+/* --- Page Background --- */
+.page-container,
+.layout-main-section,
+#page-Workspaces {
+    background-color: var(--banking-bg-page) !important;
 }
 
-[data-path="login"] .web-footer {
-	border-top: 1px solid var(--green-400) !important;
+/* --- Form Layout & Cards --- */
+.form-layout,
+.frappe-control,
+.form-section,
+.widget,
+.dashboard-card,
+.indicator-widget,
+.page-card-container,
+.page-card {
+    background: var(--banking-bg-card);
+    /* border: 1px solid var(--banking-border); */
 }
 
-.for-login .page-card {
-	border: 1px solid var(--green-400) !important;
+/* --- Section Headers --- */
+.form-section .section-head,
+.form-column .section-head {
+    background: var(--banking-primary-gradient);
+    color: var(--banking-text-inverse);
 }
 
-.for-login .btn-login {
-	background-color: var(--green-800) !important;
-	border: none !important;
-	color: white;
+.form-section .section-head .collapsed,
+.form-column .section-head .collapsed {
+    color: var(--banking-text-inverse);
 }
 
-.for-login .btn-login:hover {
-	background-color: var(--green-600) !important;
-	border: none !important;
-	color: white;
+/* Collapsible sections */
+.form-section.collapsible .section-head:hover {
+    background: linear-gradient(135deg, var(--banking-primary-light) 0%, #0088cc 100%);
 }
 
-.for-login .page-card-head h4 {
-	color: black !important;
+/* --- Buttons --- */
+.btn-primary,
+.btn-primary-dark,
+button.btn-primary,
+.page-head .standard-actions .btn-primary {
+    background: var(--banking-primary-gradient);
+    color: var(--banking-text-inverse);
 }
 
-.for-login .form-control {
-	background-color: white !important;
-	border: solid 1px var(--green-400) !important;
+.btn-primary:hover,
+.btn-primary-dark:hover,
+button.btn-primary:hover {
+    background: linear-gradient(135deg, var(--banking-primary-light) 0%, #0088cc 100%);
+    color: var(--banking-text-inverse);
 }
 
-.for-login .form-control:focus,
-.for-login .form-control:hover {
-	box-shadow: 0 0 0 1px var(--green-300) !important;
+/* Secondary Button */
+.btn-secondary,
+.btn-default {
+    background: var(--banking-bg-card);
+    border: 1px solid var(--banking-border-dark);
+    color: var(--banking-text-primary);
 }
 
-.for-login .page-card .page-card-body .forgot-password-message>* {
-	color: var(--green-600) !important;
+.btn-secondary:hover,
+.btn-default:hover {
+    background: var(--banking-bg-hover);
+    border-color: var(--banking-primary-light);
+    color: var(--banking-primary);
 }
 
-/* =========================================================
-   NAVBAR DESIGN
-   ========================================================= */
-.navbar .navbar-expand span,
-.navbar .navbar-expand li a,
-#navbar-breadcrumbs a,
-.navbar .nav-item button.nav-link {
-	color: var(--btn-default-hover-bg) !important;
+/* Status Buttons */
+.btn-success {
+    background: var(--banking-success);
+    color: var(--banking-text-inverse);
 }
 
-#navbar-breadcrumbs li.disabled a {
-	color: var(--white-overlay-400) !important;
+.btn-success:hover {
+    background: #0d9474;
 }
 
-.nav-tabs {
-	border: none;
+.btn-danger {
+    background: var(--banking-danger);
+    color: var(--banking-text-inverse);
 }
 
-.search-bar span {
-	color: var(--text-color) !important;
+.btn-danger:hover {
+    background: #c02a2a;
 }
 
-/* =========================================================
-   PAGE DESIGN
-   ========================================================= */
-body,
-.page-container {
-	background-color: var(--bg-color) !important;
-}
-
-.page-head {
-	background-color: white !important;
-}
-
-/* =========================================================
-   ARABIC FONT
-   ========================================================= */
-html[lang="ar"],
-html[lang="ar"] body,
-html[lang="ar"] * {
-	font-family: "Cairo", Calibri, 'Segoe UI', Tahoma, Geneva, sans-serif !important;
-}
-
-/* =========================================================
-   DASHBOARD WIDGETS
-   ========================================================= */
-.widget.links-widget-box,
-.widget.dashboard-widget-box {
-	border: 1px solid #04590980;
-	border-radius: 6px;
-}
-
-.widget.links-widget-box .widget-head .widget-label .widget-title {
-	background-color: white;
-	color: #045909 !important;
-}
-
-.widget-body .link-item {
-	margin-bottom: 5px !important;
-}
-
-.icon-md {
-	width: 30px;
-	height: 30px;
-}
-
-.onboard-spotlight {
-	color: var(--secondary) !important;
-}
-
-a.onboard-spotlight .link-content:hover {
-	color: var(--btn-secondary) !important;
-}
-
-.dropdown-notifications .es-icon {
-	fill: white !important;
-	stroke: white !important;
-}
-
-/* =========================================================
-   LIST GRID DESIGN
-   ========================================================= */
-.list-filters .form-control,
-.standard-filter-section .form-control {
-	box-shadow: 0 0 0 1px rgba(124, 124, 124, 0.25) !important;
-}
-
-.level.list-row-head,
-.level.list-row-head .level-item {
-	font-weight: bold;
-	background-color: var(--gray-300);
-}
-
-.list-row-container .list-row:hover {
-	background-color: var(--sidebar-select-color);
-	cursor: pointer;
-}
-
-.list-filters .form-control:focus,
-.list-filters .form-control:hover,
-.standard-filter-section .form-control:focus,
-.standard-filter-section .form-control:hover {
-	box-shadow: 0 0 0 2px rgba(124, 124, 124, 0.25) !important;
-}
-
-/* =========================================================
-   FORM DESIGN
-   ========================================================= */
+/* --- Form Controls & Inputs --- */
 .form-control,
-.frappe-control .ql-editor:not(.read-mode) {
-	box-shadow: 0 0 0 1px rgba(124, 124, 124, 0.25) !important;
-	transition: box-shadow 0.2s ease, background-color 0.2s ease;
-}
-
-.ace_editor {
-	box-shadow: 0 0 0 1px rgba(124, 124, 124, 0.25) !important;
-}
-
-.ql-editor:focus,
-.ace_editor:focus {
-	box-shadow: 0 0 0 2px rgba(124, 124, 124, 0.25) !important;
+.input-with-feedback,
+.frappe-control input[type="text"],
+.frappe-control input[type="email"],
+.frappe-control input[type="password"],
+.frappe-control input[type="number"],
+.frappe-control input[type="date"],
+.frappe-control textarea,
+.frappe-control select,
+.frappe-control .control-input,
+.frappe-control .control-value,
+input.input-with-feedback {
+    border-bottom: 2px solid var(--banking-border-dark);
+    color: var(--banking-text-primary);
+    background-color: transparent;
 }
 
 .form-control:focus,
-.form-control:hover {
-	box-shadow: 0 0 0 2px #04590980 !important;
-	background-color: #04590925;
+.input-with-feedback:focus,
+.frappe-control input:focus,
+.frappe-control textarea:focus,
+.frappe-control select:focus {
+    border-color: var(--banking-primary);
+    background-color: transparent;
 }
 
-.frappe-control:not([data-fieldtype="MultiSelectPills"]):not([data-fieldtype="Table MultiSelect"]).has-error input:hover,
-.frappe-control:not([data-fieldtype="MultiSelectPills"]):not([data-fieldtype="Table MultiSelect"]).has-error input:focus {
-	box-shadow: 0 0 0 2px #bbd6fc !important;
+.frappe-control .control-input {
+    border: 0;
+    background-color: var(--banking-bg-card);
 }
 
-option {
-	background-color: white !important;
+.frappe-control .control-input:focus-within {
+    border-color: var(--banking-primary);
 }
 
-.grid-heading-row .filter-row,
-.awesomplete [role="listbox"] {
-	background-color: white !important;
+/* Placeholder text */
+.form-control::placeholder,
+.frappe-control input::placeholder,
+.frappe-control textarea::placeholder {
+    color: var(--banking-text-muted);
 }
 
-.grid-row-open {
-	box-shadow: 0 0 0 3px #045909 !important;
+/* Read-only textbox fields */
+.form-control[readonly],
+.form-control:disabled,
+.frappe-control input[type="text"][readonly],
+.frappe-control input[type="email"][readonly],
+.frappe-control input[type="password"][readonly],
+.frappe-control input[type="number"][readonly],
+.frappe-control input[type="date"][readonly],
+.frappe-control input[readonly],
+.frappe-control textarea[readonly],
+.frappe-control input[type="text"][disabled],
+.frappe-control input[type="email"][disabled],
+.frappe-control input[type="password"][disabled],
+.frappe-control input[type="number"][disabled],
+.frappe-control input[type="date"][disabled],
+.frappe-control input[disabled],
+.frappe-control textarea[disabled],
+.control-value.like-disabled-input,
+.frappe-control .control-value.like-disabled-input {
+    background-color: #E0E0E0 !important;
+    color: var(--banking-text-secondary);
+    cursor: not-allowed;
 }
 
-.awesomplete [role="option"]:hover,
-.awesomplete li:hover {
-	background-color: var(--gray-300) !important;
+
+/* --- Labels --- */
+.frappe-control label,
+.form-group label,
+.control-label {
+    color: var(--banking-text-primary);
 }
 
-input[type="checkbox"]:checked {
-	background-color: var(--btn-secondary) !important;
-	background-image: url("data:image/svg+xml,<svg viewBox='0 0 8 7' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M1 4.00001L2.66667 5.80001L7 1.20001' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>"), var(--checkbox-gradient) !important;
+.frappe-control .help-box,
+.form-group .help-block {
+    color: var(--banking-text-secondary);
 }
 
-.datepicker {
-	background-color: var(--bg-color) !important;
+/* --- Tables --- */
+.table,
+.datatable,
+.grid-body .rows .data-row {
+    border: 1px solid var(--banking-border);
 }
 
-/* =========================================================
-   BUTTONS DESIGN
-   ========================================================= */
-.btn {
-	border-radius: 0.25rem !important;
+.table thead,
+.datatable .dt-header,
+.grid-heading-row {
+    background: var(--banking-primary-gradient);
+    color: white;
 }
 
-.btn.btn-primary {
-	color: var(--text-btn-color);
-	border: solid 2px #045909 !important;
-	background-color: #045909 !important;
+.table tbody tr,
+.datatable .dt-row,
+.grid-body .rows .data-row {
+    border-bottom: 1px solid var(--banking-divider);
 }
 
-.btn.btn-primary:hover {
-	background: var(--btn-default-hover-bg) !important;
-	border: solid 2px #045909 !important;
-	color: var(--text-color);
+.table tbody tr:hover,
+.datatable .dt-row:hover,
+.grid-body .rows .data-row:hover {
+    background-color: var(--banking-bg-hover);
 }
 
-.standard-actions .btn.btn-secondary,
-.custom-actions .btn.btn-default {
-	background: var(--secondary) !important;
-	border: solid 2px var(--secondary) !important;
-	color: var(--text-btn-color);
+.table tbody td,
+.datatable .dt-cell,
+.grid-body .rows .data-row .col {
+    border-bottom: 1px solid var(--banking-divider);
+    color: var(--banking-text-primary);
 }
 
-.standard-actions .btn.btn-secondary:hover,
-.custom-actions .btn.btn-default:hover {
-	background: var(--btn-default-hover-bg) !important;
-	border: solid 2px var(--secondary) !important;
-	color: var(--text-color);
+/* --- Custom: White Text for Specific Elements --- */
+.list-row-col,
+.level-item,
+.list-count {
+    color: #ffffff !important;
 }
 
-.btn.btn-default {
-	background: var(--btn-default-hover-bg) !important;
-	border: solid 1px var(--btn-secondary) !important;
-	color: var(--text-color);
+.frappe-timestamp {
+    color: black !important;
 }
 
-.btn.grid-add-row {
-	background: var(--btn-default-hover-bg) !important;
-	border: solid 1px var(--btn-secondary) !important;
-	color: var(--text-color);
+.ellipsis, .awesomplete > [role=listbox]>li, 
+.awesomplete > [role=listbox] > [role=option], 
+.widget.shortcut-widget-box .indicator-pill {
+    color: black;
 }
 
-.btn.btn-new-doc {
-	background-color: #045909 !important;
-	color: var(--text-btn-color);
-	border: solid 2px #045909 !important;
+.datatable .dt-header .dt-cell--header .dt-cell__content {
+    font-weight: 400;
+    background-color:var(--banking-primary);
 }
 
-.btn.btn-new-doc:hover {
-	background: var(--btn-default-hover-bg) !important;
-	border: solid 2px #045909 !important;
-	color: var(--text-color);
+/* Make ONLY child table headers white */
+.grid-heading-row .grid-row .static-area {
+    color: #ffffff !important;
 }
 
-.custom-actions .btn {
-	font-size: 12px !important;
+/* --- Child Tables / Grid --- */
+.grid-body {
+    border: 1px solid var(--banking-border);
 }
 
-.btn-group > .btn:not(:last-child):not(.dropdown-toggle),
-.btn-group > .btn-group:not(:last-child) > .btn {
-	border-top-right-radius: 0 !important;
-	border-bottom-right-radius: 0 !important;
+.grid-footer {
+    background: var(--banking-bg-hover);
+    border-top: 1px solid var(--banking-border);
 }
 
-.btn-group > .btn:not(:first-child),
-.btn-group > .btn-group:not(:first-child) > .btn {
-	border-top-left-radius: 0 !important;
-	border-bottom-left-radius: 0 !important;
+/* --- Page Header --- */
+.page-head,
+.page-title {
+    background: var(--banking-primary-gradient);
+    color: var(--banking-text-inverse);
 }
 
-/* =========================================================
-   POS DESIGN
-   ========================================================= */
-.point-of-sale-app section {
-	min-height: 40rem !important;
+.page-head .page-title,
+.page-title h3 {
+    color: var(--banking-text-inverse);
 }
 
-.client-wrapper ul {
-	padding-left: 22px;
-	margin-top: 0;
-	margin-bottom: 0;
+.page-head .page-title .title-text {
+    color: var(--banking-text-inverse);
 }
 
-.client-wrapper li {
-	float: left;
-	list-style-type: none;
+/* --- Sidebar --- */
+.layout-side-section,
+.desk-sidebar {
+    background: var(--banking-bg-sidebar);
+    border-right: 1px solid var(--banking-border);
 }
 
-.client-wrapper li a {
-	display: inline-block;
-	text-decoration: none;
-	width: 100%;
-	background-color: var(--gray-300) !important;
-	color: black;
-	text-align: center;
+.sidebar-menu .sidebar-label,
+.desk-sidebar .standard-sidebar-label {
+    color: var(--banking-text-primary);
 }
 
-.client-wrapper li a.plus-pos,
-.client-wrapper li a.plus-pos:focus,
-.client-wrapper li a.plus-pos:hover {
-	background-color: var(--gray-400) !important;
+.sidebar-menu .sidebar-label:hover,
+.desk-sidebar .standard-sidebar-item:hover {
+    background: var(--banking-bg-hover);
+    color: var(--banking-primary);
 }
 
-.client-wrapper li a.minus-pos,
-.client-wrapper li a.minus-pos:focus,
-.client-wrapper li a.minus-pos:hover {
-	background-color: var(--red-400) !important;
+.sidebar-menu .selected,
+.desk-sidebar .selected {
+    background: var(--banking-primary);
+    color: var(--banking-text-inverse);
 }
 
-.client-wrapper li a:focus,
-.client-wrapper li a:hover {
-	background-color: var(--gray-400) !important;
-	color: black;
+/* --- Indicators / Status Pills --- */
+.indicator.green,
+.indicator-pill.green,
+.badge-success {
+    background-color: var(--banking-success);
+    color: var(--banking-text-inverse);
 }
 
-.client-wrapper li a.active {
-	background-color: white !important;
-	color: black;
+.indicator.red,
+.indicator-pill.red,
+.badge-danger {
+    background-color: var(--banking-danger);
+    color: var(--banking-text-inverse);
+}
+
+.indicator.orange,
+.indicator-pill.orange,
+.badge-warning {
+    background-color: var(--banking-warning);
+    color: var(--banking-text-inverse);
+}
+
+.indicator.blue,
+.indicator-pill.blue,
+.badge-info {
+    background-color: var(--banking-info);
+    color: var(--banking-text-inverse);
+}
+
+.indicator.gray,
+.indicator-pill.gray,
+.badge-secondary {
+    background-color: var(--banking-text-muted);
+    color: var(--banking-text-inverse);
+}
+
+/* --- Alerts / Messages --- */
+.alert-info {
+    background-color: var(--banking-info-light);
+    color: #1e40af;
+    border-left: 4px solid var(--banking-info);
+}
+
+.alert-success {
+    background-color: var(--banking-success-light);
+    color: #065f46;
+    border-left: 4px solid var(--banking-success);
+}
+
+.alert-warning {
+    background-color: var(--banking-warning-light);
+    color: #92400e;
+    border-left: 4px solid var(--banking-warning);
+}
+
+.alert-danger {
+    background-color: var(--banking-danger-light);
+    color: #991b1b;
+    border-left: 4px solid var(--banking-danger);
+}
+
+/* --- Widgets & Dashboard Cards --- */
+.widget .widget-head,
+.dashboard-card .card-head {
+    border-bottom: 1px solid var(--banking-divider);
+    color: var(--banking-text-primary);
+}
+
+/* --- Links --- */
+a,
+.link-field,
+.frappe-control a {
+    color: var(--banking-primary);
+}
+
+a:hover,
+.link-field:hover,
+.frappe-control a:hover {
+    color: var(--banking-primary-light);
+}
+
+/* --- Tabs --- */
+.nav-tabs {
+    border-bottom: 2px solid var(--banking-divider);
+}
+
+.nav-tabs .nav-link {
+    color: var(--banking-text-secondary);
+    border-bottom: 3px solid transparent;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--banking-primary-light);
+    border-bottom-color: var(--banking-primary-light);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--banking-primary);
+    border-bottom-color: var(--banking-primary);
+    background: transparent;
+}
+
+/* --- Modal / Dialog --- */
+.modal-header {
+    background: var(--banking-primary);
+    color: var(--banking-text-inverse);
+}
+
+.modal-footer {
+    background: var(--banking-bg-page);
+    border-top: 1px solid var(--banking-border);
+}
+
+/* --- Dropdown Menu --- */
+.dropdown-menu {
+    border: 1px solid var(--banking-border);
+}
+
+.dropdown-item {
+    color: var(--banking-text-primary);
+}
+
+.dropdown-item:hover {
+    background: var(--banking-bg-hover);
+    color: var(--banking-primary);
+}
+
+/* --- Form Tabs --- */
+.form-tabs {
+    border-bottom: 2px solid var(--banking-divider);
+}
+
+.form-tabs .nav-link {
+    color: var(--banking-text-secondary);
+    border-bottom: 3px solid transparent;
+}
+
+.form-tabs .nav-link.active {
+    color: var(--banking-primary);
+    border-bottom-color: var(--banking-primary);
+}
+
+/* --- List View --- */
+.list-row {
+    border-bottom: 1px solid var(--banking-divider);
+}
+
+.list-row:hover {
+    background-color: var(--banking-bg-hover);
+}
+
+.list-row-head {
+    background: var(--banking-primary);
+    color: var(--banking-text-inverse);
+}
+
+/* --- Timeline --- */
+.timeline-item {
+    border-left: 2px solid var(--banking-divider);
+}
+
+.timeline-item::before {
+    background: var(--banking-primary);
+    border: 2px solid var(--banking-bg-card);
+}
+
+/* --- Attachments --- */
+.attachment-row {
+    border: 1px solid var(--banking-border);
+}
+
+.attachment-row:hover {
+    background: var(--banking-bg-hover);
+    border-color: var(--banking-primary-light);
+}
+
+/* =========================
+   RTL (Arabic) Support
+   ========================= */
+[dir="rtl"] body {
+    font-family: var(--banking-font-arabic) !important;
+}
+
+[dir="rtl"] .form-control,
+[dir="rtl"] .frappe-control,
+[dir="rtl"] .frappe-control textarea,
+[dir="rtl"] .frappe-control select,
+[dir="rtl"] .frappe-control input,
+[dir="rtl"] .page-title h3,
+[dir="rtl"] .btn {
+    font-family: var(--banking-font-arabic) !important;
+}
+
+
+[dir="rtl"] .layout-side-section,
+html[dir="rtl"] .desk-sidebar {
+    border-right: none;
+    border-left: 1px solid var(--banking-border);
+}
+
+[dir="rtl"] .form-section .section-head,
+html[dir="rtl"] .form-section .section-head,
+[dir="rtl"] .page-head,
+html[dir="rtl"] .page-head {
+    background: linear-gradient(135deg, var(--banking-primary-light) 0%, var(--banking-primary) 100%);
+}
+
+[dir="rtl"] .alert-info,
+html[dir="rtl"] .alert-info {
+    border-left: none;
+    border-right: 4px solid var(--banking-info);
+}
+
+[dir="rtl"] .alert-success,
+html[dir="rtl"] .alert-success {
+    border-left: none;
+    border-right: 4px solid var(--banking-success);
+}
+
+[dir="rtl"] .alert-warning,
+html[dir="rtl"] .alert-warning {
+    border-left: none;
+    border-right: 4px solid var(--banking-warning);
+}
+
+[dir="rtl"] .alert-danger,
+html[dir="rtl"] .alert-danger {
+    border-left: none;
+    border-right: 4px solid var(--banking-danger);
+}
+
+[dir="rtl"] .timeline-item,
+html[dir="rtl"] .timeline-item {
+    border-left: none;
+    border-right: 2px solid var(--banking-divider);
+}
+
+[dir="rtl"] .timeline-item::before,
+html[dir="rtl"] .timeline-item::before {
+    left: auto;
+    right: -6px;
+}
+
+/* --- Print Styles --- */
+@media print {
+    .page-head,
+    .form-section .section-head,
+    .page-title {
+        background: var(--banking-bg-card) !important;
+        color: var(--banking-primary) !important;
+        border: 2px solid var(--banking-primary) !important;
+    }
+
+    .form-layout,
+    .table,
+    .widget {
+        border: 1px solid var(--banking-border-dark) !important;
+    }
+
+    body {
+        background: white !important;
+    }
+}
+
+/* FORCE WHITE TABLE HEADER TEXT IN ERPNext */
+.grid-heading-row .grid-row > div,
+.dt-header .dt-cell__content,
+.table thead th,
+.table thead td,
+.datatable thead th,
+.datatable thead td,
+.grid-heading-row,
+.grid-heading-row .grid-static-col {
+    color: #ffffff !important;
+    font-weight: 600 !important;
 }
