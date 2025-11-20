@@ -19,6 +19,7 @@ def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_l
     query = """
         SELECT
             poi.item_code,
+            poi.item_name,
             po.name AS purchase_order,
             poi.name AS purchase_order_item,
             poi.qty - IFNULL(poi.received_qty, 0) + poi.qty * IFNULL(item.over_delivery_receipt_allowance , 0) AS available_qty
@@ -43,7 +44,7 @@ def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_l
     return [
         (
             row.item_code,
-            f"<b>PO:</b> {row.purchase_order},<b>Qty:</b> {frappe.utils.fmt_money(row.available_qty, currency=None)}<br>"
+            f"<b>Name:</b> {row.item_name},<b>PO:</b> {row.purchase_order},<b>Qty:</b> {frappe.utils.fmt_money(row.available_qty, currency=None)}<br>"
         )
         for row in result
     ]
@@ -112,10 +113,9 @@ def check_rquest_to_accepted_qty(self):
     for i in self.items: 
         if flt(i.qty) + flt(i.rejected_qty) > flt(i.custom_request_quantity):
             frappe.throw(
-                """The total of Accepted Qty ({0}) and Rejected Qty ({1}) "
-                cannot exceed the Requested Quantity ({2}) for item {3}.
+                _("""The total of Accepted Qty ({0}) and Rejected Qty ({1}) cannot exceed the Requested Quantity ({2}) for item {3}.
                 """.format(flt(i.qty) ,flt(i.rejected_qty) , flt(i.custom_request_quantity) , i.item_code)
-            )
+            ))
 
         
 def validate_qty(self):

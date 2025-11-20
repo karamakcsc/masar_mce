@@ -54,7 +54,7 @@ def check_agreement_items(self):
         return
 
     if not self.custom_supplier_agreement:
-        frappe.throw(_("Please select a Blanket Order in Custom Supplier Agreement."))
+        frappe.throw(_("Select Supplier Agreement."))
 
     allowed_items = frappe.get_all(
         "Blanket Order Item",
@@ -65,7 +65,7 @@ def check_agreement_items(self):
     for row in self.items:
         if row.item_code not in allowed_items:
             frappe.throw(
-                _("Item {0} is not in Blanket Order {1}").format(row.item_code, self.custom_supplier_agreement)
+                _("Item {0} is not in Supplier Agreement: {1}").format(row.item_code, self.custom_supplier_agreement)
             )
 
             

@@ -61,7 +61,7 @@ def calculate_amounts_and_total(self):
 def get_default_penalty(self):
     all_penalty = frappe.db.sql(
         """
-        SELECT name, penalty_type, account, penalty_amount, penalty_formula
+        SELECT name, penalty_type, account
         FROM `tabPenalty`
         WHERE `default` = 1
           AND `disabled` = 0

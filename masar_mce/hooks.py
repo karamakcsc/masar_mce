@@ -270,6 +270,7 @@ fixtures = [
     {"dt": "Custom Field", "filters": [
         [
             "dt", "in", [
+                'Warehouse',
                 'Supplier',
                 'Item Supplier',
                 'Quality Inspection',
@@ -305,6 +306,7 @@ fixtures = [
                 "doc_type",
                 "in",
                 [
+                    'Warehouse',
                     'Supplier',
                     'Item Supplier',
                     'Quality Inspection',

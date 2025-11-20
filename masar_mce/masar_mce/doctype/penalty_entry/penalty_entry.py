@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe import throw, bold, get_doc, get_value
+from frappe import throw, bold, get_doc, get_value , _
 from frappe.utils.safe_exec import safe_eval
 from erpnext.accounts.general_ledger import make_gl_entries
 from erpnext.controllers.accounts_controller import AccountsController
@@ -60,8 +60,8 @@ class PenaltyEntry(AccountsController):
 
         debit_account = get_debit_account()
         if not debit_account:
-            frappe.throw(
-                f"No payable account found for Supplier {self.supplier} or Company {self.company}"
+            frappe.throw(_(
+                "No payable account found for Supplier {0} or Company {1}").format(self.supplier ,self.company )
             )
         gl_entries = []
         for row in self.penalties:
@@ -112,7 +112,7 @@ class PenaltyEntry(AccountsController):
         """Get cost center from company or other sources"""
         cost_center = frappe.get_cached_value('Company', self.company, 'cost_center')
         if not cost_center:
-            frappe.throw(f"Please set default cost center for company {self.company}")
+            frappe.throw(_("Please set default cost center for company {0}").format(self.company))
         return cost_center
     
     def cancel_gl_entry(self):
