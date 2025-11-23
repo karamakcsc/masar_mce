@@ -65,15 +65,18 @@ frappe.ui.form.on("Blanket Order Item", {
         CalculateAmount(frm, cdt, cdn);
         CalculateSellingPrice(frm, cdt, cdn);
         CalculateMarkupPercentage(frm, cdt, cdn);
+        CalculatePurchasePriceAfterTax(frm, cdt, cdn);
     },
     items_remove(frm) {
         update_total(frm);
     },
     custom_markup_percentage(frm, cdt, cdn) {
         CalculateSellingPrice(frm, cdt, cdn);
+        CalculateSellingPriceAfterTax(frm, cdt, cdn);
     },
     custom_selling_price(frm, cdt, cdn) {
         CalculateMarkupPercentage(frm, cdt, cdn);
+        CalculateSellingPriceAfterTax(frm, cdt, cdn);
     }
 });
 function CalculateAmount(frm, cdt, cdn) {
@@ -205,5 +208,41 @@ function CloseandHoldButton(frm) {
                 }
             });
         }, __('Status'));
+    }
+}
+function CalculateSellingPriceAfterTax(frm, cdt, cdn){
+    let row = locals[cdt][cdn];
+    if (flt(row.custom_selling_price)) {
+        frappe.call({
+            method : 'masar_mce.utils.get_tax_for_item' , 
+            args : {
+                item_code : row.item_code
+            }, 
+            callback: function(r) { 
+                row.custom_selling_price_after_tax = flt(row.custom_selling_price) + flt(row.custom_selling_price) * flt(r.message);
+                frm.refresh_field("items");
+            }
+        });
+    } else  {
+        row.custom_selling_price_after_tax = flt(row.custom_selling_price);
+        frm.refresh_field("items"); 
+    }
+}
+function CalculatePurchasePriceAfterTax(frm, cdt, cdn){
+    let row = locals[cdt][cdn];
+    if (flt(row.rate)) {
+        frappe.call({
+            method : 'masar_mce.utils.get_tax_for_item' , 
+            args : {
+                item_code : row.item_code
+            }, 
+            callback: function(r) { 
+                row.custom_purchase_price_after_tax = flt(row.rate) + flt(row.rate) * flt(r.message);
+                frm.refresh_field("items");
+            }
+        });
+    } else {
+        row.custom_purchase_price_after_tax = flt(row.rate);
+        frm.refresh_field("items");
     }
 }

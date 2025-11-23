@@ -3,6 +3,7 @@ from frappe.utils import flt
 from frappe.model.mapper import get_mapped_doc
 from frappe import _
 from datetime import datetime
+from masar_mce.utils import get_tax_for_item
 def validate(self , method):
     calculate_amounts_and_total(self)
     if self.is_new():
@@ -11,19 +12,15 @@ def validate(self , method):
         check_inspection_result(self)
         
 def before_update_after_submit(self , method) : 
-    if self.custom_status != 'Active': 
-        close_valid_date_in_item_price(self)
-    else:
+    if self.custom_status == 'Active': 
         validate_duplicate_item_in_active_blanket_orders(self)
-        revalid_date_in_item_price(self)
         
 def on_submit(self , method): 
     self.db_set('custom_status', 'Active')
     validate_duplicate_item_in_active_blanket_orders(self)
-    create_price_list_for_selling(self)
-    
+    create_priceing_sheet(self)
 def on_cancel(self , method):
-    close_valid_date_in_item_price(self)
+    pass
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_items_by_supplier(doctype, txt, searchfield, start, page_len, filters):
@@ -55,6 +52,9 @@ def calculate_amounts_and_total(self):
         i.custom_amount = amount
         total += amount
         total_qty += i.qty
+        tax_rate = get_tax_for_item(item_code=i.item_code)
+        i.custom_purchase_price_after_tax = flt(i.rate) + flt(i.rate) * tax_rate
+        i.custom_selling_price_after_tax = flt(i.custom_selling_price) + flt(i.custom_selling_price) * tax_rate
     self.custom_total_quantity = total_qty
     self.custom_agreement_total = total
     
@@ -145,40 +145,6 @@ def check_inspection_result(self):
     for item in inspection_required_items:
         if item.custom_quality_inspection_status != 'Accepted':
             frappe.throw(_("Item {0} has not passed inspection. Please complete the inspection before proceeding.").format(item.item_code))
-            
-def create_price_list_for_selling(self):
-    selling_price_list = frappe.new_doc('Price List').update({'name': self.name , 'price_list_name': self.name , 'selling' : 1})
-    selling_price_list.insert(ignore_permissions=True).save()
-    price_list = selling_price_list.name
-    for i in self.items:
-        selling_price = flt(i.custom_selling_price)
-        price_list_rate_doc = frappe.new_doc('Item Price')
-        price_list_rate_doc.item_code = i.item_code
-        price_list_rate_doc.price_list = price_list
-        price_list_rate_doc.price_list_rate = selling_price
-        price_list_rate_doc.custom_supplier_agreement = self.name
-        price_list_rate_doc.save(ignore_permissions=True)
-
-
-def close_valid_date_in_item_price(self):
-    item_price_list = frappe.db.get_list('Item Price' , filters={'custom_supplier_agreement': self.name},pluck='name' )
-    for i in item_price_list: 
-        ip_doc = frappe.get_doc('Item Price' , i)
-        ip_doc.valid_upto = datetime.now().date()
-        ip_doc.save()
-    price_list = frappe.get_doc('Price List' , self.name)
-    price_list.enabled = 0 
-    price_list.save()
-        
-def revalid_date_in_item_price(self):
-    price_list = frappe.get_doc('Price List' , self.name)
-    price_list.enabled = 1 
-    price_list.save()   
-    item_price_list = frappe.db.get_list('Item Price' , filters={'custom_supplier_agreement': self.name},pluck='name' )
-    for i in item_price_list: 
-        ip_doc = frappe.get_doc('Item Price' , i)
-        ip_doc.valid_upto =None
-        ip_doc.save()
      
 def validate_duplicate_item_in_active_blanket_orders(self):
     current_items = [d.item_code for d in self.items]
@@ -202,3 +168,22 @@ def validate_duplicate_item_in_active_blanket_orders(self):
         for d in duplicates:
             msg_lines.append("- {0} in {1}".format(d['item_code'] , d['blanket_order']))
         frappe.throw("<br>".join(msg_lines))
+        
+def create_priceing_sheet(self):
+    rows = list()
+    for i in self.items: 
+        tax_rate = flt(get_tax_for_item(item_code=i.item_code) )
+        rows.append({
+            'item_code' : i.item_code , 
+            'item_name' : i.item_name , 
+            'rate' : i.rate , 
+            'markup_percentage' : i.custom_markup_percentage, 
+            'selling_price' : i.custom_selling_price,
+            'tax_rate' : tax_rate * 100 , 
+            'rate_after_tax' :  i.rate + i.rate *tax_rate, 
+            'selling_price_after_tax' : flt(i.custom_selling_price) + flt(i.custom_selling_price) * tax_rate 
+        })
+    frappe.new_doc('Pricing Sheet').update({
+        'blanket_order' : self.name , 
+        'items' : rows 
+    }).save().submit()

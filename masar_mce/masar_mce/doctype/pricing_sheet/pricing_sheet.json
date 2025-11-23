@@ -1,0 +1,129 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{blanket_order}/{####}",
+ "creation": "2025-11-23 10:56:12.457994",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_xb57",
+  "amended_from",
+  "blanket_order",
+  "column_break_zjit",
+  "posting_date",
+  "section_break_lvjk",
+  "items",
+  "section_break_iuhc",
+  "total_purchase_price",
+  "total_purchase_price_after_tax",
+  "column_break_iear",
+  "total_selling_price",
+  "total_selling_price_after_tax"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_xb57",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Pricing Sheet",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_zjit",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_lvjk",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Pricing Sheet Items"
+  },
+  {
+   "fieldname": "section_break_iuhc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_iear",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_purchase_price",
+   "fieldtype": "Float",
+   "label": "Total Purchase Price",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_purchase_price_after_tax",
+   "fieldtype": "Float",
+   "label": "Total Purchase Price After Tax",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_selling_price",
+   "fieldtype": "Float",
+   "label": "Total Selling Price",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_selling_price_after_tax",
+   "fieldtype": "Float",
+   "label": "Total Selling Price After Tax",
+   "read_only": 1
+  },
+  {
+   "fieldname": "blanket_order",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Supplier Agreement",
+   "options": "Blanket Order",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-11-23 16:51:33.340700",
+ "modified_by": "Administrator",
+ "module": "Masar MCE",
+ "name": "Pricing Sheet",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -2241,22 +2241,6 @@
  },
  {
   "default_value": null,
-  "doc_type": "Blanket Order Item",
-  "docstatus": 0,
-  "doctype": "Property Setter",
-  "doctype_or_field": "DocType",
-  "field_name": null,
-  "is_system_generated": 0,
-  "modified": "2025-10-13 12:34:11.777566",
-  "module": null,
-  "name": "Blanket Order Item-main-field_order",
-  "property": "field_order",
-  "property_type": "Data",
-  "row_name": null,
-  "value": "[\"item_code\", \"item_name\", \"party_item_code\", \"column_break_3\", \"qty\", \"rate\", \"ordered_qty\", \"custom_markup_percentage\", \"custom_selling_price\", \"custom_amount\", \"custom_section_break_uoh6p\", \"custom_inspection_is_required\", \"custom_quality_inspection_quantity\", \"custom_quality_inspection\", \"custom_quality_inspection_status\", \"custom_column_break_ijewz\", \"custom_quality_inspection_remarks\", \"section_break_7\", \"terms_and_conditions\"]"
- },
- {
-  "default_value": null,
   "doc_type": "Stock Entry Detail",
   "docstatus": 0,
   "doctype": "Property Setter",
@@ -2302,22 +2286,6 @@
   "property_type": "Data",
   "row_name": null,
   "value": "[\"naming_series\", \"blanket_order_type\", \"customer\", \"customer_name\", \"supplier\", \"supplier_name\", \"custom_pricing_type\", \"column_break_8\", \"order_no\", \"order_date\", \"from_date\", \"to_date\", \"company\", \"custom_submit_after_inspection\", \"custom_status\", \"section_break_12\", \"items\", \"custom_section_break_a5ugk\", \"custom_total_quantity\", \"amended_from\", \"custom_column_break_bqf6r\", \"custom_agreement_total\", \"custom_general_terms\", \"custom_payment_terms\", \"payment_terms_template\", \"terms_and_conditions_section\", \"tc_name\", \"terms\", \"custom_section_break_jmvel\", \"custom_tcs_terms\", \"custom_special_terms\", \"custom_penalties_tab\", \"custom_penalties\"]"
- },
- {
-  "default_value": null,
-  "doc_type": "Item Price",
-  "docstatus": 0,
-  "doctype": "Property Setter",
-  "doctype_or_field": "DocType",
-  "field_name": null,
-  "is_system_generated": 0,
-  "modified": "2025-10-19 11:43:56.545278",
-  "module": null,
-  "name": "Item Price-main-field_order",
-  "property": "field_order",
-  "property_type": "Data",
-  "row_name": null,
-  "value": "[\"item_code\", \"uom\", \"packing_unit\", \"supplier_agreement\", \"column_break_17\", \"item_name\", \"brand\", \"item_description\", \"price_list_details\", \"price_list\", \"customer\", \"supplier\", \"batch_no\", \"column_break_3\", \"buying\", \"selling\", \"item_details\", \"currency\", \"col_br_1\", \"price_list_rate\", \"section_break_15\", \"valid_from\", \"lead_time_days\", \"column_break_18\", \"valid_upto\", \"section_break_24\", \"note\", \"reference\"]"
  },
  {
   "default_value": null,
@@ -2894,5 +2862,37 @@
   "property_type": "Data",
   "row_name": null,
   "value": "[\"territory_name\", \"parent_territory\", \"is_group\", \"custom_number_of_days\", \"cb0\", \"territory_manager\", \"lft\", \"rgt\", \"old_parent\", \"target_details_section_break\", \"targets\"]"
+ },
+ {
+  "default_value": null,
+  "doc_type": "Blanket Order Item",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocType",
+  "field_name": null,
+  "is_system_generated": 0,
+  "modified": "2025-11-23 11:52:32.245511",
+  "module": null,
+  "name": "Blanket Order Item-main-field_order",
+  "property": "field_order",
+  "property_type": "Data",
+  "row_name": null,
+  "value": "[\"item_code\", \"item_name\", \"party_item_code\", \"column_break_3\", \"qty\", \"rate\", \"custom_purchase_price_after_tax\", \"ordered_qty\", \"custom_markup_percentage\", \"custom_selling_price\", \"selling_price_after_tax\", \"custom_amount\", \"custom_section_break_uoh6p\", \"custom_inspection_is_required\", \"custom_quality_inspection_quantity\", \"custom_quality_inspection\", \"custom_quality_inspection_status\", \"custom_column_break_ijewz\", \"custom_quality_inspection_remarks\", \"section_break_7\", \"terms_and_conditions\"]"
+ },
+ {
+  "default_value": null,
+  "doc_type": "Item Price",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocType",
+  "field_name": null,
+  "is_system_generated": 0,
+  "modified": "2025-11-23 16:28:24.351307",
+  "module": null,
+  "name": "Item Price-main-field_order",
+  "property": "field_order",
+  "property_type": "Data",
+  "row_name": null,
+  "value": "[\"item_code\", \"uom\", \"packing_unit\", \"custom_supplier_agreement\", \"pricing_sheet\", \"column_break_17\", \"item_name\", \"brand\", \"item_description\", \"price_list_details\", \"price_list\", \"customer\", \"supplier\", \"batch_no\", \"column_break_3\", \"buying\", \"selling\", \"item_details\", \"currency\", \"col_br_1\", \"price_list_rate\", \"section_break_15\", \"valid_from\", \"lead_time_days\", \"column_break_18\", \"valid_upto\", \"section_break_24\", \"note\", \"reference\"]"
  }
 ]
