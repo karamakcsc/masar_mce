@@ -38,6 +38,7 @@ frappe.ui.form.on("Blanket Order", {
         CalculateMarkupPercentage(frm, cdt, cdn);
     }
 });
+
 function filterBySupplier(frm) {
     const grid = frm.fields_dict.items.grid;
     const item_code_field = grid.get_field("item_code");
@@ -78,6 +79,25 @@ frappe.ui.form.on("Blanket Order Item", {
         CalculateMarkupPercentage(frm, cdt, cdn);
         CalculateSellingPriceAfterTax(frm, cdt, cdn);
     }
+});
+frappe.ui.form.on("Supplier Agreement Other Terms", {
+   tcs_terms: function(frm, cdt, cdn) {
+    let row = locals[cdt][cdn];
+    if (row.tcs_terms) {
+            frappe.db.get_value("Terms and Conditions", row.tcs_terms, "terms")
+                .then(r => {
+                    if (r && r.message.terms) {
+                        row.terms = r.message.terms;
+                    } else {
+                         row.terms = "";
+                    }
+                    frm.refresh_field("custom_other_terms");
+                });
+        } else {
+            row.terms = "";
+        }
+        frm.refresh_field("custom_other_terms");
+   }
 });
 function CalculateAmount(frm, cdt, cdn) {
     let row = locals[cdt][cdn];
