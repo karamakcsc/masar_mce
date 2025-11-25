@@ -3,7 +3,7 @@
 
 import frappe 
 from frappe.model.document import Document
-from masar_mce.utils import get_tax_for_item , get_standard_price_list_buying_then_selling
+from masar_mce.utils import get_tax_for_item , get_standard_price_list_buying_then_selling , get_current_stock_value_and_quantity
 from frappe.utils import flt
 from frappe import _
 from datetime import datetime
@@ -59,10 +59,14 @@ class PricingSheet(Document):
 	def calculate_pricing_after_tax_and_there_totals(self):
 		total_rate = total_rate_after_tax = total_selling_price = total_selling_price_after_tax = 0 
 		for i in self.items:
-			rate = flt(get_tax_for_item(item_code= i.item_code))
-			i.tax_rate = rate * 100 
-			i.rate_after_tax = flt(i.rate) + flt(i.rate) * rate 
-			i.selling_price_after_tax = flt(i.selling_price) + flt(i.selling_price) * rate 
+			tax_rate = flt(get_tax_for_item(item_code= i.item_code))
+			current = self.get_stock_value_and_quantity(i)
+			i.current_stock_value = current.get("value", 0)
+			i.current_quantity = current.get("quantity", 0)
+			i.rate = flt(flt(i.current_stock_value) + flt(i.new_purchase_price) * flt(i.new_quantity)) / (flt(i.current_quantity) + flt(i.new_quantity))
+			i.tax_rate = tax_rate * 100 
+			i.rate_after_tax = flt(i.rate) + flt(i.rate) * tax_rate 
+			i.selling_price_after_tax = flt(i.selling_price) + flt(i.selling_price) * tax_rate 
 			total_rate+= flt(i.rate)
 			total_rate_after_tax += flt(i.rate_after_tax) 
 			total_selling_price += flt(i.selling_price)
@@ -99,6 +103,8 @@ class PricingSheet(Document):
 	def create_item_prices_for_every_item(self): 
 		buying , selling = get_standard_price_list_buying_then_selling()
 		for i in self.items:
+			if i.rate > i.selling_price:
+				frappe.throw(_("Row #{0}: Rate cannot be greater than Selling Price for item {1}").format(i.idx, i.item_code))
 			ip_buy = frappe.new_doc("Item Price")
 			ip_buy.item_code = i.item_code
 			ip_buy.price_list = buying
@@ -122,3 +128,37 @@ class PricingSheet(Document):
 			ip_doc = frappe.get_doc('Item Price' , i)
 			ip_doc.valid_upto = datetime.now().date()
 			ip_doc.save()
+   
+	@frappe.whitelist()
+	def get_last_sync(self):
+		sql = frappe.db.sql("""
+        	SELECT 
+    			CONCAT(
+        			posting_date, ' ', 
+        			(	
+           				SELECT 
+               				MAX(posting_time) 
+         				FROM 
+             				`tabAPI Data Income` 
+         				WHERE 
+             				posting_date = t.posting_date
+                 	)
+    			) AS last_sync_datetime
+			FROM 
+   				`tabAPI Data Income` t
+			WHERE 
+   				posting_date = (
+    				SELECT 
+        				MAX(posting_date) 
+    				FROM 
+        				`tabAPI Data Income`
+				)
+			LIMIT 
+   				1""")
+		if self.docstatus == 0:
+			if sql and sql[0][0]:
+				return datetime.strptime(str(sql[0][0]), "%Y-%m-%d %H:%M:%S.%f")
+		return None
+	@frappe.whitelist()
+	def get_stock_value_and_quantity(self, row):
+		return get_current_stock_value_and_quantity(item_code=row.get('item_code'))

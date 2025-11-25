@@ -11,6 +11,7 @@
   "blanket_order",
   "column_break_zjit",
   "posting_date",
+  "last_sync",
   "section_break_lvjk",
   "items",
   "section_break_iuhc",
@@ -95,13 +96,19 @@
    "label": "Supplier Agreement",
    "options": "Blanket Order",
    "reqd": 1
+  },
+  {
+   "fieldname": "last_sync",
+   "fieldtype": "Datetime",
+   "label": "Last Sync (POS)",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-23 16:51:33.340700",
+ "modified": "2025-11-25 10:01:18.758048",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Pricing Sheet",

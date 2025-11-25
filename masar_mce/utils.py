@@ -66,4 +66,34 @@ def get_standard_price_list_buying_then_selling():
             "Found {0}".format(len(selling))
         ))
     return buying[0][0], selling[0][0]
+
+@frappe.whitelist()
+def get_current_stock_value_and_quantity(item_code=None, warehouse=None):
+    cond = "1 = 1"
+    print(f"Getting stock value and quantity for item_code={item_code}, warehouse={warehouse}")
+    if item_code in [None , '' , "" , ' ', " "]:
+        return {
+        'value': 0,
+        'quantity': 0
+    }
+    if item_code:
+        cond += f" AND item_code = '{item_code}'"
+    if warehouse:
+        cond += f" AND warehouse = '{warehouse}'"
+
+    sql = frappe.db.sql(f"""
+        SELECT 
+            IFNULL(SUM(stock_value), 0),
+            IFNULL(SUM(actual_qty), 0)
+        FROM 
+            `tabBin`
+        WHERE 
+            {cond}
+    """, as_list=True)
+
+    return {
+        'value': sql[0][0],
+        'quantity': sql[0][1]
+    }
+
     
