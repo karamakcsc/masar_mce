@@ -76,9 +76,6 @@ function set_item_code_query(frm) {
 frappe.ui.form.on('Purchase Receipt Item', {
     item_code(frm, cdt, cdn) {
         GetItemDetails(frm , cdt , cdn)
-    },
-    rate(frm, cdt, cdn) {
-        GetItemDetails(frm , cdt , cdn)
     }
 });
 function GetItemDetails(frm , cdt , cdn){
@@ -103,13 +100,11 @@ function GetItemDetails(frm , cdt , cdn){
                 if (r.message) {
                     frappe.model.set_value(cdt, cdn, {
                         purchase_order: r.message.purchase_order,
-                        purchase_order_item: r.message.purchase_order_item,
-                        rate: r.message.rate
+                        purchase_order_item: r.message.purchase_order_item
                     });
                 } else {
                     frappe.model.set_value(cdt, cdn, "purchase_order", null);
                     frappe.model.set_value(cdt, cdn, "purchase_order_item", null);
-                    frappe.model.set_value(cdt, cdn, "rate", 0);
                 }
             }
         });
