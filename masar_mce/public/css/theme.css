@@ -2,10 +2,10 @@
 
 :root {
     /* Define the LTR font stack (e.g., for English) */
-    --banking-font-body: 'Calibri', Arial, sans-serif;
+    --banking-font-body: "Cairo", Calibri, 'Segoe UI', Tahoma, Geneva, sans-serif !important;
     
     /* Define a specific font stack for Arabic/RTL contexts */
-    --banking-font-arabic: 'Calibri', Arial, sans-serif;
+    --banking-font-arabic: "Cairo", Calibri, 'Segoe UI', Tahoma, Geneva, sans-serif !important;
 
     /* Primary Colors (Green Theme) */
     --banking-primary: #0A7F3F;               /* Main green */
@@ -270,7 +270,7 @@ input.input-with-feedback {
 }
 
 .datatable .dt-header .dt-cell--header .dt-cell__content {
-    font-weight: 400;
+    font-weight: 700;
     background-color:var(--banking-primary);
 }
 
@@ -603,5 +603,5 @@ html[dir="rtl"] .timeline-item::before {
 .grid-heading-row,
 .grid-heading-row .grid-static-col {
     color: #ffffff !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
 }
