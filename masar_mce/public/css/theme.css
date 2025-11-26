@@ -50,6 +50,7 @@
 body {
     color: var(--banking-text-primary);
     font-family: var(--banking-font-body);
+    font-size: 16px !important;   
 }
 
 /* --- Page Background --- */
@@ -511,6 +512,7 @@ a:hover,
    ========================= */
 [dir="rtl"] body {
     font-family: var(--banking-font-arabic) !important;
+    font-size: 16px !important;   
 }
 
 [dir="rtl"] .form-control,
@@ -592,6 +594,7 @@ html[dir="rtl"] .timeline-item::before {
 
     body {
         background: white !important;
+        font-size: 16px !important;   
     }
 }
 
