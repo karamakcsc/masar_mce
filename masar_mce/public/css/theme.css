@@ -2,10 +2,10 @@
 
 :root {
     /* Define the LTR font stack (e.g., for English) */
-    --banking-font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --banking-font-body: 'Calibri', Arial, sans-serif;
     
     /* Define a specific font stack for Arabic/RTL contexts */
-    --banking-font-arabic: 'Cairo', 'Traditional Arabic', sans-serif;
+    --banking-font-arabic: 'Calibri', Arial, sans-serif;
 
     /* Primary Colors (Green Theme) */
     --banking-primary: #0A7F3F;               /* Main green */

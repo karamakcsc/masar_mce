@@ -63,7 +63,8 @@ class PricingSheet(Document):
 			current = self.get_stock_value_and_quantity(i)
 			i.current_stock_value = current.get("value", 0)
 			i.current_quantity = current.get("quantity", 0)
-			i.rate = flt(flt(i.current_stock_value) + flt(i.new_purchase_price) * flt(i.new_quantity)) / (flt(i.current_quantity) + flt(i.new_quantity))
+			i.rate = flt(flt(i.current_stock_value) + flt(i.new_purchase_price) * flt(i.new_quantity)) / (flt(i.current_quantity) + flt(i.new_quantity)
+                                                                                                 ) if (flt(i.current_quantity) + flt(i.new_quantity)) > 0 else 0
 			i.tax_rate = tax_rate * 100 
 			i.rate_after_tax = flt(i.rate) + flt(i.rate) * tax_rate 
 			i.selling_price_after_tax = flt(i.selling_price) + flt(i.selling_price) * tax_rate 

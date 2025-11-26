@@ -176,7 +176,8 @@ def create_priceing_sheet(self):
         rows.append({
             'item_code' : i.item_code , 
             'item_name' : i.item_name , 
-            'rate' : i.rate , 
+            'new_purchase_price' : i.rate , 
+            'new_quantity' : i.qty ,
             'markup_percentage' : i.custom_markup_percentage, 
             'selling_price' : i.custom_selling_price,
             'tax_rate' : tax_rate * 100 , 
