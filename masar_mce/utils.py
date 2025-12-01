@@ -15,36 +15,38 @@ def check_expierd_supplier_agrrement():
         sa_doc = frappe.get_doc('Blanket Order', sa.name)
         sa_doc.custom_status = 'Expired'
         sa_doc.save()
+        
 @frappe.whitelist()
-def get_tax_for_item(item_code = None ):
-    if not item_code:
+def get_tax_for_item(item_code=None, category='Local Zone'):
+    if not item_code or not category:
         return 0
-    item_doc = frappe.get_doc("Item", item_code)
-    def get_rate_from_template(template_name):
-        if not template_name:
-            return 0
-        if not frappe.db.exists("Item Tax Template", template_name):
-            return 0
-        tax_rate = frappe.db.get_value(
-            "Item Tax Template Detail",
-            {"parent": template_name},
-            "tax_rate"
-        )
-        return tax_rate/100 or 0
-    if item_doc.taxes:
-        item_template = item_doc.taxes[0].get("item_tax_template")
-        rate = get_rate_from_template(item_template)
-        if rate:
-            return rate
-    group_doc = frappe.get_doc("Item Group", item_doc.item_group)
-    if group_doc.taxes:
-        group_template = group_doc.taxes[0].get("item_tax_template")
-        rate = get_rate_from_template(group_template)
-        if rate:
-            return rate
+    if not frappe.db.exists('Item', item_code):
+        return 0
+    item_doc = frappe.get_doc('Item', item_code)
+    tax_rate = get_tax_from_taxes(item_doc.taxes, category)
+    if tax_rate is not None:
+        return tax_rate
+    group_doc = frappe.get_doc('Item Group', item_doc.item_group)
+    tax_rate = get_tax_from_taxes(group_doc.taxes, category)
+    if tax_rate is not None:
+        return tax_rate
     return 0
+def get_tax_from_taxes(taxes, category):
+    """Return tax rate from a taxes table (item or item group)."""
+    if not taxes:
+        return None
+    for tax in taxes:
+        if tax.tax_category == category and tax.item_tax_template:
+            tax_rate = frappe.db.get_value(
+                "Item Tax Template Detail",
+                {"parent": tax.item_tax_template},
+                "tax_rate"
+            )
+            return tax_rate / 100 or 0
 
-def get_standard_price_list_buying_then_selling():
+    return None
+
+def get_standard_price_list_b_s_sfz():
     buying = frappe.db.get_values(
         "Price List",
         {'enabled' : 1 , 'buying' : 1}, 
@@ -52,7 +54,12 @@ def get_standard_price_list_buying_then_selling():
     )
     selling = frappe.db.get_values(
         "Price List",
-        {'enabled' : 1 , 'selling' : 1}, 
+        {'enabled' : 1 , 'selling' : 1 , 'custom_free_zone' : 0 }, 
+        "name", as_dict=False
+    )
+    selling_free_zone = frappe.db.get_values(
+        "Price List",
+        {'enabled' : 1 , 'selling' : 1 , 'custom_free_zone' : 1 }, 
         "name", as_dict=False
     )
     if len(buying) != 1: 
@@ -65,7 +72,12 @@ def get_standard_price_list_buying_then_selling():
             "There must be exactly one enabled Selling Price List. "
             "Found {0}".format(len(selling))
         ))
-    return buying[0][0], selling[0][0]
+    if len(selling_free_zone) != 1:
+        frappe.throw(_(
+            "There must be exactly one enabled Selling Free Zone Price List. "
+            "Found {0}".format(len(selling_free_zone))
+        ))
+    return buying[0][0], selling[0][0], selling_free_zone[0][0]
 
 @frappe.whitelist()
 def get_current_stock_value_and_quantity(item_code=None, warehouse=None):

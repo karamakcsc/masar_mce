@@ -3,7 +3,7 @@
 
 import frappe 
 from frappe.model.document import Document
-from masar_mce.utils import get_tax_for_item , get_standard_price_list_buying_then_selling , get_current_stock_value_and_quantity
+from masar_mce.utils import get_tax_for_item , get_standard_price_list_b_s_sfz , get_current_stock_value_and_quantity
 from frappe.utils import flt
 from frappe import _
 from datetime import datetime
@@ -42,7 +42,6 @@ def get_items_for_dialog(blanket_order):
         filters={"parent": blanket_order},
         fields=["item_code","item_name" ,"rate","custom_selling_price_after_tax", "custom_purchase_price_after_tax", "custom_markup_percentage", "custom_selling_price"]
     )
-
     return items
 
 class PricingSheet(Document):
@@ -57,23 +56,31 @@ class PricingSheet(Document):
 	def on_submit(self): 
 		self.create_item_prices_for_every_item()
 	def calculate_pricing_after_tax_and_there_totals(self):
-		total_rate = total_rate_after_tax = total_selling_price = total_selling_price_after_tax = 0 
+		new_total_quantity = local_sa = free_sa = new_purchase_amount = 0
 		for i in self.items:
-			tax_rate = flt(get_tax_for_item(item_code= i.item_code))
+			free_tax_rate = get_tax_for_item(i.item_code , 'Free Zone')
+			local_tax_rate = get_tax_for_item(i.item_code , 'Local Zone')
 			current = self.get_stock_value_and_quantity(i)
-			i.current_stock_value = current.get("value", 0)
-			i.current_quantity = current.get("quantity", 0)
-			i.rate = flt(flt(i.current_stock_value) + flt(i.new_purchase_price) * flt(i.new_quantity)) / (flt(i.current_quantity) + flt(i.new_quantity)
-                                                                                                 ) if (flt(i.current_quantity) + flt(i.new_quantity)) > 0 else 0
-			i.tax_rate = tax_rate * 100 
-			i.rate_after_tax = flt(i.rate) + flt(i.rate) * tax_rate 
-			i.selling_price_after_tax = flt(i.selling_price) + flt(i.selling_price) * tax_rate 
-			total_rate+= flt(i.rate)
-			total_rate_after_tax += flt(i.rate_after_tax) 
-			total_selling_price += flt(i.selling_price)
-			total_selling_price_after_tax += flt(i.selling_price_after_tax)
-		self.total_purchase_price , self.total_purchase_price_after_tax = total_rate , total_rate_after_tax
-		self.total_selling_price  , self.total_selling_price_after_tax = total_selling_price , total_selling_price_after_tax
+			i.current_stock_value = flt(current.get("value", 0))
+			i.current_quantity = flt(current.get("quantity", 0))
+			i.new_cost_per_unit = (flt(i.current_stock_value) + flt(i.new_purchase_price)  * flt(i.new_quantity)
+							) / (flt(i.current_quantity) + flt(i.new_quantity)) if (flt(i.current_quantity) + flt(i.new_quantity)) > 0 else 0
+			i.local_tax_rate = local_tax_rate * 100
+			i.free_tax_rate = free_tax_rate * 100
+			i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_rate)
+			i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_rate)
+			i.local_mp = (flt(i.local_sp) - flt(i.local_pp_after_tax)) / flt(i.local_pp_after_tax) * 100  if flt(i.local_pp_after_tax) > 0 else 0
+			i.local_sp_after_tax = flt(i.local_sp) * (1 + local_tax_rate)
+			i.free_mp = (flt(i.free_sp) - flt(i.free_pp_after_tax)) / flt(i.free_pp_after_tax) * 100  if flt(i.free_pp_after_tax) > 0 else 0
+			i.free_sp_after_tax = flt(i.free_sp) * (1 + free_tax_rate)
+			new_total_quantity += flt(i.new_quantity)
+			local_sa += flt(i.new_quantity) * flt(i.local_sp_after_tax)
+			free_sa += flt(i.new_quantity) * flt(i.free_sp_after_tax)
+			new_purchase_amount += flt(i.new_quantity) * flt(i.new_purchase_price)
+		self.new_total_quantity = new_total_quantity
+		self.local_sa = local_sa 
+		self.free_sa = free_sa
+		self.new_purchase_amount = new_purchase_amount
 	def validate_items_from_blanket_order(self):
 		if not self.blanket_order:
 			frappe.throw(_("Please select a Supplier Agreement before adding items."))
@@ -102,14 +109,14 @@ class PricingSheet(Document):
 			)
    
 	def create_item_prices_for_every_item(self): 
-		buying , selling = get_standard_price_list_buying_then_selling()
+		buying , selling  , selling_free_zone = get_standard_price_list_b_s_sfz()
 		for i in self.items:
-			if i.rate > i.selling_price:
+			if i.new_purchase_price > i.local_sp or i.new_purchase_price > i.free_sp:
 				frappe.throw(_("Row #{0}: Rate cannot be greater than Selling Price for item {1}").format(i.idx, i.item_code))
 			ip_buy = frappe.new_doc("Item Price")
 			ip_buy.item_code = i.item_code
 			ip_buy.price_list = buying
-			ip_buy.price_list_rate = i.rate
+			ip_buy.price_list_rate = i.new_purchase_price
 			ip_buy.valid_from = self.posting_date
 			ip_buy.custom_supplier_agreement = self.blanket_order
 			ip_buy.custom_pricing_sheet = self.name
@@ -117,11 +124,19 @@ class PricingSheet(Document):
 			ip_sell = frappe.new_doc("Item Price")
 			ip_sell.item_code = i.item_code
 			ip_sell.price_list = selling
-			ip_sell.price_list_rate = i.selling_price
+			ip_sell.price_list_rate = i.local_sp
 			ip_sell.valid_from = self.posting_date
 			ip_sell.custom_supplier_agreement = self.blanket_order
 			ip_sell.custom_pricing_sheet = self.name
 			ip_sell.insert(ignore_permissions=True)
+			ip_sell_free_zone = frappe.new_doc("Item Price")
+			ip_sell_free_zone.item_code = i.item_code
+			ip_sell_free_zone.price_list = selling_free_zone
+			ip_sell_free_zone.price_list_rate = i.free_sp
+			ip_sell_free_zone.valid_from = self.posting_date
+			ip_sell_free_zone.custom_supplier_agreement = self.blanket_order
+			ip_sell_free_zone.custom_pricing_sheet = self.name
+			ip_sell_free_zone.insert(ignore_permissions=True)
    
 	def close_valid_date_in_item_price(self):
 		item_price_list = frappe.db.get_list('Item Price' , filters={'custom_pricing_sheet': self.name},pluck='name' )

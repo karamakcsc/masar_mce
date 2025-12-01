@@ -1,44 +1,224 @@
 frappe.ui.form.on("Blanket Order", {
-    onload: function(frm) {
-        filterBySupplier(frm);
-        CreateRequiredInspectionButton(frm);
-        CloseandHoldButton(frm);
-        hide_buttons(frm);
+    onload(frm) {
+        init_form(frm);
     },
-    refresh:  function(frm) {
-        filterBySupplier(frm);
-        CreateRequiredInspectionButton(frm);
-        CloseandHoldButton(frm);
-        hide_buttons(frm);
+    refresh(frm) {
+        init_form(frm);
     },
-    setup:  function(frm) {
-        filterBySupplier(frm);
-        CreateRequiredInspectionButton(frm);
-        CloseandHoldButton(frm);
-        hide_buttons(frm);
+    setup(frm) {
+        init_form(frm);
     },
     custom_tcs_terms(frm) {
-       
-        if (frm.doc.custom_tcs_terms) {
-            frappe.db.get_value("Terms and Conditions", frm.doc.custom_tcs_terms, "terms")
-                .then(r => {
-                    if (r && r.message.terms) {
-                        frm.set_value("custom_special_terms", r.message.terms);
-                    } else {
-                        frm.set_value("custom_special_terms", "");
-                    }
-                });
-        } else {
+        if (!frm.doc.custom_tcs_terms) {
             frm.set_value("custom_special_terms", "");
+            return;
         }
-    }, 
+        frappe.db.get_value("Terms and Conditions", frm.doc.custom_tcs_terms, "terms")
+            .then(r => {
+                frm.set_value("custom_special_terms", r.message?.terms || "");
+            });
+    },
     custom_pricing_type(frm) {
+        if (frm.doc.items) {
+            frm.doc.items.forEach(row => {
+                const cdt = "Blanket Order Item";
+                const cdn = row.name;
+
+                if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+                    CalculateSellingPrice(frm, cdt, cdn);
+                } else {
+                    CalculateRateFromSellingPrice(frm, cdt, cdn);
+                }
+                CalculateSellingPriceAfterTax(frm, cdt, cdn);
+                CalculatePurchasePriceAfterTax(frm, cdt, cdn);
+                CalculateAmount(frm, cdt, cdn);
+            });
+        }
         frm.refresh_field("items");
-        CalculateSellingPrice(frm, cdt, cdn);
-        CalculateMarkupPercentage(frm, cdt, cdn);
     }
 });
+function init_form(frm) {
+    filterBySupplier(frm);
+    CreateRequiredInspectionButton(frm);
+    CloseandHoldButton(frm);
+    hide_buttons(frm);
+}
 
+frappe.ui.form.on("Blanket Order Item", {
+    qty(frm, cdt, cdn) {
+        CalculateAmount(frm, cdt, cdn);
+    },
+    rate(frm, cdt, cdn) {
+        CalculateAmount(frm, cdt, cdn);
+
+        if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+            CalculateSellingPrice(frm, cdt, cdn);
+        }
+
+        CalculateMarkupPercentage(frm, cdt, cdn);
+        CalculatePurchasePriceAfterTax(frm, cdt, cdn);
+    },
+    custom_markup_percentage(frm, cdt, cdn) {
+        if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+            CalculateSellingPrice(frm, cdt, cdn);
+        } else {
+            CalculateRateFromSellingPrice(frm, cdt, cdn);
+            CalculateAmount(frm, cdt, cdn);
+        }
+
+        CalculateSellingPriceAfterTax(frm, cdt, cdn);
+        CalculatePurchasePriceAfterTax(frm, cdt, cdn);
+    },
+    custom_selling_price(frm, cdt, cdn) {
+        if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+            CalculateMarkupPercentage(frm, cdt, cdn);
+        } else {
+            CalculateRateFromSellingPrice(frm, cdt, cdn);
+            CalculateAmount(frm, cdt, cdn);
+        }
+
+        CalculateSellingPriceAfterTax(frm, cdt, cdn);
+    },
+
+    items_remove(frm) {
+        update_total(frm);
+    }
+});
+frappe.ui.form.on("Supplier Agreement Other Terms", {
+    tcs_terms(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+        if (!row.tcs_terms) {
+            row.terms = "";
+            frm.refresh_field("custom_other_terms");
+            return;
+        }
+        frappe.db.get_value("Terms and Conditions", row.tcs_terms, "terms")
+            .then(r => {
+                row.terms = r.message?.terms || "";
+                frm.refresh_field("custom_other_terms");
+            });
+    }
+});
+function CalculateAmount(frm, cdt, cdn) {
+    let row = locals[cdt][cdn];
+    row.custom_amount = flt(row.qty) * flt(row.rate);
+    frm.refresh_field("items");
+    update_total(frm);
+}
+function CalculateSellingPrice(frm, cdt, cdn) {
+    let row = locals[cdt][cdn];
+    if (!row.rate) {
+        row.custom_selling_price = 0;
+    } else {
+        row.custom_selling_price =
+            flt(row.rate) * (1 + flt(row.custom_markup_percentage) / 100);
+    }
+    frm.refresh_field("items");
+}
+function CalculateRateFromSellingPrice(frm, cdt, cdn) {
+    let row = locals[cdt][cdn];
+
+    if (!row.custom_selling_price) {
+        row.rate = 0;
+    } else {
+        row.rate =
+            flt(row.custom_selling_price) / (1 + flt(row.custom_markup_percentage) / 100);
+    }
+    frm.refresh_field("items");
+}
+function CalculateMarkupPercentage(frm, cdt, cdn) {
+    let row = locals[cdt][cdn];
+
+    if (!row.rate) {
+        row.custom_markup_percentage = 0;
+    } else {
+        row.custom_markup_percentage =
+            ((flt(row.custom_selling_price) - flt(row.rate)) / flt(row.rate)) * 100;
+    }
+    frm.refresh_field("items");
+}
+function update_total(frm) {
+    let total = (frm.doc.items || [])
+        .reduce((t, d) => t + flt(d.custom_amount), 0);
+
+    frm.set_value("custom_agreement_total", total);
+}
+function CalculateSellingPriceAfterTax(frm, cdt, cdn) {
+    const row = locals[cdt][cdn];
+
+    frappe.call({
+        method: "masar_mce.utils.get_tax_for_item",
+        args: { item_code: row.item_code },
+        callback(r) {
+            row.custom_selling_price_after_tax =
+                flt(row.custom_selling_price) * (1 + flt(r.message));
+            frm.refresh_field("items");
+        }
+    });
+}
+function CalculatePurchasePriceAfterTax(frm, cdt, cdn) {
+    const row = locals[cdt][cdn];
+
+    frappe.call({
+        method: "masar_mce.utils.get_tax_for_item",
+        args: { item_code: row.item_code },
+        callback(r) {
+            row.custom_purchase_price_after_tax =
+                flt(row.rate) * (1 + flt(r.message));
+            frm.refresh_field("items");
+        }
+    });
+}
+function hide_buttons(frm) {
+    setTimeout(() => {
+        if (frm.doc.custom_status != 'Active') {
+            cur_frm.page.remove_inner_button(__('Purchase Order'), __('Create'));
+        }
+    }, 100);
+}
+function CreateRequiredInspectionButton(frm) {
+    if (frm.doc.docstatus === 0 && !frm.is_new()) {
+        frm.add_custom_button(__('Material Receipt for Inspection'), () => {
+            frappe.model.open_mapped_doc({
+                method:
+                    'masar_mce.custom.blanket_order.blanket_order.create_stock_entry_for_inspection',
+                source_name: frm.doc.name
+            });
+        }, __('Create'));
+    }
+}
+function CloseandHoldButton(frm) {
+    if (frm.doc.docstatus !== 1) return;
+
+    if (frm.doc.custom_status === "Active") {
+        add_status_button(frm, "Close", "Closed");
+        add_status_button(frm, "Hold", "Hold");
+    }
+
+    if (frm.doc.custom_status === "Hold") {
+        add_status_button(frm, "Resume", "Active");
+    }
+}
+function add_status_button(frm, label, status) {
+    frm.add_custom_button(label, () => {
+        frappe.call({
+            method: "frappe.client.set_value",
+            args: {
+                doctype: frm.doctype,
+                name: frm.doc.name,
+                fieldname: "custom_status",
+                value: status
+            },
+            callback() {
+                frm.reload_doc();
+                frappe.show_alert({
+                    message: __("Status updated to " + status),
+                    indicator: "green"
+                });
+            }
+        });
+    }, __("Status"));
+}
 function filterBySupplier(frm) {
     const grid = frm.fields_dict.items.grid;
     const item_code_field = grid.get_field("item_code");
@@ -57,212 +237,4 @@ function filterBySupplier(frm) {
             filters: filters
         };   
     };
-}
-frappe.ui.form.on("Blanket Order Item", {
-    qty(frm, cdt, cdn) {
-        CalculateAmount(frm, cdt, cdn);
-    },
-    rate(frm, cdt, cdn) {
-        CalculateAmount(frm, cdt, cdn);
-        CalculateSellingPrice(frm, cdt, cdn);
-        CalculateMarkupPercentage(frm, cdt, cdn);
-        CalculatePurchasePriceAfterTax(frm, cdt, cdn);
-    },
-    items_remove(frm) {
-        update_total(frm);
-    },
-    custom_markup_percentage(frm, cdt, cdn) {
-        CalculateSellingPrice(frm, cdt, cdn);
-        CalculateSellingPriceAfterTax(frm, cdt, cdn);
-    },
-    custom_selling_price(frm, cdt, cdn) {
-        CalculateMarkupPercentage(frm, cdt, cdn);
-        CalculateSellingPriceAfterTax(frm, cdt, cdn);
-    }
-});
-frappe.ui.form.on("Supplier Agreement Other Terms", {
-   tcs_terms: function(frm, cdt, cdn) {
-    let row = locals[cdt][cdn];
-    if (row.tcs_terms) {
-            frappe.db.get_value("Terms and Conditions", row.tcs_terms, "terms")
-                .then(r => {
-                    if (r && r.message.terms) {
-                        row.terms = r.message.terms;
-                    } else {
-                         row.terms = "";
-                    }
-                    frm.refresh_field("custom_other_terms");
-                });
-        } else {
-            row.terms = "";
-        }
-        frm.refresh_field("custom_other_terms");
-   }
-});
-function CalculateAmount(frm, cdt, cdn) {
-    let row = locals[cdt][cdn];
-    row.custom_amount = (flt(row.qty) || 0) * (flt(row.rate) || 0);
-    frm.refresh_field("items");
-
-    update_total(frm);
-}
-function CalculateSellingPrice(frm, cdt, cdn) {
-    let row = locals[cdt][cdn];
-    if (flt(row.rate) && flt(row.custom_markup_percentage)) {
-        row.custom_selling_price = flt(row.rate) + (flt(row.rate) * flt(row.custom_markup_percentage) / 100);
-    } else {
-        row.custom_selling_price = 0;
-    }
-    frm.refresh_field("items");
-
-}
-function CalculateMarkupPercentage(frm, cdt, cdn) {
-    let row = locals[cdt][cdn];
-    if (flt(row.rate) && flt(row.custom_selling_price)) {
-        row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.rate)) / flt(row.rate)) * 100;
-    } else {
-        row.custom_markup_percentage = 0;
-    }
-    frm.refresh_field("items");
-}
-function update_total(frm) {
-    let total = 0;
-    (frm.doc.items || []).forEach(d => {
-        total += flt(d.custom_amount);
-    });
-    frm.set_value("custom_agreement_total", total);
-}
-frappe.form.link_formatters['Item'] = function(value, doc) {
-    if(doc.item_code && doc.item_name !== value) {
-        return doc.item_code;
-    } else {
-        return value;
-    }
-};
-function hide_buttons(frm) {
-    setTimeout(() => {
-        if(frm.doc.custom_status != 'Active') {
-            cur_frm.page.remove_inner_button(__('Purchase Order'), __('Create'));
-        }
-    }, 100);
-}
-function CreateRequiredInspectionButton(frm) {
-    if (frm.doc.docstatus === 0 && !frm.is_new()) {
-            frm.add_custom_button(__('Material Receipt for Inspection'), function() {
-                frappe.model.open_mapped_doc({
-                    method: 'masar_mce.custom.blanket_order.blanket_order.create_stock_entry_for_inspection',
-                    source_name: frm.doc.name
-                });
-            }, __('Create'));
-        }
-}
-function CloseandHoldButton(frm) {
-    if (frm.doc.docstatus === 1 && frm.doc.custom_status === 'Active' ) {
-        frm.add_custom_button(__('Close'), function () {
-            frappe.call({
-                method: 'frappe.client.set_value',
-                args: {
-                    doctype: frm.doctype,
-                    name: frm.doc.name,
-                    fieldname: 'custom_status',
-                    value: 'Closed'
-                },
-                callback: function(r) {
-                    if (!r.exc) {
-                        frm.doc.custom_status = 'Closed';
-                        frm.refresh_fields();
-                        frm.reload_doc();
-                        frappe.show_alert({
-                            message: __('Status updated to Closed'),
-                            indicator: 'green'
-                        });
-                    }
-                }
-            });
-        }, __('Status'));
-
-        frm.add_custom_button(__('Hold'), function () {
-            frappe.call({
-                method: 'frappe.client.set_value',
-                args: {
-                    doctype: frm.doctype,
-                    name: frm.doc.name,
-                    fieldname: 'custom_status',
-                    value: 'Hold'
-                },
-                callback: function(r) {
-                    if (!r.exc) {
-                        frm.doc.custom_status = 'Hold';
-                        frm.refresh_fields();
-                        frm.reload_doc();
-                        frappe.show_alert({
-                            message: __('Status updated to Hold'),
-                            indicator: 'green'
-                        });
-                    }
-                }
-            });
-        }, __('Status'));
-    }
-
-    if (frm.doc.docstatus === 1 && frm.doc.custom_status === 'Hold') {
-        frm.add_custom_button(__('Resume'), function () {
-            frappe.call({
-                method: 'frappe.client.set_value',
-                args: {
-                    doctype: frm.doctype,
-                    name: frm.doc.name,
-                    fieldname: 'custom_status',
-                    value: 'Active'
-                },
-                callback: function(r) {
-                    if (!r.exc) {
-                        frm.doc.custom_status = 'Active';
-                        frm.refresh_fields();
-                        frm.reload_doc();
-                        frappe.show_alert({
-                            message: __('Status updated to Active'),
-                            indicator: 'green'
-                        });
-                    }
-                }
-            });
-        }, __('Status'));
-    }
-}
-function CalculateSellingPriceAfterTax(frm, cdt, cdn){
-    let row = locals[cdt][cdn];
-    if (flt(row.custom_selling_price)) {
-        frappe.call({
-            method : 'masar_mce.utils.get_tax_for_item' , 
-            args : {
-                item_code : row.item_code
-            }, 
-            callback: function(r) { 
-                row.custom_selling_price_after_tax = flt(row.custom_selling_price) + flt(row.custom_selling_price) * flt(r.message);
-                frm.refresh_field("items");
-            }
-        });
-    } else  {
-        row.custom_selling_price_after_tax = flt(row.custom_selling_price);
-        frm.refresh_field("items"); 
-    }
-}
-function CalculatePurchasePriceAfterTax(frm, cdt, cdn){
-    let row = locals[cdt][cdn];
-    if (flt(row.rate)) {
-        frappe.call({
-            method : 'masar_mce.utils.get_tax_for_item' , 
-            args : {
-                item_code : row.item_code
-            }, 
-            callback: function(r) { 
-                row.custom_purchase_price_after_tax = flt(row.rate) + flt(row.rate) * flt(r.message);
-                frm.refresh_field("items");
-            }
-        });
-    } else {
-        row.custom_purchase_price_after_tax = flt(row.rate);
-        frm.refresh_field("items");
-    }
 }

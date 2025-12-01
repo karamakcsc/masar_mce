@@ -172,19 +172,24 @@ def validate_duplicate_item_in_active_blanket_orders(self):
 def create_priceing_sheet(self):
     rows = list()
     for i in self.items: 
-        tax_rate = flt(get_tax_for_item(item_code=i.item_code) )
+        free_tax_rate = get_tax_for_item(i.item_code , 'Free Zone')
+        local_tax_rate = get_tax_for_item(i.item_code , 'Local Zone')
         rows.append({
             'item_code' : i.item_code , 
             'item_name' : i.item_name , 
             'new_purchase_price' : i.rate , 
             'new_quantity' : i.qty ,
-            'markup_percentage' : i.custom_markup_percentage, 
-            'selling_price' : i.custom_selling_price,
-            'tax_rate' : tax_rate * 100 , 
-            'rate_after_tax' :  i.rate + i.rate *tax_rate, 
-            'selling_price_after_tax' : flt(i.custom_selling_price) + flt(i.custom_selling_price) * tax_rate 
+            'local_sp' : i.custom_selling_price ,
+            'free_sp' : i.custom_selling_price ,
+            'local_tax_rate' : local_tax_rate * 100 ,
+            'free_tax_rate' : free_tax_rate * 100 ,
+            'local_pp_after_tax' : flt(i.rate) * (1 + local_tax_rate) ,
+            'free_pp_after_tax' : flt(i.rate) * (1 + free_tax_rate) ,
+            'local_mp' : i.custom_markup_percentage ,
+            'free_mp' : i.custom_markup_percentage,
         })
     frappe.new_doc('Pricing Sheet').update({
         'blanket_order' : self.name , 
-        'items' : rows 
+        'items' : rows , 
+        'posting_date' : self.from_date
     }).save().submit()

@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "item_code",
+  "item_group",
   "column_break_ossb",
   "item_name",
   "section_break_bbcg",
@@ -15,14 +16,21 @@
   "column_break_obcm",
   "new_purchase_price",
   "new_quantity",
-  "pricing_section",
-  "rate",
-  "tax_rate",
-  "rate_after_tax",
-  "column_break_osrq",
-  "markup_percentage",
-  "selling_price",
-  "selling_price_after_tax"
+  "new_cost_per_unit",
+  "local_zone_pricing_section",
+  "local_tax_rate",
+  "local_pp_after_tax",
+  "column_break_zwru",
+  "local_mp",
+  "local_sp",
+  "local_sp_after_tax",
+  "section_break_kkfp",
+  "free_tax_rate",
+  "free_pp_after_tax",
+  "column_break_gryq",
+  "free_mp",
+  "free_sp",
+  "free_sp_after_tax"
  ],
  "fields": [
   {
@@ -46,59 +54,6 @@
   {
    "fieldname": "column_break_ossb",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "pricing_section",
-   "fieldtype": "Section Break",
-   "label": "Pricing"
-  },
-  {
-   "fieldname": "rate",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Purchase Price",
-   "non_negative": 1,
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_osrq",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "markup_percentage",
-   "fieldtype": "Percent",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Markup Percentage",
-   "reqd": 1
-  },
-  {
-   "fieldname": "selling_price",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Selling Price",
-   "non_negative": 1,
-   "reqd": 1
-  },
-  {
-   "fieldname": "tax_rate",
-   "fieldtype": "Float",
-   "label": "Tax Rate",
-   "read_only": 1
-  },
-  {
-   "fieldname": "rate_after_tax",
-   "fieldtype": "Float",
-   "label": "Purchase Price After Tax",
-   "read_only": 1
-  },
-  {
-   "fieldname": "selling_price_after_tax",
-   "fieldtype": "Float",
-   "label": "Selling Price After Tax",
-   "read_only": 1
   },
   {
    "fieldname": "section_break_bbcg",
@@ -135,13 +90,103 @@
    "fieldtype": "Float",
    "label": "Current Stock Value",
    "read_only": 1
+  },
+  {
+   "fetch_from": "item_code.item_group",
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "label": "Item Group",
+   "options": "Item Group",
+   "read_only": 1
+  },
+  {
+   "fieldname": "new_cost_per_unit",
+   "fieldtype": "Float",
+   "label": "New Cost Per Unit",
+   "read_only": 1
+  },
+  {
+   "fieldname": "local_zone_pricing_section",
+   "fieldtype": "Section Break",
+   "label": "Local Zone Pricing"
+  },
+  {
+   "fieldname": "local_tax_rate",
+   "fieldtype": "Float",
+   "label": "Tax Rate",
+   "read_only": 1
+  },
+  {
+   "fieldname": "local_pp_after_tax",
+   "fieldtype": "Float",
+   "label": "Purchase Price After Tax",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_zwru",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "local_mp",
+   "fieldtype": "Percent",
+   "label": "Markup Percentage",
+   "reqd": 1
+  },
+  {
+   "fieldname": "local_sp",
+   "fieldtype": "Float",
+   "label": "Selling Price",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_kkfp",
+   "fieldtype": "Section Break",
+   "label": "Free Zone Pricing"
+  },
+  {
+   "fieldname": "free_tax_rate",
+   "fieldtype": "Float",
+   "label": "Tax Rate",
+   "read_only": 1
+  },
+  {
+   "fieldname": "free_pp_after_tax",
+   "fieldtype": "Float",
+   "label": "Purchase Price After Tax",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_gryq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "free_mp",
+   "fieldtype": "Percent",
+   "label": "Markup Percentage",
+   "reqd": 1
+  },
+  {
+   "fieldname": "free_sp",
+   "fieldtype": "Float",
+   "label": "Selling Price",
+   "reqd": 1
+  },
+  {
+   "fieldname": "free_sp_after_tax",
+   "fieldtype": "Float",
+   "label": "Selling Price After Tax"
+  },
+  {
+   "fieldname": "local_sp_after_tax",
+   "fieldtype": "Float",
+   "label": "Selling Price After Tax"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-11-25 10:49:48.660724",
+ "modified": "2025-11-30 12:53:18.339941",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Pricing Sheet Items",
