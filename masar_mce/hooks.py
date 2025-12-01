@@ -294,7 +294,7 @@ fixtures = [
                 'Material Request',
                 'Material Request Item', 
                 'Item Price' , 
-                'List Price'
+                'Price List'
             ]
         ]
     ]},
@@ -332,7 +332,7 @@ fixtures = [
                     'Material Request',
                     'Material Request Item',
                     'Item Price',
-                    'List Price'
+                    'Price List'
                 ]
             ]
         ]
