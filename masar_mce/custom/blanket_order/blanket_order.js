@@ -19,67 +19,97 @@ frappe.ui.form.on("Blanket Order", {
             });
     },
     custom_pricing_type(frm) {
+        setupFieldReadOnly(frm);
         if (frm.doc.items) {
             frm.doc.items.forEach(row => {
                 const cdt = "Blanket Order Item";
-                const cdn = row.name;
-
-                if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-                    CalculateSellingPrice(frm, cdt, cdn);
-                } else {
-                    CalculateRateFromSellingPrice(frm, cdt, cdn);
-                }
-                CalculateSellingPriceAfterTax(frm, cdt, cdn);
-                CalculatePurchasePriceAfterTax(frm, cdt, cdn);
-                CalculateAmount(frm, cdt, cdn);
+                const cdn = row.name;                
+                getTaxRate(row.item_code, (taxRate) => {
+                    if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+                        if (flt(row.rate)) {
+                            row.custom_purchase_price_after_tax = flt(row.rate) * (1 + flt(taxRate));
+                        }
+                        CalculateSellingPrice(frm, cdt, cdn);
+                    } else {
+                        CalculateRateFromSellingPrice(frm, cdt, cdn, taxRate);
+                    }                  
+                    CalculateSellingPriceAfterTax(frm, cdt, cdn);
+                    CalculateAmount(frm, cdt, cdn);
+                    frm.refresh_field("items");
+                });
             });
         }
         frm.refresh_field("items");
     }
 });
+
 function init_form(frm) {
     filterBySupplier(frm);
     CreateRequiredInspectionButton(frm);
     CloseandHoldButton(frm);
     hide_buttons(frm);
 }
-
 frappe.ui.form.on("Blanket Order Item", {
     qty(frm, cdt, cdn) {
         CalculateAmount(frm, cdt, cdn);
     },
     rate(frm, cdt, cdn) {
-        CalculateAmount(frm, cdt, cdn);
-
-        if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-            CalculateSellingPrice(frm, cdt, cdn);
-        }
-
-        CalculateMarkupPercentage(frm, cdt, cdn);
-        CalculatePurchasePriceAfterTax(frm, cdt, cdn);
+        const row = locals[cdt][cdn];
+        
+        getTaxRate(row.item_code, (taxRate) => {
+            row.custom_purchase_price_after_tax = flt(row.rate) * (1 + flt(taxRate));
+            
+            CalculateAmount(frm, cdt, cdn);
+            
+            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+                CalculateSellingPrice(frm, cdt, cdn);
+            } else {
+                CalculateMarkupPercentage(frm, cdt, cdn);
+            }
+            
+            CalculateSellingPriceAfterTax(frm, cdt, cdn);
+        });
     },
     custom_markup_percentage(frm, cdt, cdn) {
-        if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-            CalculateSellingPrice(frm, cdt, cdn);
-        } else {
-            CalculateRateFromSellingPrice(frm, cdt, cdn);
-            CalculateAmount(frm, cdt, cdn);
-        }
-
-        CalculateSellingPriceAfterTax(frm, cdt, cdn);
-        CalculatePurchasePriceAfterTax(frm, cdt, cdn);
+        const row = locals[cdt][cdn];
+        
+        getTaxRate(row.item_code, (taxRate) => {
+            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+                CalculateSellingPrice(frm, cdt, cdn);
+                CalculateSellingPriceAfterTax(frm, cdt, cdn);
+            } else {
+                CalculatePurchasePriceAfterTaxFromSelling(frm, cdt, cdn, taxRate);
+                CalculateAmount(frm, cdt, cdn);
+            }
+        });
     },
     custom_selling_price(frm, cdt, cdn) {
-        if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-            CalculateMarkupPercentage(frm, cdt, cdn);
-        } else {
-            CalculateRateFromSellingPrice(frm, cdt, cdn);
-            CalculateAmount(frm, cdt, cdn);
-        }
-
-        CalculateSellingPriceAfterTax(frm, cdt, cdn);
+        const row = locals[cdt][cdn];
+        
+        getTaxRate(row.item_code, (taxRate) => {
+            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+                CalculateMarkupPercentage(frm, cdt, cdn);
+            } else {
+                CalculatePurchasePriceAfterTaxFromSelling(frm, cdt, cdn, taxRate);
+                CalculateAmount(frm, cdt, cdn);
+            }
+            
+            CalculateSellingPriceAfterTax(frm, cdt, cdn);
+        });
     },
-
+    custom_purchase_price_after_tax(frm, cdt, cdn) {
+        const row = locals[cdt][cdn];
+        
+        getTaxRate(row.item_code, (taxRate) => {
+            row.rate = flt(row.custom_purchase_price_after_tax) / (1 + flt(taxRate));
+            CalculateAmount(frm, cdt, cdn);
+            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+                CalculateSellingPrice(frm, cdt, cdn);
+            }
+            CalculateMarkupPercentage(frm, cdt, cdn);
+            CalculateSellingPriceAfterTax(frm, cdt, cdn);
+        });
+    },
     items_remove(frm) {
         update_total(frm);
     }
@@ -107,33 +137,54 @@ function CalculateAmount(frm, cdt, cdn) {
 }
 function CalculateSellingPrice(frm, cdt, cdn) {
     let row = locals[cdt][cdn];
-    if (!row.rate) {
-        row.custom_selling_price = 0;
+    if (flt(row.custom_purchase_price_after_tax) && flt(row.custom_markup_percentage)) {
+        row.custom_selling_price = (1 + flt(row.custom_markup_percentage) / 100) * flt(row.custom_purchase_price_after_tax);
+    } else if (flt(row.custom_purchase_price_after_tax)) {
+        row.custom_selling_price = flt(row.custom_purchase_price_after_tax);
     } else {
-        row.custom_selling_price =
-            flt(row.rate) * (1 + flt(row.custom_markup_percentage) / 100);
+        row.custom_selling_price = 0;
     }
     frm.refresh_field("items");
 }
-function CalculateRateFromSellingPrice(frm, cdt, cdn) {
-    let row = locals[cdt][cdn];
 
+function CalculateRateFromSellingPrice(frm, cdt, cdn, taxRate) {
+    let row = locals[cdt][cdn];
+    
     if (!row.custom_selling_price) {
         row.rate = 0;
+        row.custom_purchase_price_after_tax = 0;
+    } else if (flt(row.custom_markup_percentage)) {
+        row.custom_purchase_price_after_tax = (1 - flt(row.custom_markup_percentage) / 100) * flt(row.custom_selling_price);
+        row.rate = flt(row.custom_purchase_price_after_tax) / (1 + flt(taxRate));
     } else {
-        row.rate =
-            flt(row.custom_selling_price) / (1 + flt(row.custom_markup_percentage) / 100);
+        row.custom_purchase_price_after_tax = flt(row.custom_selling_price);
+        row.rate = flt(row.custom_selling_price) / (1 + flt(taxRate));
     }
     frm.refresh_field("items");
 }
-function CalculateMarkupPercentage(frm, cdt, cdn) {
-    let row = locals[cdt][cdn];
 
-    if (!row.rate) {
-        row.custom_markup_percentage = 0;
+function CalculatePurchasePriceAfterTaxFromSelling(frm, cdt, cdn, taxRate) {
+    let row = locals[cdt][cdn];
+    
+    if (!row.custom_selling_price) {
+        row.custom_purchase_price_after_tax = 0;
+        row.rate = 0;
+    } else if (flt(row.custom_markup_percentage)) {
+        row.custom_purchase_price_after_tax = (1 - flt(row.custom_markup_percentage) / 100) * flt(row.custom_selling_price);   
+        row.rate = flt(row.custom_purchase_price_after_tax) / (1 + flt(taxRate));
     } else {
-        row.custom_markup_percentage =
-            ((flt(row.custom_selling_price) - flt(row.rate)) / flt(row.rate)) * 100;
+        row.custom_purchase_price_after_tax = flt(row.custom_selling_price);
+        row.rate = flt(row.custom_selling_price) / (1 + flt(taxRate));
+    }
+    frm.refresh_field("items");
+}
+
+function CalculateMarkupPercentage(frm, cdt, cdn) {
+    let row = locals[cdt][cdn]; 
+    if (flt(row.custom_purchase_price_after_tax) && flt(row.custom_selling_price)) {
+        row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_purchase_price_after_tax)) * 100;
+    } else {
+        row.custom_markup_percentage = 0;
     }
     frm.refresh_field("items");
 }
@@ -145,27 +196,27 @@ function update_total(frm) {
 }
 function CalculateSellingPriceAfterTax(frm, cdt, cdn) {
     const row = locals[cdt][cdn];
-
-    frappe.call({
-        method: "masar_mce.utils.get_tax_for_item",
-        args: { item_code: row.item_code },
-        callback(r) {
-            row.custom_selling_price_after_tax =
-                flt(row.custom_selling_price) * (1 + flt(r.message));
-            frm.refresh_field("items");
+    
+    getTaxRate(row.item_code, (taxRate) => {
+        if (flt(row.custom_selling_price)) {
+            row.custom_selling_price_after_tax = flt(row.custom_selling_price) * (1 + flt(taxRate));
+        } else {
+            row.custom_selling_price_after_tax = flt(row.custom_selling_price);
         }
+        frm.refresh_field("items");
     });
 }
-function CalculatePurchasePriceAfterTax(frm, cdt, cdn) {
-    const row = locals[cdt][cdn];
-
+function getTaxRate(itemCode, callback) {
+    if (!itemCode) {
+        callback(0);
+        return;
+    }
+    
     frappe.call({
         method: "masar_mce.utils.get_tax_for_item",
-        args: { item_code: row.item_code },
+        args: { item_code: itemCode },
         callback(r) {
-            row.custom_purchase_price_after_tax =
-                flt(row.rate) * (1 + flt(r.message));
-            frm.refresh_field("items");
+            callback(r.message || 0);
         }
     });
 }
@@ -180,8 +231,7 @@ function CreateRequiredInspectionButton(frm) {
     if (frm.doc.docstatus === 0 && !frm.is_new()) {
         frm.add_custom_button(__('Material Receipt for Inspection'), () => {
             frappe.model.open_mapped_doc({
-                method:
-                    'masar_mce.custom.blanket_order.blanket_order.create_stock_entry_for_inspection',
+                method: 'masar_mce.custom.blanket_order.blanket_order.create_stock_entry_for_inspection',
                 source_name: frm.doc.name
             });
         }, __('Create'));
@@ -222,10 +272,10 @@ function add_status_button(frm, label, status) {
 function filterBySupplier(frm) {
     const grid = frm.fields_dict.items.grid;
     const item_code_field = grid.get_field("item_code");
-    if (!item_code_field) return;
+    if (!item_code_field) return;    
     if (!item_code_field.hasOwnProperty('original_get_query')) {
         item_code_field.original_get_query = item_code_field.get_query;
-    }
+    }  
     item_code_field.get_query = function() {
         const filters = {};
         if (frm.doc.supplier) {

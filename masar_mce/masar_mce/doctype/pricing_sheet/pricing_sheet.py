@@ -82,6 +82,7 @@ class PricingSheet(Document):
 		self.free_sa = free_sa
 		self.new_purchase_amount = new_purchase_amount
 	def validate_items_from_blanket_order(self):
+     
 		if not self.blanket_order:
 			frappe.throw(_("Please select a Supplier Agreement before adding items."))
 		allowed_items = [i.item_code for i in frappe.db.get_values(
@@ -178,3 +179,15 @@ class PricingSheet(Document):
 	@frappe.whitelist()
 	def get_stock_value_and_quantity(self, row):
 		return get_current_stock_value_and_quantity(item_code=row.get('item_code'))
+
+	def autoname(self):
+		last = frappe.db.get_value("Pricing Sheet", {'blanket_order': self.blanket_order}, "name", order_by="creation DESC")
+		if last and last.startswith(f"{self.blanket_order}/"):
+			try:
+				last_number = int(last.split("/")[-1])
+			except:
+				last_number = 0
+		else:
+			last_number = 0
+		new_number = last_number + 1
+		self.name = f"{self.blanket_order}/{new_number}"

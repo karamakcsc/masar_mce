@@ -1,7 +1,6 @@
 {
  "actions": [],
- "allow_rename": 1,
- "autoname": "format:{blanket_order}/{####}",
+ "autoname": "format:",
  "creation": "2025-11-23 10:56:12.457994",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -108,11 +107,10 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-30 13:07:45.765053",
+ "modified": "2025-12-01 16:15:01.348509",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Pricing Sheet",
- "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
