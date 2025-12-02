@@ -18,7 +18,7 @@ def before_update_after_submit(self , method) :
 def on_submit(self , method): 
     self.db_set('custom_status', 'Active')
     validate_duplicate_item_in_active_blanket_orders(self)
-    create_priceing_sheet(self)
+    create_pricing_sheet(self)
 def on_cancel(self , method):
     pass
 @frappe.whitelist()
@@ -169,27 +169,36 @@ def validate_duplicate_item_in_active_blanket_orders(self):
             msg_lines.append("- {0} in {1}".format(d['item_code'] , d['blanket_order']))
         frappe.throw("<br>".join(msg_lines))
         
-def create_priceing_sheet(self):
+def create_pricing_sheet(self):
     rows = list()
     for i in self.items: 
-        free_tax_rate = get_tax_for_item(i.item_code , 'Free Zone')
-        local_tax_rate = get_tax_for_item(i.item_code , 'Local Zone')
+        free_tax_rate = get_tax_for_item(i.item_code, 'Free Zone')
+        local_tax_rate = get_tax_for_item(i.item_code, 'Local Zone')
+        local_pp_after_tax = flt(i.rate) * (1 + local_tax_rate)
+        free_pp_after_tax = flt(i.rate) * (1 + free_tax_rate)
+        markup_percentage = flt(i.custom_markup_percentage or 0) / 100.0
+        local_sp = local_pp_after_tax * (1 + markup_percentage)
+        free_sp = free_pp_after_tax * (1 + markup_percentage)
+        local_sp_after_tax = local_sp * (1 + local_tax_rate)
+        free_sp_after_tax = free_sp * (1 + free_tax_rate)
         rows.append({
-            'item_code' : i.item_code , 
-            'item_name' : i.item_name , 
-            'new_purchase_price' : i.rate , 
-            'new_quantity' : i.qty ,
-            'local_sp' : i.custom_selling_price ,
-            'free_sp' : i.custom_selling_price ,
-            'local_tax_rate' : local_tax_rate * 100 ,
-            'free_tax_rate' : free_tax_rate * 100 ,
-            'local_pp_after_tax' : flt(i.rate) * (1 + local_tax_rate) ,
-            'free_pp_after_tax' : flt(i.rate) * (1 + free_tax_rate) ,
-            'local_mp' : i.custom_markup_percentage ,
-            'free_mp' : i.custom_markup_percentage,
+            'item_code': i.item_code, 
+            'item_name': i.item_name, 
+            'new_purchase_price': i.rate, 
+            'new_quantity': i.qty,
+            'local_sp': local_sp,  
+            'free_sp': free_sp, 
+            'local_tax_rate': local_tax_rate * 100,
+            'free_tax_rate': free_tax_rate * 100,
+            'local_pp_after_tax': local_pp_after_tax,
+            'free_pp_after_tax': free_pp_after_tax,
+            'local_mp': i.custom_markup_percentage,
+            'free_mp': i.custom_markup_percentage,
+            'local_sp_after_tax': local_sp_after_tax,
+            'free_sp_after_tax': free_sp_after_tax
         })
     frappe.new_doc('Pricing Sheet').update({
-        'blanket_order' : self.name , 
-        'items' : rows , 
-        'posting_date' : self.from_date
+        'blanket_order': self.name, 
+        'items': rows, 
+        'posting_date': self.from_date
     }).save().submit()

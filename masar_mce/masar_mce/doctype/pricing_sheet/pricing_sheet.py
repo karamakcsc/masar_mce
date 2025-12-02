@@ -58,27 +58,43 @@ class PricingSheet(Document):
 	def calculate_pricing_after_tax_and_there_totals(self):
 		new_total_quantity = local_sa = free_sa = new_purchase_amount = 0
 		for i in self.items:
-			free_tax_rate = get_tax_for_item(i.item_code , 'Free Zone')
-			local_tax_rate = get_tax_for_item(i.item_code , 'Local Zone')
-			current = self.get_stock_value_and_quantity(i)
-			i.current_stock_value = flt(current.get("value", 0))
-			i.current_quantity = flt(current.get("quantity", 0))
-			i.new_cost_per_unit = (flt(i.current_stock_value) + flt(i.new_purchase_price)  * flt(i.new_quantity)
-							) / (flt(i.current_quantity) + flt(i.new_quantity)) if (flt(i.current_quantity) + flt(i.new_quantity)) > 0 else 0
+			free_tax_rate 					= get_tax_for_item(i.item_code, 'Free Zone')
+			local_tax_rate 					= get_tax_for_item(i.item_code, 'Local Zone')
+			local_stock 					= get_current_stock_value_and_quantity(i.item_code, cost_zone='Local Zone')
+			free_stock 						= get_current_stock_value_and_quantity(i.item_code, cost_zone='Free Zone')
+			i.local_curr_qty 				= flt(local_stock.get("quantity", 0))
+			i.local_curr_stock_value 		= flt(local_stock.get("stock_value", 0))
+			i.local_curr_val_rate 			= flt(local_stock.get("valuation_rate", 0))
+			i.free_curr_qty 				= flt(free_stock.get("quantity", 0))
+			i.free_curr_stock_value 		= flt(free_stock.get("stock_value", 0))
+			i.free_curr_cal_rate 			= flt(free_stock.get("valuation_rate", 0))
+			i.global_curr_stock_value 		= flt(i.local_curr_stock_value) + flt(i.free_curr_stock_value)
+			i.global_new_stock_value 		= flt(i.global_curr_stock_value) + (flt(i.new_purchase_price) * flt(i.new_quantity))
+			total_quantity = flt(i.local_curr_qty) + flt(i.free_curr_qty) + flt(i.new_quantity)
+			i.global_val_rate = i.global_new_stock_value / total_quantity if total_quantity > 0 else 0
 			i.local_tax_rate = local_tax_rate * 100
 			i.free_tax_rate = free_tax_rate * 100
 			i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_rate)
 			i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_rate)
-			i.local_mp = (flt(i.local_sp) - flt(i.local_pp_after_tax)) / flt(i.local_pp_after_tax) * 100  if flt(i.local_pp_after_tax) > 0 else 0
+			calculated_local_sp = flt(i.local_pp_after_tax) * (1 + flt(i.local_mp or 0) / 100)
+			calculated_free_sp = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp or 0) / 100)
+			tolerance = 0.01 
+			local_sp_diff = abs(flt(i.local_sp or 0) - calculated_local_sp)
+			free_sp_diff = abs(flt(i.free_sp or 0) - calculated_free_sp)
+			if local_sp_diff > tolerance:
+				i.local_sp = calculated_local_sp
+			if free_sp_diff > tolerance:
+				i.free_sp = calculated_free_sp
+			i.local_mp = (flt(i.local_sp) - flt(i.local_pp_after_tax)) / flt(i.local_pp_after_tax) * 100 if flt(i.local_pp_after_tax) > 0 else 0
+			i.free_mp = (flt(i.free_sp) - flt(i.free_pp_after_tax)) / flt(i.free_pp_after_tax) * 100 if flt(i.free_pp_after_tax) > 0 else 0
 			i.local_sp_after_tax = flt(i.local_sp) * (1 + local_tax_rate)
-			i.free_mp = (flt(i.free_sp) - flt(i.free_pp_after_tax)) / flt(i.free_pp_after_tax) * 100  if flt(i.free_pp_after_tax) > 0 else 0
 			i.free_sp_after_tax = flt(i.free_sp) * (1 + free_tax_rate)
 			new_total_quantity += flt(i.new_quantity)
 			local_sa += flt(i.new_quantity) * flt(i.local_sp_after_tax)
 			free_sa += flt(i.new_quantity) * flt(i.free_sp_after_tax)
 			new_purchase_amount += flt(i.new_quantity) * flt(i.new_purchase_price)
 		self.new_total_quantity = new_total_quantity
-		self.local_sa = local_sa 
+		self.local_sa = local_sa
 		self.free_sa = free_sa
 		self.new_purchase_amount = new_purchase_amount
 	def validate_items_from_blanket_order(self):
@@ -176,9 +192,6 @@ class PricingSheet(Document):
 			if sql and sql[0][0]:
 				return datetime.strptime(str(sql[0][0]), "%Y-%m-%d %H:%M:%S.%f")
 		return None
-	@frappe.whitelist()
-	def get_stock_value_and_quantity(self, row):
-		return get_current_stock_value_and_quantity(item_code=row.get('item_code'))
 
 	def autoname(self):
 		last = frappe.db.get_value("Pricing Sheet", {'blanket_order': self.blanket_order}, "name", order_by="creation DESC")

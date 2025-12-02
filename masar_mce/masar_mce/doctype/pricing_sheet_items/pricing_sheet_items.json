@@ -11,26 +11,34 @@
   "column_break_ossb",
   "item_name",
   "section_break_bbcg",
-  "current_stock_value",
-  "current_quantity",
+  "new_quantity",
   "column_break_obcm",
   "new_purchase_price",
-  "new_quantity",
-  "new_cost_per_unit",
   "local_zone_pricing_section",
+  "local_curr_qty",
+  "local_curr_stock_value",
   "local_tax_rate",
   "local_pp_after_tax",
   "column_break_zwru",
+  "local_curr_val_rate",
   "local_mp",
   "local_sp",
   "local_sp_after_tax",
   "section_break_kkfp",
+  "free_curr_qty",
+  "free_curr_stock_value",
   "free_tax_rate",
   "free_pp_after_tax",
   "column_break_gryq",
+  "free_curr_cal_rate",
   "free_mp",
   "free_sp",
-  "free_sp_after_tax"
+  "free_sp_after_tax",
+  "global_section",
+  "global_curr_stock_value",
+  "global_new_stock_value",
+  "column_break_uikh",
+  "global_val_rate"
  ],
  "fields": [
   {
@@ -60,12 +68,6 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "current_quantity",
-   "fieldtype": "Float",
-   "label": "Current Quantity",
-   "read_only": 1
-  },
-  {
    "fieldname": "column_break_obcm",
    "fieldtype": "Column Break"
   },
@@ -73,6 +75,8 @@
    "default": "0",
    "fieldname": "new_purchase_price",
    "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "New Purchase Price",
    "non_negative": 1,
    "reqd": 1
@@ -81,15 +85,11 @@
    "default": "0",
    "fieldname": "new_quantity",
    "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "New Quantity",
    "non_negative": 1,
    "reqd": 1
-  },
-  {
-   "fieldname": "current_stock_value",
-   "fieldtype": "Float",
-   "label": "Current Stock Value",
-   "read_only": 1
   },
   {
    "fetch_from": "item_code.item_group",
@@ -97,12 +97,6 @@
    "fieldtype": "Link",
    "label": "Item Group",
    "options": "Item Group",
-   "read_only": 1
-  },
-  {
-   "fieldname": "new_cost_per_unit",
-   "fieldtype": "Float",
-   "label": "New Cost Per Unit",
    "read_only": 1
   },
   {
@@ -174,19 +168,93 @@
   {
    "fieldname": "free_sp_after_tax",
    "fieldtype": "Float",
-   "label": "Selling Price After Tax"
+   "label": "Selling Price After Tax",
+   "read_only": 1
   },
   {
    "fieldname": "local_sp_after_tax",
    "fieldtype": "Float",
-   "label": "Selling Price After Tax"
+   "label": "Selling Price After Tax",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "local_curr_qty",
+   "fieldtype": "Float",
+   "label": "Current Quantity",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "local_curr_val_rate",
+   "fieldtype": "Float",
+   "label": "Current Cost Per Unit",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "local_curr_stock_value",
+   "fieldtype": "Float",
+   "label": "Current Stock Value",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "free_curr_qty",
+   "fieldtype": "Float",
+   "label": "Current Quantity",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "free_curr_cal_rate",
+   "fieldtype": "Float",
+   "label": "Current Cost Per Unit",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "free_curr_stock_value",
+   "fieldtype": "Float",
+   "label": "Current Stock Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "global_section",
+   "fieldtype": "Section Break",
+   "label": "Global"
+  },
+  {
+   "default": "0",
+   "fieldname": "global_curr_stock_value",
+   "fieldtype": "Float",
+   "label": "Current Stock Value",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "global_new_stock_value",
+   "fieldtype": "Float",
+   "label": "New Stock Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_uikh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "global_val_rate",
+   "fieldtype": "Float",
+   "label": "New Cost Per Unit",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-11-30 12:53:18.339941",
+ "modified": "2025-12-02 11:14:36.330678",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Pricing Sheet Items",

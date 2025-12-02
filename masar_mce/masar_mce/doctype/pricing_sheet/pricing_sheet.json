@@ -8,6 +8,8 @@
   "section_break_xb57",
   "amended_from",
   "blanket_order",
+  "supplier",
+  "supplier_name",
   "column_break_zjit",
   "posting_date",
   "last_sync",
@@ -101,16 +103,32 @@
    "fieldtype": "Float",
    "label": "New Selling Amount (Free Zone)",
    "read_only": 1
+  },
+  {
+   "fetch_from": "blanket_order.supplier",
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "blanket_order.supplier",
+   "fieldname": "supplier_name",
+   "fieldtype": "Data",
+   "label": "Supplier Name",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-01 16:15:01.348509",
+ "modified": "2025-12-02 09:46:47.434108",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Pricing Sheet",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

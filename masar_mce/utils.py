@@ -80,8 +80,8 @@ def get_standard_price_list_b_s_sfz():
     return buying[0][0], selling[0][0], selling_free_zone[0][0]
 
 @frappe.whitelist()
-def get_current_stock_value_and_quantity(item_code=None, warehouse=None):
-    cond = "1 = 1"
+def get_current_stock_value_and_quantity(item_code=None, warehouse=None, cost_zone = 'Local Zone'):
+    cond = " w.custom_cost_zone = '{0}' ".format(cost_zone)
     print(f"Getting stock value and quantity for item_code={item_code}, warehouse={warehouse}")
     if item_code in [None , '' , "" , ' ', " "]:
         return {
@@ -89,23 +89,31 @@ def get_current_stock_value_and_quantity(item_code=None, warehouse=None):
         'quantity': 0
     }
     if item_code:
-        cond += f" AND item_code = '{item_code}'"
+        cond += f" AND b.item_code = '{item_code}'"
     if warehouse:
-        cond += f" AND warehouse = '{warehouse}'"
+        cond += f" AND b.warehouse = '{warehouse}'"
 
     sql = frappe.db.sql(f"""
         SELECT 
             IFNULL(SUM(stock_value), 0),
-            IFNULL(SUM(actual_qty), 0)
+            IFNULL(SUM(actual_qty), 0),
+            IFNULL(b.valuation_rate  , 0 )
         FROM 
-            `tabBin`
+            `tabBin` b
+        INNER JOIN 
+            `tabWarehouse` w ON b.warehouse = w.name
         WHERE 
             {cond}
     """, as_list=True)
 
     return {
-        'value': sql[0][0],
-        'quantity': sql[0][1]
+        'stock_value': sql[0][0],
+        'quantity': sql[0][1], 
+        'valuation_rate': sql[0][2]
+    } if sql else {
+        'stock_value': 0,
+        'quantity': 0,
+        'valuation_rate': 0
     }
 
     
