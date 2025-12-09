@@ -13,6 +13,7 @@
   "column_break_zjit",
   "posting_date",
   "last_sync",
+  "pricing_type",
   "section_break_lvjk",
   "items",
   "section_break_ugmy",
@@ -118,13 +119,21 @@
    "fieldtype": "Data",
    "label": "Supplier Name",
    "read_only": 1
+  },
+  {
+   "fetch_from": "blanket_order.custom_pricing_type",
+   "fieldname": "pricing_type",
+   "fieldtype": "Select",
+   "label": "Pricing Type",
+   "options": "Buying Price Basis\nSelling Price Basis",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-02 09:46:47.434108",
+ "modified": "2025-12-09 14:47:16.677596",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Pricing Sheet",
