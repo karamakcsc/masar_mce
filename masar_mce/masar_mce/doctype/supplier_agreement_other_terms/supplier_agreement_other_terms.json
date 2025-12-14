@@ -16,7 +16,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Terms",
-   "link_filters": "[[\"Terms and Conditions\",\"disabled\",\"=\",0],[\"Terms and Conditions\",\"custom_other_terms\",\"=\",1]]",
+   "link_filters": "[[\"Terms and Conditions\",\"disabled\",\"=\",0]]",
    "options": "Terms and Conditions",
    "reqd": 1
   },
@@ -32,7 +32,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-11-25 12:13:09.205154",
+ "modified": "2025-12-14 14:16:32.090412",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Supplier Agreement Other Terms",
