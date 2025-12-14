@@ -35,8 +35,40 @@ frappe.ui.form.on("Purchase Receipt", {
             refresh_item_fields(frm);   
         }
     },
-});
+    custom_request_date(frm) {
+        calculate_delivery_date(frm);
+    },
 
+    set_warehouse(frm) {
+        calculate_delivery_date(frm);
+    } 
+});
+function calculate_delivery_date(frm) {
+    if (!frm.doc.custom_request_date || !frm.doc.set_warehouse) {
+        frm.set_value("custom_delivery_date", null);
+        return;
+    }
+
+    frappe.db.get_value(
+        "Warehouse",
+        frm.doc.set_warehouse,
+        "custom_number_of_days"
+    ).then(r => {
+        const days = cint(r.message?.custom_number_of_days || 0);
+
+        if (!days) {
+            frm.set_value("custom_delivery_date", frm.doc.custom_request_date);
+            return;
+        }
+
+        const delivery_date = frappe.datetime.add_days(
+            frm.doc.custom_request_date,
+            days
+        );
+
+        frm.set_value("custom_delivery_date", delivery_date);
+    });
+}
 function refresh_item_fields(frm) {
     frm.fields_dict["items"].grid.update_docfield_property("rejected_qty", "read_only", ['Purchase Receipt', 'Receipt Return'].indexOf(frm.doc.workflow_state) === -1);
     frm.fields_dict["items"].grid.update_docfield_property("qty", "read_only", ['Purchase Receipt', 'Receipt Return'].indexOf(frm.doc.workflow_state) === -1);
