@@ -249,7 +249,7 @@ def create_pricing_sheet(self):
         pricing_sheet.append('items', row)
     pricing_sheet.save()
     pricing_sheet.calculate_pricing_after_tax_and_there_totals()
-    pricing_sheet.save()
+    pricing_sheet.submit()
     frappe.msgprint(f"Pricing Sheet {pricing_sheet.name} created successfully." , alert=1)
     return pricing_sheet.name
     
