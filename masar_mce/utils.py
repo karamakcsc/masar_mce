@@ -116,4 +116,33 @@ def get_current_stock_value_and_quantity(item_code=None, warehouse=None, cost_zo
         'valuation_rate': 0
     }
 
+def get_item_barcode(item_code):
+    if not item_code:
+        return None
+    barcode = frappe.db.get_value(
+        "Item Barcode",
+        {"parent": item_code},
+        "barcode"
+    )
+    if barcode:
+        return barcode
+    return None
+
+def get_item_price(item_code):
+    if not item_code:
+        return None, None
+    buying , selling  , selling_free_zone = get_standard_price_list_b_s_sfz()
+    local_zone_rate = frappe.db.get_value(
+        "Item Price",
+        {"item_code": item_code, "price_list": selling},
+        "price_list_rate"
+    )
     
+    free_zone_rate = frappe.db.get_value(
+        "Item Price",
+        {"item_code": item_code, "price_list": selling_free_zone},
+        "price_list_rate"
+    )
+    if local_zone_rate and free_zone_rate:
+        return local_zone_rate, free_zone_rate
+    return None, None

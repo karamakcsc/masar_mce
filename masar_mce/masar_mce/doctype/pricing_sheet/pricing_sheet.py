@@ -74,53 +74,97 @@ class PricingSheet(Document):
 			i.global_val_rate = i.global_new_stock_value / total_quantity if total_quantity > 0 else 0
 			i.local_tax_rate = local_tax_rate * 100
 			i.free_tax_rate = free_tax_rate * 100
+			local_tax_decimal = local_tax_rate
+			free_tax_decimal = free_tax_rate
 			if self.pricing_type == "Buying Price Basis":
-				i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_rate)
-				i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_rate)
-				i.local_sp = flt(i.local_pp_after_tax) * (1 + flt(i.local_mp or 0) / 100)
-				i.free_sp = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp or 0) / 100)
-			elif self.pricing_type == "Selling Price Basis":
-				local_sp = flt(i.local_sp or 0)
-				free_sp = flt(i.free_sp or 0)
-				local_mp = flt(i.local_mp or 0)
-				free_mp = flt(i.free_mp or 0)
-				if local_sp > 0 and local_mp != -100: 
-					local_pp_after_tax = local_sp / (1 + local_mp / 100)
-					i.new_purchase_price = local_pp_after_tax / (1 + local_tax_rate)
-				elif free_sp > 0 and free_mp != -100:
-					free_pp_after_tax = free_sp / (1 + free_mp / 100)
-					i.new_purchase_price = free_pp_after_tax / (1 + free_tax_rate)
+				i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_decimal)
+				i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_decimal)
+				if flt(i.local_mp):
+					i.local_sp_after_tax = flt(i.local_pp_after_tax) * (1 + flt(i.local_mp or 0) / 100)
 				else:
+					i.local_sp_after_tax = flt(i.local_pp_after_tax)
+				if flt(i.free_mp):
+					i.free_sp_after_tax = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp or 0) / 100)
+				else:
+					i.free_sp_after_tax = flt(i.free_pp_after_tax)
+				if flt(i.local_sp_after_tax):
+					i.local_sp = flt(i.local_sp_after_tax) / (1 + local_tax_decimal)
+				else:
+					i.local_sp = 0
+				if flt(i.free_sp_after_tax):
+					i.free_sp = flt(i.free_sp_after_tax) / (1 + free_tax_decimal)
+				else:
+					i.free_sp = 0
+					
+			elif self.pricing_type == "Selling Price Basis":
+				if flt(i.local_sp_after_tax):
+					i.local_sp = flt(i.local_sp_after_tax) / (1 + local_tax_decimal)
+					if flt(i.local_mp) and flt(i.local_mp) != -100:
+						i.local_pp_after_tax = flt(i.local_sp_after_tax) / (1 + flt(i.local_mp) / 100)
+						i.new_purchase_price = flt(i.local_pp_after_tax) / (1 + local_tax_decimal)
+					elif flt(i.local_mp) == -100:
+						i.local_pp_after_tax = 0
+						i.new_purchase_price = 0
+					else:
+						i.local_pp_after_tax = flt(i.local_sp_after_tax)
+						i.new_purchase_price = flt(i.local_sp_after_tax) / (1 + local_tax_decimal)
+				else:
+					i.local_sp = 0
+					i.local_pp_after_tax = 0
 					i.new_purchase_price = flt(i.new_purchase_price or 0)
-				i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_rate)
-				i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_rate)
-				i.local_sp = flt(i.local_pp_after_tax) * (1 + flt(i.local_mp or 0) / 100)
-				i.free_sp = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp or 0) / 100)
-				
+					i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_decimal)
+				i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_decimal)
+				if flt(i.free_mp) and flt(i.free_mp) != -100:
+					i.free_sp_after_tax = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp or 0) / 100)
+				elif flt(i.free_mp) == -100:
+					i.free_sp_after_tax = 0
+				else:
+					i.free_sp_after_tax = flt(i.free_pp_after_tax)
+				if flt(i.free_sp_after_tax):
+					i.free_sp = flt(i.free_sp_after_tax) / (1 + free_tax_decimal)
+				else:
+					i.free_sp = 0		
 			else:
-				i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_rate)
-				i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_rate)
-				i.local_sp = flt(i.local_pp_after_tax) * (1 + flt(i.local_mp or 0) / 100)
-				i.free_sp = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp or 0) / 100)
+				i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_decimal)
+				i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_decimal)
+				if flt(i.local_mp):
+					i.local_sp_after_tax = flt(i.local_pp_after_tax) * (1 + flt(i.local_mp or 0) / 100)
+				else:
+					i.local_sp_after_tax = flt(i.local_pp_after_tax)
+					
+				if flt(i.free_mp):
+					i.free_sp_after_tax = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp or 0) / 100)
+				else:
+					i.free_sp_after_tax = flt(i.free_pp_after_tax)
+				
+				if flt(i.local_sp_after_tax):
+					i.local_sp = flt(i.local_sp_after_tax) / (1 + local_tax_decimal)
+				else:
+					i.local_sp = 0
+					
+				if flt(i.free_sp_after_tax):
+					i.free_sp = flt(i.free_sp_after_tax) / (1 + free_tax_decimal)
+				else:
+					i.free_sp = 0
 			if flt(i.local_pp_after_tax) > 0:
-				i.local_mp = ((flt(i.local_sp or 0) - flt(i.local_pp_after_tax)) / flt(i.local_pp_after_tax)) * 100
+				i.local_mp = ((flt(i.local_sp_after_tax or 0) - flt(i.local_pp_after_tax)) / flt(i.local_pp_after_tax)) * 100
 			else:
 				i.local_mp = 0
 				
 			if flt(i.free_pp_after_tax) > 0:
-				i.free_mp = ((flt(i.free_sp or 0) - flt(i.free_pp_after_tax)) / flt(i.free_pp_after_tax)) * 100
+				i.free_mp = ((flt(i.free_sp_after_tax or 0) - flt(i.free_pp_after_tax)) / flt(i.free_pp_after_tax)) * 100
 			else:
 				i.free_mp = 0
-			i.local_sp_after_tax = flt(i.local_sp or 0) * (1 + local_tax_rate)
-			i.free_sp_after_tax = flt(i.free_sp or 0) * (1 + free_tax_rate)
 			new_total_quantity += flt(i.new_quantity or 0)
-			local_sa += flt(i.new_quantity or 0) * flt(i.local_sp_after_tax or 0)
-			free_sa += flt(i.new_quantity or 0) * flt(i.free_sp_after_tax or 0)
+			local_sa += flt(i.new_quantity or 0) * flt(i.local_sp or 0)
+			free_sa += flt(i.new_quantity or 0) * flt(i.free_sp or 0)
 			new_purchase_amount += flt(i.new_quantity or 0) * flt(i.new_purchase_price or 0)
 		self.new_total_quantity = new_total_quantity
 		self.local_sa = local_sa
 		self.free_sa = free_sa
 		self.new_purchase_amount = new_purchase_amount
+  
+  
 	def validate_items_from_blanket_order(self):
      
 		if not self.blanket_order:

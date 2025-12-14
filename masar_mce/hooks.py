@@ -50,7 +50,7 @@ doctype_js = {
     "Stock Entry" : "custom/stock_entry/stock_entry.js", 
     "Purchase Order" : "custom/purchase_order/purchase_order.js", 
     "Purchase Receipt" : "custom/purchase_receipt/purchase_receipt.js",
-    "Purchase Invoice" : "custom/purchase_invoice/purchase_invoice.js", 
+    # "Purchase Invoice" : "custom/purchase_invoice/purchase_invoice.js", 
     "Material Request" : "custom/material_request/material_request.js"
     }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}

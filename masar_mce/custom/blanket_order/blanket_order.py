@@ -3,7 +3,8 @@ from frappe.utils import flt
 from frappe.model.mapper import get_mapped_doc
 from frappe import _
 from datetime import datetime
-from masar_mce.utils import get_tax_for_item
+from masar_mce.utils import get_tax_for_item, get_item_barcode
+from masar_mce.api import insert_pos_item
 def validate(self , method):
     calculate_amounts_and_total(self)
     if self.is_new():
@@ -19,6 +20,7 @@ def on_submit(self , method):
     self.db_set('custom_status', 'Active')
     validate_duplicate_item_in_active_blanket_orders(self)
     create_pricing_sheet(self)
+    create_pos_item(self)
 def on_cancel(self , method):
     pass
 @frappe.whitelist()
@@ -174,31 +176,129 @@ def create_pricing_sheet(self):
     for i in self.items: 
         free_tax_rate = get_tax_for_item(i.item_code, 'Free Zone')
         local_tax_rate = get_tax_for_item(i.item_code, 'Local Zone')
-        local_pp_after_tax = flt(i.rate) * (1 + local_tax_rate)
-        free_pp_after_tax = flt(i.rate) * (1 + free_tax_rate)
-        markup_percentage = flt(i.custom_markup_percentage or 0) / 100.0
-        local_sp = local_pp_after_tax * (1 + markup_percentage)
-        free_sp = free_pp_after_tax * (1 + markup_percentage)
-        local_sp_after_tax = local_sp * (1 + local_tax_rate)
-        free_sp_after_tax = free_sp * (1 + free_tax_rate)
+        markup_percentage = flt(i.custom_markup_percentage or 0)
+        selling_after_tax = flt(i.custom_selling_price_after_tax or 0)
+        purchase_price = flt(i.rate or 0)
+        if self.custom_pricing_type == "Buying Price Basis":
+            local_pp_after_tax = purchase_price * (1 + local_tax_rate)
+            free_pp_after_tax = purchase_price * (1 + free_tax_rate)
+            local_sp_after_tax = local_pp_after_tax * (1 + markup_percentage / 100)
+            free_sp_after_tax = free_pp_after_tax * (1 + markup_percentage / 100)
+            local_sp = local_sp_after_tax / (1 + local_tax_rate)
+            free_sp = free_sp_after_tax / (1 + free_tax_rate)
+            
+        elif self.custom_pricing_type == "Selling Price Basis":
+            if selling_after_tax:
+                local_sp_after_tax = selling_after_tax
+                free_sp_after_tax = selling_after_tax
+                local_sp = local_sp_after_tax / (1 + local_tax_rate)
+                free_sp = free_sp_after_tax / (1 + free_tax_rate)
+                if markup_percentage and markup_percentage != -100:
+                    local_pp_after_tax = local_sp_after_tax / (1 + markup_percentage / 100)
+                    free_pp_after_tax = free_sp_after_tax / (1 + markup_percentage / 100)
+                    purchase_price = local_pp_after_tax / (1 + local_tax_rate)
+                elif markup_percentage == -100:
+                    local_pp_after_tax = 0
+                    free_pp_after_tax = 0
+                    purchase_price = 0
+                else:
+                    local_pp_after_tax = local_sp_after_tax
+                    free_pp_after_tax = free_sp_after_tax
+                    purchase_price = local_sp_after_tax / (1 + local_tax_rate)
+            else:
+                local_pp_after_tax = purchase_price * (1 + local_tax_rate)
+                free_pp_after_tax = purchase_price * (1 + free_tax_rate)
+                local_sp_after_tax = local_pp_after_tax * (1 + markup_percentage / 100)
+                free_sp_after_tax = free_pp_after_tax * (1 + markup_percentage / 100)
+                local_sp = local_sp_after_tax / (1 + local_tax_rate)
+                free_sp = free_sp_after_tax / (1 + free_tax_rate)
+        else:
+            local_pp_after_tax = purchase_price * (1 + local_tax_rate)
+            free_pp_after_tax = purchase_price * (1 + free_tax_rate)
+            local_sp_after_tax = local_pp_after_tax * (1 + markup_percentage / 100)
+            free_sp_after_tax = free_pp_after_tax * (1 + markup_percentage / 100)
+            local_sp = local_sp_after_tax / (1 + local_tax_rate)
+            free_sp = free_sp_after_tax / (1 + free_tax_rate)
         rows.append({
             'item_code': i.item_code, 
             'item_name': i.item_name, 
-            'new_purchase_price': i.rate, 
+            'new_purchase_price': purchase_price, 
             'new_quantity': i.qty,
-            'local_sp': local_sp,  
+            'local_sp': local_sp,
             'free_sp': free_sp, 
             'local_tax_rate': local_tax_rate * 100,
-            'free_tax_rate': free_tax_rate * 100,
+            'free_tax_rate': free_tax_rate * 100,  
             'local_pp_after_tax': local_pp_after_tax,
             'free_pp_after_tax': free_pp_after_tax,
-            'local_mp': i.custom_markup_percentage,
-            'free_mp': i.custom_markup_percentage,
+            'local_mp': markup_percentage,
+            'free_mp': markup_percentage, 
             'local_sp_after_tax': local_sp_after_tax,
-            'free_sp_after_tax': free_sp_after_tax
+            'free_sp_after_tax': free_sp_after_tax,  
+            'blanket_order_item': i.name 
         })
-    frappe.new_doc('Pricing Sheet').update({
-        'blanket_order': self.name, 
-        'items': rows, 
-        'posting_date': self.from_date
-    }).save().submit()
+    pricing_sheet = frappe.new_doc('Pricing Sheet')
+    pricing_sheet.update({
+        'blanket_order': self.name,
+        'supplier': self.supplier,
+        'supplier_name': self.supplier_name,
+        'company': self.company,
+        'posting_date': self.from_date or frappe.utils.nowdate(),
+        'pricing_type': self.custom_pricing_type or "Buying Price Basis"  # Use same pricing type
+    })
+    for row in rows:
+        pricing_sheet.append('items', row)
+    pricing_sheet.save()
+    pricing_sheet.calculate_pricing_after_tax_and_there_totals()
+    pricing_sheet.save()
+    frappe.msgprint(f"Pricing Sheet {pricing_sheet.name} created successfully." , alert=1)
+    return pricing_sheet.name
+    
+###### MK ######   
+def create_pos_item(self):
+    if self.docstatus == 1 and self.custom_status == "Active":
+        items_local_zone = []
+        items_free_zone = []
+        supplier_code = frappe.db.get_value("Supplier", self.supplier, "custom_supplier_code")
+        for item in self.items:
+            is_disabled = frappe.db.get_value("Item", item.item_code, "disabled")
+            local_zone_tax = get_tax_for_item(item.item_code, "Local Zone")
+            free_zone_tax = get_tax_for_item(item.item_code, "Free Zone")
+            items_local_zone.append({
+                "ITEMNO": item.item_code,
+                "BARCODE": get_item_barcode(item.item_code),
+                "ITEMSHORTNAME": item.item_name,
+                "ITEMTAX": local_zone_tax * 100,
+                "ITEMPRICE": item.custom_selling_price_after_tax,
+                "ITEMSTOP": is_disabled,
+                "TRN_TYPE_PRICE": 1
+            })
+            items_free_zone.append({
+                "ITEMNO": item.item_code,
+                "BARCODE": get_item_barcode(item.item_code),
+                "ITEMSHORTNAME": item.item_name,
+                "ITEMTAX": free_zone_tax * 100,
+                "ITEMPRICE": item.custom_selling_price,
+                "ITEMSTOP": is_disabled,
+                "TRN_TYPE_PRICE": 1
+            })
+            
+        payload_local_zone = {
+            "AGREEMENT_NO": self.name,
+            "ITEMS": items_local_zone,
+            "COMP_CODE": supplier_code if supplier_code else "",
+            "AGR_STDATE": self.from_date,
+            "AGR_ENDATE": self.to_date,
+        }
+        payload_free_zone = {
+            "AGREEMENT_NO": self.name,
+            "ITEMS": items_free_zone,
+            "COMP_CODE": supplier_code if supplier_code else "",
+            "AGR_STDATE": self.from_date,
+            "AGR_ENDATE": self.to_date,
+        }
+        
+        # frappe.throw(f"Local Zone: {payload_local_zone} <br> Free Zone: {payload_free_zone}")
+        
+        # insert_pos_item(payload_local_zone, payload_free_zone)
+        
+        

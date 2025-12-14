@@ -24,201 +24,162 @@ frappe.ui.form.on("Blanket Order", {
             frm.doc.items.forEach(row => {
                 const cdt = "Blanket Order Item";
                 const cdn = row.name;                
-                getTaxRate(row.item_code, (taxRate) => {
+                getTaxRate(row.item_code, tax => {
                     if (frm.doc.custom_pricing_type === "Buying Price Basis") {
                         if (flt(row.rate)) {
-                            row.custom_purchase_price_after_tax = flt(row.rate) * (1 + flt(taxRate));
+                            row.custom_purchase_price_after_tax = flt(row.rate) * (1 + flt(tax));
                         }
-                        CalculateSellingPrice(frm, cdt, cdn);
+                        if (flt(row.custom_markup_percentage)) {
+                            row.custom_selling_price_after_tax = row.custom_purchase_price_after_tax * (1 + flt(row.custom_markup_percentage) / 100);
+                        }
+                        CalculateSellingBeforeTax(row, tax);
                     } else {
-                        CalculateRateFromSellingPrice(frm, cdt, cdn, taxRate);
-                    }                  
-                    CalculateSellingPriceAfterTax(frm, cdt, cdn);
-                    CalculateAmount(frm, cdt, cdn);
-                    frm.refresh_field("items");
+                        CalculateSellingBeforeTax(row, tax);
+                        if (flt(row.custom_markup_percentage) && flt(row.custom_selling_price_after_tax)) {
+                            row.custom_purchase_price_after_tax = flt(row.custom_selling_price_after_tax) / (1 + flt(row.custom_markup_percentage) / 100);
+                            row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
+                        }
+                    }
+                    refresh(frm, cdt);
                 });
             });
         }
-        frm.refresh_field("items");
     }
 });
 
-function init_form(frm) {
-    filterBySupplier(frm);
-    CreateRequiredInspectionButton(frm);
-    CloseandHoldButton(frm);
-    hide_buttons(frm);
-}
 frappe.ui.form.on("Blanket Order Item", {
+    rate(frm, cdt, cdn) {
+        const row = locals[cdt][cdn];
+        getTaxRate(row.item_code, tax => {
+            row.custom_purchase_price_after_tax = flt(row.rate) * (1 + flt(tax));
+
+            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+                if (flt(row.custom_markup_percentage)) {
+                    row.custom_selling_price_after_tax = row.custom_purchase_price_after_tax * (1 + flt(row.custom_markup_percentage) / 100);
+                } else {
+                    row.custom_selling_price_after_tax = row.custom_purchase_price_after_tax;
+                }
+                CalculateSellingBeforeTax(row, tax);
+            } else {
+                if (flt(row.custom_selling_price_after_tax)) {
+                    row.custom_markup_percentage = ((flt(row.custom_selling_price_after_tax) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_purchase_price_after_tax)) * 100;
+                }
+                CalculateSellingBeforeTax(row, tax);
+            }
+            
+            CalculateAmount(frm, cdt, cdn);
+            refresh(frm, cdt);
+        });
+    },
+
+    custom_markup_percentage(frm, cdt, cdn) {
+        const row = locals[cdt][cdn];
+
+        getTaxRate(row.item_code, tax => {
+            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+                row.custom_selling_price_after_tax = flt(row.custom_purchase_price_after_tax) * (1 + flt(row.custom_markup_percentage) / 100);
+                CalculateSellingBeforeTax(row, tax);
+            } else {
+                if (flt(row.custom_selling_price_after_tax) && flt(row.custom_markup_percentage)) {
+                    row.custom_purchase_price_after_tax = flt(row.custom_selling_price_after_tax) / (1 + flt(row.custom_markup_percentage) / 100);
+                    row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
+                    CalculateAmount(frm, cdt, cdn);
+                }
+            }
+            refresh(frm, cdt);
+        });
+    },
+
+    custom_selling_price_after_tax(frm, cdt, cdn) {
+        const row = locals[cdt][cdn];
+        getTaxRate(row.item_code, tax => {
+            CalculateSellingBeforeTax(row, tax);
+            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+                if (flt(row.custom_purchase_price_after_tax)) {
+                    row.custom_markup_percentage = ((flt(row.custom_selling_price_after_tax) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_purchase_price_after_tax)) * 100;
+                }
+            } else {
+                if (flt(row.custom_markup_percentage)) {
+                    row.custom_purchase_price_after_tax = flt(row.custom_selling_price_after_tax) / (1 + flt(row.custom_markup_percentage) / 100);
+                    row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
+                    CalculateAmount(frm, cdt, cdn);
+                } else {
+                    row.custom_purchase_price_after_tax = flt(row.custom_selling_price_after_tax);
+                    row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
+                    CalculateAmount(frm, cdt, cdn);
+                }
+            }
+            refresh(frm, cdt);
+        });
+    },
+
+    custom_purchase_price_after_tax(frm, cdt, cdn) {
+        const row = locals[cdt][cdn];
+
+        getTaxRate(row.item_code, tax => {
+            row.rate = flt(row.custom_purchase_price_after_tax) / (1 + flt(tax));
+            
+            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+                if (flt(row.custom_markup_percentage)) {
+                    row.custom_selling_price_after_tax = row.custom_purchase_price_after_tax * (1 + flt(row.custom_markup_percentage) / 100);
+                } else {
+                    row.custom_selling_price_after_tax = row.custom_purchase_price_after_tax;
+                }
+                CalculateSellingBeforeTax(row, tax);
+            } else {
+                if (flt(row.custom_selling_price_after_tax)) {
+                    row.custom_markup_percentage = ((flt(row.custom_selling_price_after_tax) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_purchase_price_after_tax)) * 100;
+                }
+            }       
+            CalculateAmount(frm, cdt, cdn);
+            refresh(frm, cdt);
+        });
+    },
+
     qty(frm, cdt, cdn) {
         CalculateAmount(frm, cdt, cdn);
     },
-    rate(frm, cdt, cdn) {
-        const row = locals[cdt][cdn];
-        
-        getTaxRate(row.item_code, (taxRate) => {
-            row.custom_purchase_price_after_tax = flt(row.rate) * (1 + flt(taxRate));
-            
-            CalculateAmount(frm, cdt, cdn);
-            
-            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-                CalculateSellingPrice(frm, cdt, cdn);
-            } else {
-                CalculateMarkupPercentage(frm, cdt, cdn);
-            }
-            
-            CalculateSellingPriceAfterTax(frm, cdt, cdn);
-        });
-    },
-    custom_markup_percentage(frm, cdt, cdn) {
-        const row = locals[cdt][cdn];
-        
-        getTaxRate(row.item_code, (taxRate) => {
-            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-                CalculateSellingPrice(frm, cdt, cdn);
-                CalculateSellingPriceAfterTax(frm, cdt, cdn);
-            } else {
-                CalculatePurchasePriceAfterTaxFromSelling(frm, cdt, cdn, taxRate);
-                CalculateAmount(frm, cdt, cdn);
-            }
-        });
-    },
-    custom_selling_price(frm, cdt, cdn) {
-        const row = locals[cdt][cdn];
-        
-        getTaxRate(row.item_code, (taxRate) => {
-            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-                CalculateMarkupPercentage(frm, cdt, cdn);
-            } else {
-                CalculatePurchasePriceAfterTaxFromSelling(frm, cdt, cdn, taxRate);
-                CalculateAmount(frm, cdt, cdn);
-            }
-            
-            CalculateSellingPriceAfterTax(frm, cdt, cdn);
-        });
-    },
-    custom_purchase_price_after_tax(frm, cdt, cdn) {
-        const row = locals[cdt][cdn];
-        
-        getTaxRate(row.item_code, (taxRate) => {
-            row.rate = flt(row.custom_purchase_price_after_tax) / (1 + flt(taxRate));
-            CalculateAmount(frm, cdt, cdn);
-            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-                CalculateSellingPrice(frm, cdt, cdn);
-            }
-            CalculateMarkupPercentage(frm, cdt, cdn);
-            CalculateSellingPriceAfterTax(frm, cdt, cdn);
-        });
-    },
+
     items_remove(frm) {
         update_total(frm);
     }
 });
-frappe.ui.form.on("Supplier Agreement Other Terms", {
-    tcs_terms(frm, cdt, cdn) {
-        let row = locals[cdt][cdn];
-        if (!row.tcs_terms) {
-            row.terms = "";
-            frm.refresh_field("custom_other_terms");
-            return;
-        }
-        frappe.db.get_value("Terms and Conditions", row.tcs_terms, "terms")
-            .then(r => {
-                row.terms = r.message?.terms || "";
-                frm.refresh_field("custom_other_terms");
-            });
-    }
-});
+function CalculateSellingBeforeTax(row, tax) {
+    row.custom_selling_price = flt(row.custom_selling_price_after_tax) / (1 + flt(tax));
+}
 function CalculateAmount(frm, cdt, cdn) {
-    let row = locals[cdt][cdn];
+    const row = locals[cdt][cdn];
     row.custom_amount = flt(row.qty) * flt(row.rate);
-    frm.refresh_field("items");
     update_total(frm);
 }
-function CalculateSellingPrice(frm, cdt, cdn) {
-    let row = locals[cdt][cdn];
-    if (flt(row.custom_purchase_price_after_tax) && flt(row.custom_markup_percentage)) {
-        row.custom_selling_price = (1 + flt(row.custom_markup_percentage) / 100) * flt(row.custom_purchase_price_after_tax);
-    } else if (flt(row.custom_purchase_price_after_tax)) {
-        row.custom_selling_price = flt(row.custom_purchase_price_after_tax);
-    } else {
-        row.custom_selling_price = 0;
-    }
-    frm.refresh_field("items");
-}
-
-function CalculateRateFromSellingPrice(frm, cdt, cdn, taxRate) {
-    let row = locals[cdt][cdn];
-    
-    if (!row.custom_selling_price) {
-        row.rate = 0;
-        row.custom_purchase_price_after_tax = 0;
-    } else if (flt(row.custom_markup_percentage)) {
-        row.custom_purchase_price_after_tax = (1 - flt(row.custom_markup_percentage) / 100) * flt(row.custom_selling_price);
-        row.rate = flt(row.custom_purchase_price_after_tax) / (1 + flt(taxRate));
-    } else {
-        row.custom_purchase_price_after_tax = flt(row.custom_selling_price);
-        row.rate = flt(row.custom_selling_price) / (1 + flt(taxRate));
-    }
-    frm.refresh_field("items");
-}
-
-function CalculatePurchasePriceAfterTaxFromSelling(frm, cdt, cdn, taxRate) {
-    let row = locals[cdt][cdn];
-    
-    if (!row.custom_selling_price) {
-        row.custom_purchase_price_after_tax = 0;
-        row.rate = 0;
-    } else if (flt(row.custom_markup_percentage)) {
-        row.custom_purchase_price_after_tax = (1 - flt(row.custom_markup_percentage) / 100) * flt(row.custom_selling_price);   
-        row.rate = flt(row.custom_purchase_price_after_tax) / (1 + flt(taxRate));
-    } else {
-        row.custom_purchase_price_after_tax = flt(row.custom_selling_price);
-        row.rate = flt(row.custom_selling_price) / (1 + flt(taxRate));
-    }
-    frm.refresh_field("items");
-}
-
-function CalculateMarkupPercentage(frm, cdt, cdn) {
-    let row = locals[cdt][cdn]; 
-    if (flt(row.custom_purchase_price_after_tax) && flt(row.custom_selling_price)) {
-        row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_purchase_price_after_tax)) * 100;
-    } else {
-        row.custom_markup_percentage = 0;
-    }
-    frm.refresh_field("items");
-}
 function update_total(frm) {
-    let total = (frm.doc.items || [])
+    const total = (frm.doc.items || [])
         .reduce((t, d) => t + flt(d.custom_amount), 0);
 
     frm.set_value("custom_agreement_total", total);
-}
-function CalculateSellingPriceAfterTax(frm, cdt, cdn) {
-    const row = locals[cdt][cdn];
-    
-    getTaxRate(row.item_code, (taxRate) => {
-        if (flt(row.custom_selling_price)) {
-            row.custom_selling_price_after_tax = flt(row.custom_selling_price) * (1 + flt(taxRate));
-        } else {
-            row.custom_selling_price_after_tax = flt(row.custom_selling_price);
-        }
-        frm.refresh_field("items");
-    });
 }
 function getTaxRate(itemCode, callback) {
     if (!itemCode) {
         callback(0);
         return;
     }
-    
     frappe.call({
         method: "masar_mce.utils.get_tax_for_item",
         args: { item_code: itemCode },
         callback(r) {
-            callback(r.message || 0);
+            callback(flt(r.message));
         }
     });
+}
+
+function refresh(frm, cdt) {
+    frm.refresh_field("items");
+}
+function init_form(frm) {
+    filterBySupplier(frm);
+    CreateRequiredInspectionButton(frm);
+    CloseandHoldButton(frm);
+    hide_buttons(frm);
 }
 function hide_buttons(frm) {
     setTimeout(() => {
