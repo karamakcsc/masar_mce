@@ -1,6 +1,7 @@
 /******************************************************************
  * PRICING SHEET – AFTER TAX BASED PRICING
  * Corrected: local_sp = before tax, local_sp_after_tax = after tax
+ * Markup formula: (sp - pp_after_tax) / pp_after_tax * 100
  ******************************************************************/
 
 frappe.ui.form.on("Pricing Sheet", {
@@ -28,11 +29,9 @@ frappe.ui.form.on("Pricing Sheet", {
                     calculateBuyingPriceBasis(frm, cdt, cdn);
                 } else if (frm.doc.pricing_type === "Selling Price Basis") {
                     // For selling price basis, start with local zone
-                    if (row.local_sp_after_tax && row.local_mp) {
-                        calculateSellingPriceBasisFromSellingAfterTax(frm, cdt, cdn, 'local');
+                    if (row.local_sp) {
+                        calculateSellingPriceBasisFromSellingBeforeTax(frm, cdt, cdn, 'local');
                     }
-                    // Then calculate free zone based on the purchase price
-                    calculateFreeZoneFromPurchasePrice(frm, cdt, cdn);
                 }
                 
                 calculate_global_values(row);
@@ -84,7 +83,7 @@ frappe.ui.form.on("Pricing Sheet Items", {
         const row = locals[cdt][cdn];
         
         if (frm.doc.pricing_type === "Buying Price Basis") {
-            // Calculate selling after tax and before tax from markup
+            // Calculate selling before tax and after tax from markup
             calculateSellingFromMarkupForZone(frm, cdt, cdn, 'local');
         } else if (frm.doc.pricing_type === "Selling Price Basis") {
             // Calculate purchase after tax and purchase price from markup
@@ -94,26 +93,36 @@ frappe.ui.form.on("Pricing Sheet Items", {
     },
     
     local_sp(frm, cdt, cdn) {
-        // 1️⃣ Convert entered selling price → after tax
+        // Calculate selling after tax from selling before tax
         calculateSellingAfterTaxFromSellingBeforeTax(frm, cdt, cdn, 'local');
 
-        // 2️⃣ Reuse existing logic (unchanged)
         if (frm.doc.pricing_type === "Buying Price Basis") {
-            calculateSellingBeforeTaxAndMarkupFromSellingAfterTax(frm, cdt, cdn, 'local');
+            calculateMarkupFromSellingBeforeTax(frm, cdt, cdn, 'local');
         } else if (frm.doc.pricing_type === "Selling Price Basis") {
-            calculateSellingPriceBasisFromSellingAfterTax(frm, cdt, cdn, 'local');
+            calculateSellingPriceBasisFromSellingBeforeTax(frm, cdt, cdn, 'local');
         }
 
         recalc_row_and_totals(frm, cdt, cdn);
     },
-
+    
+    local_sp_after_tax(frm, cdt, cdn) {
+        // Calculate selling before tax from selling after tax
+        calculateSellingBeforeTaxFromSellingAfterTax(frm, cdt, cdn, 'local');
+        
+        if (frm.doc.pricing_type === "Buying Price Basis") {
+            calculateMarkupFromSellingBeforeTax(frm, cdt, cdn, 'local');
+        } else if (frm.doc.pricing_type === "Selling Price Basis") {
+            calculateSellingPriceBasisFromSellingBeforeTax(frm, cdt, cdn, 'local');
+        }
+        recalc_row_and_totals(frm, cdt, cdn);
+    },
     
     // BUYING PRICE BASIS - Free Zone
     free_mp(frm, cdt, cdn) {
         const row = locals[cdt][cdn];
         
         if (frm.doc.pricing_type === "Buying Price Basis") {
-            // Calculate selling after tax and before tax from markup
+            // Calculate selling before tax and after tax from markup
             calculateSellingFromMarkupForZone(frm, cdt, cdn, 'free');
         } else if (frm.doc.pricing_type === "Selling Price Basis") {
             // For selling price basis, free zone only affects free zone values
@@ -126,14 +135,24 @@ frappe.ui.form.on("Pricing Sheet Items", {
         calculateSellingAfterTaxFromSellingBeforeTax(frm, cdt, cdn, 'free');
 
         if (frm.doc.pricing_type === "Buying Price Basis") {
-            calculateSellingBeforeTaxAndMarkupFromSellingAfterTax(frm, cdt, cdn, 'free');
+            calculateMarkupFromSellingBeforeTax(frm, cdt, cdn, 'free');
         } else if (frm.doc.pricing_type === "Selling Price Basis") {
-            calculateFreeZoneFromSellingAfterTax(frm, cdt, cdn);
+            calculateFreeZoneFromSellingBeforeTax(frm, cdt, cdn);
         }
 
         recalc_row_and_totals(frm, cdt, cdn);
+    },
+    
+    free_sp_after_tax(frm, cdt, cdn) {
+        calculateSellingBeforeTaxFromSellingAfterTax(frm, cdt, cdn, 'free');
+        
+        if (frm.doc.pricing_type === "Buying Price Basis") {
+            calculateMarkupFromSellingBeforeTax(frm, cdt, cdn, 'free');
+        } else if (frm.doc.pricing_type === "Selling Price Basis") {
+            calculateFreeZoneFromSellingBeforeTax(frm, cdt, cdn);
+        }
+        recalc_row_and_totals(frm, cdt, cdn);
     }
-
 });
 
 /******************************************************************
@@ -155,30 +174,31 @@ function calculateBuyingPriceBasis(frm, cdt, cdn) {
     row.local_pp_after_tax = flt(row.new_purchase_price) * (1 + local_tax_decimal);
     row.free_pp_after_tax = flt(row.new_purchase_price) * (1 + free_tax_decimal);
     
-    // 2. Calculate selling after tax from markup for both zones
-    if (flt(row.local_mp)) {
-        row.local_sp_after_tax = row.local_pp_after_tax * (1 + flt(row.local_mp) / 100);
+    // 2. Calculate selling before tax from markup for both zones
+    // Using new formula: sp = pp_after_tax * (1 + markup/100)
+    if (flt(row.local_mp) || flt(row.local_mp) === 0) {
+        row.local_sp = row.local_pp_after_tax * (1 + flt(row.local_mp) / 100);
     } else {
-        row.local_sp_after_tax = row.local_pp_after_tax;
+        row.local_sp = row.local_pp_after_tax;
     }
     
-    if (flt(row.free_mp)) {
-        row.free_sp_after_tax = row.free_pp_after_tax * (1 + flt(row.free_mp) / 100);
+    if (flt(row.free_mp) || flt(row.free_mp) === 0) {
+        row.free_sp = row.free_pp_after_tax * (1 + flt(row.free_mp) / 100);
     } else {
-        row.free_sp_after_tax = row.free_pp_after_tax;
+        row.free_sp = row.free_pp_after_tax;
     }
     
-    // 3. Calculate selling before tax (for display)
-    if (flt(row.local_sp_after_tax)) {
-        row.local_sp = flt(row.local_sp_after_tax) / (1 + local_tax_decimal);
+    // 3. Calculate selling after tax (for tax calculation)
+    if (flt(row.local_sp)) {
+        row.local_sp_after_tax = flt(row.local_sp) * (1 + local_tax_decimal);
     } else {
-        row.local_sp = 0;
+        row.local_sp_after_tax = 0;
     }
     
-    if (flt(row.free_sp_after_tax)) {
-        row.free_sp = flt(row.free_sp_after_tax) / (1 + free_tax_decimal);
+    if (flt(row.free_sp)) {
+        row.free_sp_after_tax = flt(row.free_sp) * (1 + free_tax_decimal);
     } else {
-        row.free_sp = 0;
+        row.free_sp_after_tax = 0;
     }
     
     frm.refresh_field("items");
@@ -186,55 +206,58 @@ function calculateBuyingPriceBasis(frm, cdt, cdn) {
 
 function calculateSellingFromMarkupForZone(frm, cdt, cdn, zone) {
     let row = locals[cdt][cdn];
-    let tax_field = `${zone}_tax_rate`;
     let pp_after_tax_field = `${zone}_pp_after_tax`;
     let markup_field = `${zone}_mp`;
+    let sp_field = `${zone}_sp`;
     let sp_after_tax_field = `${zone}_sp_after_tax`;
-    let sp_field = `${zone}_sp`; // This is before tax
+    let tax_field = `${zone}_tax_rate`;
     
-    let tax_decimal = flt(row[tax_field]) / 100.0;
     let purchase_after_tax = flt(row[pp_after_tax_field]);
     let markup = flt(row[markup_field]);
+    let tax_decimal = flt(row[tax_field]) / 100.0;
     
     if (purchase_after_tax) {
-        // Calculate selling after tax
-        if (markup) {
-            row[sp_after_tax_field] = purchase_after_tax * (1 + markup / 100);
+        // Calculate selling before tax from markup
+        // Using formula: sp = pp_after_tax * (1 + markup/100)
+        if (markup || markup === 0) {
+            row[sp_field] = purchase_after_tax * (1 + markup / 100);
         } else {
-            row[sp_after_tax_field] = purchase_after_tax;
+            row[sp_field] = purchase_after_tax;
         }
         
-        // Calculate selling before tax (for display)
-        if (flt(row[sp_after_tax_field])) {
-            row[sp_field] = flt(row[sp_after_tax_field]) / (1 + tax_decimal);
+        // Calculate selling after tax (for display)
+        if (flt(row[sp_field])) {
+            row[sp_after_tax_field] = flt(row[sp_field]) * (1 + tax_decimal);
         } else {
-            row[sp_field] = 0;
+            row[sp_after_tax_field] = 0;
         }
     }
     
     frm.refresh_field("items");
 }
 
-function calculateSellingBeforeTaxAndMarkupFromSellingAfterTax(frm, cdt, cdn, zone) {
+function calculateMarkupFromSellingBeforeTax(frm, cdt, cdn, zone) {
     let row = locals[cdt][cdn];
-    let tax_field = `${zone}_tax_rate`;
     let pp_after_tax_field = `${zone}_pp_after_tax`;
     let markup_field = `${zone}_mp`;
-    let sp_after_tax_field = `${zone}_sp_after_tax`;
-    let sp_field = `${zone}_sp`; // This is before tax
+    let sp_field = `${zone}_sp`;
     
-    let tax_decimal = flt(row[tax_field]) / 100.0;
-    let selling_after_tax = flt(row[sp_after_tax_field]);
+    let selling_before_tax = flt(row[sp_field]);
     let purchase_after_tax = flt(row[pp_after_tax_field]);
     
-    if (selling_after_tax) {
-        // Calculate selling before tax
-        row[sp_field] = selling_after_tax / (1 + tax_decimal);
-        
-        // Calculate markup if purchase after tax exists
-        if (purchase_after_tax) {
-            row[markup_field] = ((selling_after_tax - purchase_after_tax) / purchase_after_tax) * 100;
+    if (selling_before_tax && purchase_after_tax) {
+        // Calculate markup using the formula: (sp - pp_after_tax) / pp_after_tax * 100
+        if (purchase_after_tax !== 0) {
+            row[markup_field] = ((selling_before_tax - purchase_after_tax) / purchase_after_tax) * 100;
+        } else if (selling_before_tax > 0) {
+            // If purchase after tax is 0 but selling is positive, markup is infinite
+            row[markup_field] = 100;
+        } else {
+            row[markup_field] = 0;
         }
+    } else if (selling_before_tax && !purchase_after_tax) {
+        // If no purchase after tax, set markup to 0
+        row[markup_field] = 0;
     }
     
     frm.refresh_field("items");
@@ -244,32 +267,36 @@ function calculateSellingBeforeTaxAndMarkupFromSellingAfterTax(frm, cdt, cdn, zo
  * SELLING PRICE BASIS FUNCTIONS
  ******************************************************************/
 
-function calculateSellingPriceBasisFromSellingAfterTax(frm, cdt, cdn, zone) {
+function calculateSellingPriceBasisFromSellingBeforeTax(frm, cdt, cdn, zone) {
     let row = locals[cdt][cdn];
     
     if (zone !== 'local') return; // Only local zone drives purchase price
     
     let local_tax_decimal = flt(row.local_tax_rate) / 100.0;
-    let selling_after_tax = flt(row.local_sp_after_tax);
+    let selling_before_tax = flt(row.local_sp);
     let markup = flt(row.local_mp);
     
-    if (selling_after_tax) {
-        // 1. Calculate selling before tax
-        row.local_sp = selling_after_tax / (1 + local_tax_decimal);
+    if (selling_before_tax) {
+        // 1. Calculate selling after tax
+        row.local_sp_after_tax = selling_before_tax * (1 + local_tax_decimal);
         
-        if (markup && markup !== -100) {
-            // 2. Calculate purchase after tax
-            row.local_pp_after_tax = selling_after_tax * (1 - markup / 100);
-            
-            // 3. Calculate purchase price (before tax)
-            row.new_purchase_price = row.local_pp_after_tax / (1 + local_tax_decimal);
-        } else if (markup === -100) {
-            row.local_pp_after_tax = 0;
-            row.new_purchase_price = 0;
+        if (markup || markup === 0) {
+            if (markup !== -100) {
+                // 2. Calculate purchase after tax from selling before tax and markup
+                // Formula: pp_after_tax = sp / (1 + markup/100)
+                row.local_pp_after_tax = selling_before_tax * (1 - markup / 100);
+                
+                // 3. Calculate purchase price (before tax)
+                row.new_purchase_price = row.local_pp_after_tax / (1 + local_tax_decimal);
+            } else {
+                // If markup is -100%, purchase after tax is 0
+                row.local_pp_after_tax = 0;
+                row.new_purchase_price = 0;
+            }
         } else {
-            // If no markup, selling after tax = purchase after tax
-            row.local_pp_after_tax = selling_after_tax;
-            row.new_purchase_price = selling_after_tax / (1 + local_tax_decimal);
+            // If no markup, selling before tax = purchase after tax
+            row.local_pp_after_tax = selling_before_tax;
+            row.new_purchase_price = selling_before_tax / (1 + local_tax_decimal);
         }
         
         // 4. Calculate free zone based on new purchase price
@@ -285,25 +312,25 @@ function calculatePurchaseFromMarkupForZone(frm, cdt, cdn, zone) {
     if (zone !== 'local') return; // Only local zone affects purchase price
     
     let local_tax_decimal = flt(row.local_tax_rate) / 100.0;
-    let selling_after_tax = flt(row.local_sp_after_tax);
+    let selling_before_tax = flt(row.local_sp);
     let markup = flt(row.local_mp);
     
-    if (selling_after_tax && markup && markup !== -100) {
-        // 1. Calculate purchase after tax
-        row.local_pp_after_tax = selling_after_tax * (1 - markup / 100);
+    if (selling_before_tax && (markup || markup === 0)) {
+        // 1. Calculate purchase after tax from selling before tax and markup
+        if (markup !== -100) {
+            row.local_pp_after_tax = selling_before_tax * (1 - markup / 100);
+            
+            // 2. Calculate purchase price (before tax)
+            row.new_purchase_price = row.local_pp_after_tax / (1 + local_tax_decimal);
+        } else {
+            row.local_pp_after_tax = 0;
+            row.new_purchase_price = 0;
+        }
         
-        // 2. Calculate purchase price (before tax)
-        row.new_purchase_price = row.local_pp_after_tax / (1 + local_tax_decimal);
-        
-        // 3. Calculate selling before tax
-        row.local_sp = selling_after_tax / (1 + local_tax_decimal);
+        // 3. Calculate selling after tax
+        row.local_sp_after_tax = selling_before_tax * (1 + local_tax_decimal);
         
         // 4. Calculate free zone based on new purchase price
-        calculateFreeZoneFromPurchasePrice(frm, cdt, cdn);
-    } else if (markup === -100) {
-        row.local_pp_after_tax = 0;
-        row.new_purchase_price = 0;
-        row.local_sp = selling_after_tax / (1 + local_tax_decimal);
         calculateFreeZoneFromPurchasePrice(frm, cdt, cdn);
     }
     
@@ -313,19 +340,24 @@ function calculatePurchaseFromMarkupForZone(frm, cdt, cdn, zone) {
 function recalculateMarkupFromPurchasePrice(frm, cdt, cdn) {
     let row = locals[cdt][cdn];
     let local_tax_decimal = flt(row.local_tax_rate) / 100.0;
-    let selling_after_tax = flt(row.local_sp_after_tax);
+    let selling_before_tax = flt(row.local_sp);
     
-    if (selling_after_tax && row.new_purchase_price) {
+    if (selling_before_tax && row.new_purchase_price) {
         // 1. Calculate purchase after tax
         row.local_pp_after_tax = flt(row.new_purchase_price) * (1 + local_tax_decimal);
         
-        // 2. Calculate markup
+        // 2. Calculate markup using the formula: (sp - pp_after_tax) / pp_after_tax * 100
         if (row.local_pp_after_tax > 0) {
-            row.local_mp = ((selling_after_tax - row.local_pp_after_tax) / row.local_pp_after_tax) * 100;
+            row.local_mp = ((selling_before_tax - row.local_pp_after_tax) / row.local_pp_after_tax) * 100;
+        } else if (selling_before_tax > 0) {
+            // If purchase after tax is 0 but selling is positive, markup is infinite
+            row.local_mp = 100;
+        } else {
+            row.local_mp = 0;
         }
         
-        // 3. Calculate selling before tax
-        row.local_sp = selling_after_tax / (1 + local_tax_decimal);
+        // 3. Calculate selling after tax
+        row.local_sp_after_tax = selling_before_tax * (1 + local_tax_decimal);
         
         // 4. Calculate free zone based on new purchase price
         calculateFreeZoneFromPurchasePrice(frm, cdt, cdn);
@@ -345,20 +377,23 @@ function calculateFreeZoneFromPurchasePrice(frm, cdt, cdn) {
     // 1. Calculate purchase after tax for free zone
     row.free_pp_after_tax = flt(row.new_purchase_price) * (1 + free_tax_decimal);
     
-    // 2. Calculate selling after tax from markup
-    if (markup && markup !== -100) {
-        row.free_sp_after_tax = row.free_pp_after_tax * (1 + markup / 100);
-    } else if (markup === -100) {
-        row.free_sp_after_tax = 0;
+    // 2. Calculate selling before tax from markup
+    // Using formula: sp = pp_after_tax * (1 + markup/100)
+    if (markup || markup === 0) {
+        if (markup !== -100) {
+            row.free_sp = row.free_pp_after_tax * (1 + markup / 100);
+        } else {
+            row.free_sp = 0;
+        }
     } else {
-        row.free_sp_after_tax = row.free_pp_after_tax;
+        row.free_sp = row.free_pp_after_tax;
     }
     
-    // 3. Calculate selling before tax (for display)
-    if (flt(row.free_sp_after_tax)) {
-        row.free_sp = flt(row.free_sp_after_tax) / (1 + free_tax_decimal);
+    // 3. Calculate selling after tax (for display)
+    if (flt(row.free_sp)) {
+        row.free_sp_after_tax = flt(row.free_sp) * (1 + free_tax_decimal);
     } else {
-        row.free_sp = 0;
+        row.free_sp_after_tax = 0;
     }
     
     frm.refresh_field("items");
@@ -375,45 +410,53 @@ function calculateFreeZoneFromMarkup(frm, cdt, cdn) {
     // 1. Calculate purchase after tax for free zone
     row.free_pp_after_tax = flt(row.new_purchase_price) * (1 + free_tax_decimal);
     
-    // 2. Calculate selling after tax from markup
-    if (markup && markup !== -100) {
-        row.free_sp_after_tax = row.free_pp_after_tax * (1 + markup / 100);
-    } else if (markup === -100) {
-        row.free_sp_after_tax = 0;
+    // 2. Calculate selling before tax from markup
+    // Using formula: sp = pp_after_tax * (1 + markup/100)
+    if (markup || markup === 0) {
+        if (markup !== -100) {
+            row.free_sp = row.free_pp_after_tax * (1 + markup / 100);
+        } else {
+            row.free_sp = 0;
+        }
     } else {
-        row.free_sp_after_tax = row.free_pp_after_tax;
+        row.free_sp = row.free_pp_after_tax;
     }
     
-    // 3. Calculate selling before tax (for display)
-    if (flt(row.free_sp_after_tax)) {
-        row.free_sp = flt(row.free_sp_after_tax) / (1 + free_tax_decimal);
+    // 3. Calculate selling after tax (for display)
+    if (flt(row.free_sp)) {
+        row.free_sp_after_tax = flt(row.free_sp) * (1 + free_tax_decimal);
     } else {
-        row.free_sp = 0;
+        row.free_sp_after_tax = 0;
     }
     
     frm.refresh_field("items");
 }
 
-function calculateFreeZoneFromSellingAfterTax(frm, cdt, cdn) {
+function calculateFreeZoneFromSellingBeforeTax(frm, cdt, cdn) {
     let row = locals[cdt][cdn];
     
     if (!row.new_purchase_price) return;
     
     let free_tax_decimal = flt(row.free_tax_rate) / 100.0;
-    let selling_after_tax = flt(row.free_sp_after_tax);
+    let selling_before_tax = flt(row.free_sp);
     
-    if (selling_after_tax) {
-        // 1. Calculate selling before tax
-        row.free_sp = selling_after_tax / (1 + free_tax_decimal);
+    if (selling_before_tax) {
+        // 1. Calculate selling after tax
+        row.free_sp_after_tax = selling_before_tax * (1 + free_tax_decimal);
         
         // 2. Calculate purchase after tax (should already be set from purchase price)
         if (!row.free_pp_after_tax) {
             row.free_pp_after_tax = flt(row.new_purchase_price) * (1 + free_tax_decimal);
         }
         
-        // 3. Calculate markup
+        // 3. Calculate markup using the formula: (sp - pp_after_tax) / pp_after_tax * 100
         if (row.free_pp_after_tax > 0) {
-            row.free_mp = ((selling_after_tax - row.free_pp_after_tax) / row.free_pp_after_tax) * 100;
+            row.free_mp = ((selling_before_tax - row.free_pp_after_tax) / row.free_pp_after_tax) * 100;
+        } else if (selling_before_tax > 0) {
+            // If purchase after tax is 0 but selling is positive, markup is infinite
+            row.free_mp = 100;
+        } else {
+            row.free_mp = 0;
         }
     }
     
@@ -497,9 +540,9 @@ function fetch_tax_and_stock_then_recalc(frm, cdt, cdn) {
             if (frm.doc.pricing_type === "Buying Price Basis") {
                 calculateBuyingPriceBasis(frm, cdt, cdn);
             } else if (frm.doc.pricing_type === "Selling Price Basis") {
-                // For Selling Price Basis, calculate from selling after tax if exists
-                if (row.local_sp_after_tax) {
-                    calculateSellingPriceBasisFromSellingAfterTax(frm, cdt, cdn, 'local');
+                // For Selling Price Basis, calculate from selling before tax if exists
+                if (row.local_sp) {
+                    calculateSellingPriceBasisFromSellingBeforeTax(frm, cdt, cdn, 'local');
                 }
             }
             
@@ -547,8 +590,8 @@ function fetch_data_fallback(frm, row, cdt, cdn) {
                                     if (frm.doc.pricing_type === "Buying Price Basis") {
                                         calculateBuyingPriceBasis(frm, cdt, cdn);
                                     } else if (frm.doc.pricing_type === "Selling Price Basis") {
-                                        if (row.local_sp_after_tax) {
-                                            calculateSellingPriceBasisFromSellingAfterTax(frm, cdt, cdn, 'local');
+                                        if (row.local_sp) {
+                                            calculateSellingPriceBasisFromSellingBeforeTax(frm, cdt, cdn, 'local');
                                         }
                                     }
                                     
@@ -607,13 +650,13 @@ function recalc_row_and_totals(frm, cdt, cdn) {
         row.free_pp_after_tax = flt(row.new_purchase_price) * (1 + free_tax_decimal);
     }
     
-    // Calculate selling before tax if selling after tax exists
-    if (row.local_sp_after_tax && !row.local_sp) {
-        row.local_sp = flt(row.local_sp_after_tax) / (1 + local_tax_decimal);
+    // Calculate selling after tax if selling before tax exists
+    if (row.local_sp && !row.local_sp_after_tax) {
+        row.local_sp_after_tax = flt(row.local_sp) * (1 + local_tax_decimal);
     }
     
-    if (row.free_sp_after_tax && !row.free_sp) {
-        row.free_sp = flt(row.free_sp_after_tax) / (1 + free_tax_decimal);
+    if (row.free_sp && !row.free_sp_after_tax) {
+        row.free_sp_after_tax = flt(row.free_sp) * (1 + free_tax_decimal);
     }
     
     calculate_global_values(row);
@@ -652,7 +695,7 @@ function GetTotals(frm) {
     
     (frm.doc.items || []).forEach(row => {
         new_total_quantity += flt(row.new_quantity);
-        // Use selling before tax for totals (since this is what's displayed to users)
+        // Use selling before tax for totals
         local_sa += flt(row.new_quantity) * flt(row.local_sp);
         free_sa += flt(row.new_quantity) * flt(row.free_sp);
         new_purchase_amount += flt(row.new_quantity) * flt(row.new_purchase_price);
@@ -664,6 +707,36 @@ function GetTotals(frm) {
     frm.set_value("new_purchase_amount", new_purchase_amount);
 
     frm.refresh_fields();
+}
+
+function calculateSellingAfterTaxFromSellingBeforeTax(frm, cdt, cdn, zone) {
+    let row = locals[cdt][cdn];
+
+    let tax_rate = flt(row[`${zone}_tax_rate`]) / 100;
+    let selling_before_tax = flt(row[`${zone}_sp`]);
+
+    if (!selling_before_tax) {
+        row[`${zone}_sp_after_tax`] = 0;
+        return;
+    }
+
+    // selling after tax = selling before tax + tax
+    row[`${zone}_sp_after_tax`] = selling_before_tax * (1 + tax_rate);
+}
+
+function calculateSellingBeforeTaxFromSellingAfterTax(frm, cdt, cdn, zone) {
+    let row = locals[cdt][cdn];
+
+    let tax_rate = flt(row[`${zone}_tax_rate`]) / 100;
+    let selling_after_tax = flt(row[`${zone}_sp_after_tax`]);
+
+    if (!selling_after_tax) {
+        row[`${zone}_sp`] = 0;
+        return;
+    }
+
+    // selling before tax = selling after tax / (1 + tax_rate)
+    row[`${zone}_sp`] = selling_after_tax / (1 + tax_rate);
 }
 
 // Update GetItemsDialog to use correct field names
@@ -729,42 +802,42 @@ function GetItemsDialog(frm) {
                             // Buying Price Basis
                             local_pp_after_tax = new_purchase_price * (1 + local_tax);
                             free_pp_after_tax = new_purchase_price * (1 + free_tax);
-                            local_sp_after_tax = local_pp_after_tax * (1 + markup_percentage / 100);
-                            free_sp_after_tax = free_pp_after_tax * (1 + markup_percentage / 100);
-                            local_sp = local_sp_after_tax / (1 + local_tax);
-                            free_sp = free_sp_after_tax / (1 + free_tax);
+                            local_sp = local_pp_after_tax * (1 + markup_percentage / 100);
+                            free_sp = free_pp_after_tax * (1 + markup_percentage / 100);
+                            local_sp_after_tax = local_sp * (1 + local_tax);
+                            free_sp_after_tax = free_sp * (1 + free_tax);
                         } else {
                             // Selling Price Basis
-                            let selling_after_tax = flt(item.custom_selling_price_after_tax || 0);
+                            let selling_before_tax = flt(item.custom_selling_price_before_tax || 0);
                             
-                            if (selling_after_tax) {
-                                local_sp_after_tax = selling_after_tax;
-                                free_sp_after_tax = selling_after_tax;
+                            if (selling_before_tax) {
+                                local_sp = selling_before_tax;
+                                free_sp = selling_before_tax;
                                 
                                 if (markup_percentage && markup_percentage !== -100) {
-                                    local_pp_after_tax = selling_after_tax / (1 + markup_percentage / 100);
-                                    free_pp_after_tax = selling_after_tax / (1 + markup_percentage / 100);
+                                    local_pp_after_tax = selling_before_tax * (1 - markup_percentage / 100);
+                                    free_pp_after_tax = selling_before_tax * (1 - markup_percentage / 100);
                                     new_purchase_price = local_pp_after_tax / (1 + local_tax);
                                 } else if (markup_percentage === -100) {
                                     local_pp_after_tax = 0;
                                     free_pp_after_tax = 0;
                                     new_purchase_price = 0;
                                 } else {
-                                    local_pp_after_tax = selling_after_tax;
-                                    free_pp_after_tax = selling_after_tax;
-                                    new_purchase_price = selling_after_tax / (1 + local_tax);
+                                    local_pp_after_tax = selling_before_tax;
+                                    free_pp_after_tax = selling_before_tax;
+                                    new_purchase_price = selling_before_tax / (1 + local_tax);
                                 }
                                 
-                                local_sp = selling_after_tax / (1 + local_tax);
-                                free_sp = selling_after_tax / (1 + free_tax);
+                                local_sp_after_tax = selling_before_tax * (1 + local_tax);
+                                free_sp_after_tax = selling_before_tax * (1 + free_tax);
                             } else {
                                 // Calculate from purchase price
                                 local_pp_after_tax = new_purchase_price * (1 + local_tax);
                                 free_pp_after_tax = new_purchase_price * (1 + free_tax);
-                                local_sp_after_tax = local_pp_after_tax * (1 + markup_percentage / 100);
-                                free_sp_after_tax = free_pp_after_tax * (1 + markup_percentage / 100);
-                                local_sp = local_sp_after_tax / (1 + local_tax);
-                                free_sp = free_sp_after_tax / (1 + free_tax);
+                                local_sp = local_pp_after_tax * (1 + markup_percentage / 100);
+                                free_sp = free_pp_after_tax * (1 + markup_percentage / 100);
+                                local_sp_after_tax = local_sp * (1 + local_tax);
+                                free_sp_after_tax = free_sp * (1 + free_tax);
                             }
                         }
                         
@@ -793,7 +866,6 @@ function GetItemsDialog(frm) {
                     }
                 }
                 
-                // ... rest of GetItemsDialog remains the same
                 const dialog = new frappe.ui.Dialog({
                     title: __("Select Items to Add"),
                     size: "extra-large",
@@ -819,10 +891,10 @@ function GetItemsDialog(frm) {
                                 { fieldname: "free_tax_rate", label: "Free Tax %", fieldtype: "Percent", read_only: 1, width: 100, in_list_view: 1 },
                                 { fieldname: "local_pp_after_tax", label: "Purch. After Tax (Local)", fieldtype: "Currency", read_only: 1, width: 140, in_list_view: 1 },
                                 { fieldname: "free_pp_after_tax", label: "Purch. After Tax (Free)", fieldtype: "Currency", read_only: 1, width: 140, in_list_view: 1 },
-                                { fieldname: "local_sp_after_tax", label: "Local SP (After Tax)", fieldtype: "Currency", width: 120, in_list_view: 1 },
-                                { fieldname: "local_sp", label: "Local SP (Before Tax)", fieldtype: "Currency", read_only: 1, width: 160, in_list_view: 1 },
-                                { fieldname: "free_sp_after_tax", label: "Free SP (After Tax)", fieldtype: "Currency", width: 120, in_list_view: 1 },
-                                { fieldname: "free_sp", label: "Free SP (Before Tax)", fieldtype: "Currency", read_only: 1, width: 160, in_list_view: 1 }
+                                { fieldname: "local_sp", label: "Local SP (Before Tax)", fieldtype: "Currency", width: 120, in_list_view: 1 },
+                                { fieldname: "local_sp_after_tax", label: "Local SP (After Tax)", fieldtype: "Currency", read_only: 1, width: 160, in_list_view: 1 },
+                                { fieldname: "free_sp", label: "Free SP (Before Tax)", fieldtype: "Currency", width: 120, in_list_view: 1 },
+                                { fieldname: "free_sp_after_tax", label: "Free SP (After Tax)", fieldtype: "Currency", read_only: 1, width: 160, in_list_view: 1 }
                             ]
                         }
                     ],
@@ -846,10 +918,10 @@ function GetItemsDialog(frm) {
                                 new_row.free_pp_after_tax = row.free_pp_after_tax;
                                 new_row.local_mp = flt(row.local_mp || 0);
                                 new_row.free_mp = flt(row.free_mp || 0);
-                                new_row.local_sp_after_tax = flt(row.local_sp_after_tax);
-                                new_row.free_sp_after_tax = flt(row.free_sp_after_tax);
                                 new_row.local_sp = flt(row.local_sp);
                                 new_row.free_sp = flt(row.free_sp);
+                                new_row.local_sp_after_tax = flt(row.local_sp_after_tax);
+                                new_row.free_sp_after_tax = flt(row.free_sp_after_tax);
                                 new_row.local_curr_qty = row.local_curr_qty;
                                 new_row.local_curr_stock_value = row.local_curr_stock_value;
                                 new_row.free_curr_qty = row.free_curr_qty;
@@ -891,20 +963,6 @@ function GetLastSync(frm) {
             }
         }
     });
-}
-function calculateSellingAfterTaxFromSellingBeforeTax(frm, cdt, cdn, zone) {
-    let row = locals[cdt][cdn];
-
-    let tax_rate = flt(row[`${zone}_tax_rate`]) / 100;
-    let selling_before_tax = flt(row[`${zone}_sp`]);
-
-    if (!selling_before_tax) {
-        row[`${zone}_sp_after_tax`] = 0;
-        return;
-    }
-
-    // selling after tax = selling before tax + tax
-    row[`${zone}_sp_after_tax`] = selling_before_tax * (1 + tax_rate);
 }
 
 function set_item_query(frm) {
