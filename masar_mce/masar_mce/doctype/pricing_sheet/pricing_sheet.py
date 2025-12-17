@@ -100,7 +100,7 @@ class PricingSheet(Document):
 				if flt(i.local_sp_after_tax):
 					i.local_sp = flt(i.local_sp_after_tax) / (1 + local_tax_decimal)
 					if flt(i.local_mp) and flt(i.local_mp) != -100:
-						i.local_pp_after_tax = flt(i.local_sp_after_tax) / (1 + flt(i.local_mp) / 100)
+						i.local_pp_after_tax = flt(i.local_sp_after_tax) * (1 - flt(i.local_mp) / 100)
 						i.new_purchase_price = flt(i.local_pp_after_tax) / (1 + local_tax_decimal)
 					elif flt(i.local_mp) == -100:
 						i.local_pp_after_tax = 0
