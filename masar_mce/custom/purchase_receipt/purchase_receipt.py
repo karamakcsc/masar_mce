@@ -12,6 +12,8 @@ def on_submit(self , method):
     if self.is_return == 0 :
         create_auto_penalty_entry(self)
         check_rquest_to_accepted_qty(self)
+def before_insert(self , method):
+    set_purchase_order_rate(self)
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_len, filters):
@@ -165,3 +167,6 @@ def validate_qty(self):
                             limits_crossed_error(self , args, item, "qty")
                     elif item[args["target_ref_field"]]:
                         check_overflow_with_allowance(self , item, args)
+def set_purchase_order_rate(self):
+    for i in self.items:
+        i.rate = flt(frappe.db.get_value('Purchase Order Item' , i.purchase_order_item , 'rate'))

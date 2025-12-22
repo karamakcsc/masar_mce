@@ -165,7 +165,8 @@ doc_events = {
     }, 
     "Purchase Receipt" : {
         "on_submit" : "masar_mce.custom.purchase_receipt.purchase_receipt.on_submit", 
-        "validate" :  "masar_mce.custom.purchase_receipt.purchase_receipt.validate"
+        "validate" :  "masar_mce.custom.purchase_receipt.purchase_receipt.validate", 
+        "before_insert" : "masar_mce.custom.purchase_receipt.purchase_receipt.before_insert"
     }, 
     "Territory": {
         "on_update" : "masar_mce.custom.territory.territory.on_update"

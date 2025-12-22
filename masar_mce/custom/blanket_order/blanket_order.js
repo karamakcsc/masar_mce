@@ -343,7 +343,6 @@ function filterBySupplier(frm) {
         };   
     };
 }
-
 frappe.ui.form.on("Supplier Agreement Other Terms", {
     tcs_terms(frm, cdt, cdn) {
         let row = locals[cdt][cdn];

@@ -70,10 +70,10 @@ function calculate_delivery_date(frm) {
     });
 }
 function refresh_item_fields(frm) {
-    frm.fields_dict["items"].grid.update_docfield_property("rejected_qty", "read_only", ['Purchase Receipt', 'Receipt Return'].indexOf(frm.doc.workflow_state) === -1);
-    frm.fields_dict["items"].grid.update_docfield_property("qty", "read_only", ['Purchase Receipt', 'Receipt Return'].indexOf(frm.doc.workflow_state) === -1);
-    frm.fields_dict["items"].grid.update_docfield_property("received_qty", "read_only", ['Purchase Receipt', 'Receipt Return'].indexOf(frm.doc.workflow_state) === -1);
-    frm.fields_dict["items"].grid.update_docfield_property("custom_request_quantity", "read_only", ['Purchase Receipt', 'Receipt Return'].indexOf(frm.doc.workflow_state) === 1);
+    frm.fields_dict["items"].grid.update_docfield_property("rejected_qty", "read_only", ['Receiving Purchases', 'Receipt Return'].indexOf(frm.doc.workflow_state) === -1);
+    frm.fields_dict["items"].grid.update_docfield_property("qty", "read_only", ['Receiving Purchases', 'Receipt Return'].indexOf(frm.doc.workflow_state) === -1);
+    frm.fields_dict["items"].grid.update_docfield_property("received_qty", "read_only", ['Receiving Purchases', 'Receipt Return'].indexOf(frm.doc.workflow_state) === -1);
+    frm.fields_dict["items"].grid.update_docfield_property("custom_request_quantity", "read_only", ['Receiving Purchases', 'Receipt Return'].indexOf(frm.doc.workflow_state) === 1);
     frm.refresh_field("items");
 }
 function hide_buttons(frm) {

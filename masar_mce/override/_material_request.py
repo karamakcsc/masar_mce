@@ -46,7 +46,7 @@ def make_stock_entry(source_name, target_doc=None):
 		target.calculate_rate_and_amount(raise_error_if_no_rate=False)
 
 		if target.purpose == "Material Transfer":
-			target.stock_entry_type = "تحويل مواد"
+			target.stock_entry_type = "سند تدوير"
 		else:
 			target.stock_entry_type = target.purpose
 
