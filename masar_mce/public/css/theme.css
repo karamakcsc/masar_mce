@@ -346,12 +346,12 @@ input.input-with-feedback {
     color: var(--banking-text-inverse);
 }
 
-.indicator.orange,
+/* .indicator.orange,
 .indicator-pill.orange,
 .badge-warning {
     background-color: var(--banking-warning);
     color: var(--banking-text-inverse);
-}
+} */
 
 .indicator.blue,
 .indicator-pill.blue,
