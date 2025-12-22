@@ -206,7 +206,8 @@ scheduler_events = {
 # ------------------------------
 #
 override_whitelisted_methods = {
-	"erpnext.stock.doctype.material_request.material_request.make_stock_entry": "masar_mce.override._material_request.make_stock_entry"
+	"erpnext.stock.doctype.material_request.material_request.make_stock_entry": "masar_mce.override._material_request.make_stock_entry",
+    "erpnext.stock.doctype.material_request.material_request.make_in_transit_stock_entry": "masar_mce.override._material_request.make_in_transit_stock_entry"
 }
 #
 # each overriding function accepts a `data` argument;
