@@ -181,7 +181,7 @@ def update_received_qty(doc):
             pr_item = frappe.get_doc("Purchase Request Item", item.custom_purchase_request_item)
             pr_item.received_qty = flt(pr_item.received_qty) + flt(item.qty)
             pr_item.save(ignore_permissions=True)
-    pr = frappe.get_doc("Purchase Request", doc.items[0].custom_purchase_request)
+    pr = frappe.get_doc("Market Purchase Request", doc.items[0].custom_purchase_request)
     total_requested = sum(flt(i.request_quantity) for i in pr.items)
     total_received = sum(flt(i.received_qty) for i in pr.items)
     pr.status = "Completed" if total_received >= total_requested else "To Receive"
@@ -195,7 +195,7 @@ def update_received_qty_on_cancel(doc):
                 pr_item.received_qty = 0
             pr_item.save(ignore_permissions=True)
     if doc.items[0].custom_purchase_request:
-        pr = frappe.get_doc("Purchase Request", doc.items[0].custom_purchase_request)
+        pr = frappe.get_doc("Market Purchase Request", doc.items[0].custom_purchase_request)
         total_requested = sum(flt(i.request_quantity) for i in pr.items)
         total_received = sum(flt(i.received_qty) for i in pr.items)
         pr.status = "Completed" if total_received >= total_requested else "To Receive"

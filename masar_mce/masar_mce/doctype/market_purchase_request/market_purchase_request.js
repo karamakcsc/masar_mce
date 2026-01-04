@@ -1,7 +1,7 @@
 // Copyright (c) 2025, KCSC and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on("Purchase Request", {
+frappe.ui.form.on("Market Purchase Request", {
 	refresh(frm) {
         set_item_code_query(frm);
         GetItemsFromPO(frm);
@@ -19,7 +19,7 @@ frappe.ui.form.on("Purchase Request", {
 function set_item_code_query(frm) {
     frm.fields_dict['items'].grid.get_field('item_code').get_query = function(doc, cdt, cdn) {
         return {
-            query: "masar_mce.masar_mce.doctype.purchase_request.purchase_request.get_items_from_open_purchase_orders",
+            query: "masar_mce.masar_mce.doctype.market_purchase_request.market_purchase_request.get_items_from_open_purchase_orders",
             filters: {
                 supplier: frm.doc.supplier
             }
@@ -27,7 +27,7 @@ function set_item_code_query(frm) {
     };
 }
 
-frappe.ui.form.on('Purchase Request Item', {
+frappe.ui.form.on('Market Purchase Request Item', {
     item_code(frm, cdt, cdn) {
         GetItemDetails(frm , cdt , cdn)
     }, 
@@ -72,7 +72,7 @@ function GetItemDetails(frm , cdt , cdn){
         });
         
         frappe.call({
-            method: "masar_mce.masar_mce.doctype.purchase_request.purchase_request.get_po_details_for_item",
+            method: "masar_mce.masar_mce.doctype.market_purchase_request.market_purchase_request.get_po_details_for_item",
             args: {
                 item_code: row.item_code,
                 supplier: frm.doc.supplier,
@@ -106,7 +106,7 @@ function GetItemsFromPO(frm) {
                 }
 
                 erpnext.utils.map_current_doc({
-                    method: "masar_mce.masar_mce.doctype.purchase_request.purchase_request.make_purchase_request",
+                    method: "masar_mce.masar_mce.doctype.market_purchase_request.market_purchase_request.make_purchase_request",
                     source_doctype: "Purchase Order",
                     target: frm,
                     setters: {
@@ -135,7 +135,7 @@ function GetItemsFromPO(frm) {
         __("Purchase Receipt"),
         function () {
             frappe.model.open_mapped_doc({
-            method: "masar_mce.masar_mce.doctype.purchase_request.purchase_request.make_purchase_receipt_from_purchase_request",
+            method: "masar_mce.masar_mce.doctype.market_purchase_request.market_purchase_request.make_purchase_receipt_from_purchase_request",
             frm: frm,
             freeze_message: __("Creating Purchase Receipt ..."),
         });

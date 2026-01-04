@@ -5,7 +5,7 @@ import frappe, json
 from frappe.model.document import Document
 from frappe.utils import flt
 from frappe.model.mapper import get_mapped_doc
-
+from frappe import _
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_len, filters):
@@ -128,7 +128,7 @@ def make_purchase_request(source_name, target_doc=None, args=None):
         source_name,
         {
             "Purchase Order": {
-                "doctype": "Purchase Request",
+                "doctype": "Market Purchase Request",
                 "validation": {"docstatus": ["=", 1]},
             },
             "Purchase Order Item": {
@@ -148,14 +148,14 @@ def make_purchase_request(source_name, target_doc=None, args=None):
     return doc
 @frappe.whitelist()
 def make_purchase_receipt_from_purchase_request(source_name, target_doc=None):
-    pr = frappe.get_doc("Purchase Request", source_name)
+    pr = frappe.get_doc("Market Purchase Request", source_name)
     if not pr.items:
-        frappe.throw("No items found in Purchase Request")
+        frappe.throw(_("No items found in Market Purchase Request"))
     
     po_items_map = {}
     for item in pr.items:
         if not item.purchase_order:
-            frappe.throw(f"Item {item.item_code} has no linked Purchase Order")
+            frappe.throw(_("Item {0} has no linked Purchase Order".format(item.item_code)))
         po_items_map.setdefault(item.purchase_order, []).append(item)
     
     receipts = []
@@ -228,5 +228,5 @@ def make_purchase_receipt_from_purchase_request(source_name, target_doc=None):
 
 
 
-class PurchaseRequest(Document):
+class MarketPurchaseRequest(Document):
     pass

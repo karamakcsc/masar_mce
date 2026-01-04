@@ -37,7 +37,7 @@
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "Purchase Request",
+   "options": "Market Purchase Request",
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
@@ -168,7 +168,7 @@
  "modified": "2026-01-04 13:39:17.546398",
  "modified_by": "Administrator",
  "module": "Masar MCE",
- "name": "Purchase Request",
+ "name": "Market Purchase Request",
  "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
