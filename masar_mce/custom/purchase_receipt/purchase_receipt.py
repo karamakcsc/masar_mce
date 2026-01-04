@@ -7,11 +7,13 @@ check_overflow_with_allowance = StatusUpdater.check_overflow_with_allowance
 limits_crossed_error = StatusUpdater.limits_crossed_error
 def validate(self , method ):
     validate_qty(self)
-    
+def on_cancel(self , method):
+    update_received_qty_on_cancel(self)  
 def on_submit(self , method): 
     if self.is_return == 0 :
         create_auto_penalty_entry(self)
-        check_rquest_to_accepted_qty(self)
+        check_request_to_accepted_qty(self)
+    update_received_qty(self)
 def before_insert(self , method):
     set_purchase_order_rate(self)
 @frappe.whitelist()
@@ -111,7 +113,7 @@ def create_auto_penalty_entry(self):
             }
             frappe.new_doc('Penalty Entry').update(entry).insert(ignore_permissions = True).submit()
 
-def check_rquest_to_accepted_qty(self): 
+def check_request_to_accepted_qty(self): 
     for i in self.items: 
         if flt(i.qty) + flt(i.rejected_qty) > flt(i.custom_request_quantity):
             frappe.throw(
@@ -170,3 +172,31 @@ def validate_qty(self):
 def set_purchase_order_rate(self):
     for i in self.items:
         i.rate = flt(frappe.db.get_value('Purchase Order Item' , i.purchase_order_item , 'rate'))
+        
+        
+def update_received_qty(doc):
+
+    for item in doc.items:
+        if item.custom_purchase_request and item.custom_purchase_request_item:
+            pr_item = frappe.get_doc("Purchase Request Item", item.custom_purchase_request_item)
+            pr_item.received_qty = flt(pr_item.received_qty) + flt(item.qty)
+            pr_item.save(ignore_permissions=True)
+    pr = frappe.get_doc("Purchase Request", doc.items[0].custom_purchase_request)
+    total_requested = sum(flt(i.request_quantity) for i in pr.items)
+    total_received = sum(flt(i.received_qty) for i in pr.items)
+    pr.status = "Completed" if total_received >= total_requested else "To Receive"
+    pr.save(ignore_permissions=True)
+def update_received_qty_on_cancel(doc):
+    for item in doc.items:
+        if item.custom_purchase_request and item.custom_purchase_request_item:
+            pr_item = frappe.get_doc("Purchase Request Item", item.custom_purchase_request_item)
+            pr_item.received_qty = flt(pr_item.received_qty) - flt(item.qty)
+            if pr_item.received_qty < 0:
+                pr_item.received_qty = 0
+            pr_item.save(ignore_permissions=True)
+    if doc.items[0].custom_purchase_request:
+        pr = frappe.get_doc("Purchase Request", doc.items[0].custom_purchase_request)
+        total_requested = sum(flt(i.request_quantity) for i in pr.items)
+        total_received = sum(flt(i.received_qty) for i in pr.items)
+        pr.status = "Completed" if total_received >= total_requested else "To Receive"
+        pr.save(ignore_permissions=True)

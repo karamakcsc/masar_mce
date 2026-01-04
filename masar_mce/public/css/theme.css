@@ -1,148 +1,140 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+/* =========================================================
+   ERPNext / Frappe theme.css (FULL FILE - NO LINES REMOVED)
+   ========================================================= */
+
+/* Only keep imports that are actually used by the variables below */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
 
 :root {
-    /* Define the LTR font stack (e.g., for English) */
-    --banking-font-body: 'Calibri', Arial, sans-serif;
-    
-    /* Define a specific font stack for Arabic/RTL contexts */
-    --banking-font-arabic: 'Calibri', Arial, sans-serif;
+  /* Fonts */
+  --banking-font-body: "Trebuchet MS", Trebuchet, Arial, sans-serif;
+  --banking-font-arabic: "Noto Sans Arabic", Tahoma, Arial, sans-serif;
 
-    /* Primary Colors (Green Theme) */
-    --banking-primary: #0A7F3F;               /* Main green */
-    --banking-primary-light: #11A857;         /* Lighter green */
-    --banking-primary-dark: #065A2B;          /* Dark green */
-    --banking-primary-gradient: linear-gradient(135deg, #0A7F3F 0%, #11A857 100%);
+  /* Brand colors */
+  --banking-primary: #0A7F3F;
+  --banking-primary-light: #11A857;
+  --banking-primary-dark: #065A2B;
 
-    /* Secondary Colors (Natural earthy tones) */
-    --banking-secondary: #A88F4F;             /* olive-gold */
-    --banking-secondary-dark: #8A743C;
-    --banking-accent: #6C5E3A;                /* warm earthy accent */
+  /* Status */
+  --banking-success: #0A7F3F;
+  --banking-danger: #DC2626;
+  --banking-warning: #D97706;
+  --banking-info: #0284C7;
 
-    /* Status Colors – harmonized with green theme */
-    --banking-success: #0A7F3F;              /* success = primary green */
-    --banking-success-light: #D4F2E3;
-    --banking-danger: #DC2626;
-    --banking-danger-light: #FEE2E2;
-    --banking-warning: #D97706;
-    --banking-warning-light: #FEF3C7;
-    --banking-info: #0284C7;
-    --banking-info-light: #DBEAFE;
+  /* Neutrals */
+  --ui-bg-page: #F7F8FA;
+  --ui-bg-card: #ffffff;
+  --ui-bg-hover: #E6F4EB;
 
-    /* Backgrounds */
-    --banking-bg-page: #F4FAF7;
-    --banking-bg-card: #ffffff;
-    --banking-bg-hover: #E6F4EB;              /* subtle green tint */
-    --banking-bg-sidebar: #ffffff;
+  --ui-border: #E5E7EB;
+  --ui-border-2: #D1D5DB;
 
-    /* Borders & Dividers */
-    --banking-border: #D9E8DF;
-    --banking-border-dark: #AAC8BA;
-    --banking-divider: #E8F2EC;
+  --ui-text: #0F172A;
+  --ui-text-2: #334155;
+  --ui-text-muted: #94a3b8;
 
-    /* Text Colors */
-    --banking-text-primary: #1e293b;
-    --banking-text-secondary: #475569;
-    --banking-text-muted: #94a3b8;
-    --banking-text-inverse: #ffffff;
+  /* Section header (light) */
+  --ui-section-bg: #E8F5E9;
+  --ui-section-border: #C8E6C9;
+  --ui-section-text: #1B5E20;
+
+  /* Table header */
+  --ui-table-head: #F1F5F9;
+
+  /* Editable input background (distinct from disabled/read-only) */
+  --ui-input-bg-editable: #F7FBFF;
+  --ui-input-bg-hover: #EFF7FF;
 }
 
-/* --- Global Base Styles --- */
+/* When Arabic UI is active, make body font resolve to Arabic font */
+html[dir="rtl"] {
+  --banking-font-body: var(--banking-font-arabic);
+}
+
+/* =========================
+   1) Base typography + density
+   ========================= */
+html { font-size: 15px !important; }
+
 body {
-    color: var(--banking-text-primary);
-    font-family: var(--banking-font-body);
-    font-size: 16px !important;   
+  font-family: var(--banking-font-body) !important;
+  color: var(--ui-text) !important;
+  font-size: 15px !important;
+  line-height: 1.45 !important;
 }
 
-/* --- Page Background --- */
+/* Force font on common UI elements */
+body,
+body input, body select, body textarea, body button,
+body .control-label, body .control-value, body .form-control,
+body .datatable, body .grid-body {
+  font-family: var(--banking-font-body) !important;
+}
+
+/* =========================
+   2) Layout background / cards / density
+   ========================= */
 .page-container,
 .layout-main-section,
 #page-Workspaces {
-    background-color: var(--banking-bg-page) !important;
+  background: var(--ui-bg-page) !important;
 }
 
-/* --- Form Layout & Cards --- */
 .form-layout,
-.frappe-control,
 .form-section,
 .widget,
 .dashboard-card,
 .indicator-widget,
 .page-card-container,
 .page-card {
-    background: var(--banking-bg-card);
-    /* border: 1px solid var(--banking-border); */
+  background: var(--ui-bg-card) !important;
 }
 
-/* --- Section Headers --- */
+.form-layout .form-page {
+  background: var(--ui-bg-card) !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 14px !important;
+}
+
+.form-layout .form-page { padding-top: 6px !important; }
+.form-layout .form-column { padding-left: 8px !important; padding-right: 8px !important; }
+.form-layout .form-section { margin-bottom: 8px !important; }
+.form-layout .section-body { padding: 8px 10px !important; }
+.control-group, .form-group { margin-bottom: 6px !important; }
+
+/* =========================
+   3) Section headers
+   ========================= */
 .form-section .section-head,
 .form-column .section-head {
-    background: var(--banking-primary-gradient);
-    color: var(--banking-text-inverse);
+  background: var(--ui-section-bg) !important;
+  border: 1px solid var(--ui-section-border) !important;
+  border-radius: 10px !important;
+  padding: 8px 12px !important;
+  color: var(--ui-section-text) !important;
 }
 
-.form-section .section-head .collapsed,
-.form-column .section-head .collapsed {
-    color: var(--banking-text-inverse);
-}
-
-/* Collapsible sections */
 .form-section.collapsible .section-head:hover {
-    background: linear-gradient(135deg, var(--banking-primary-light) 0%, #0088cc 100%);
+  background: #DFF3E5 !important;
+  border-color: #B7E1C2 !important;
 }
 
-/* --- Buttons --- */
-.btn-primary,
-.btn-primary-dark,
-button.btn-primary,
-.page-head .standard-actions .btn-primary {
-    background: var(--banking-primary-gradient);
-    color: var(--banking-text-inverse);
+/* =========================
+   4) Labels
+   ========================= */
+.control-label,
+.form-group .control-label,
+.frappe-control label {
+  color: var(--ui-text-2) !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
 }
 
-.btn-primary:hover,
-.btn-primary-dark:hover,
-button.btn-primary:hover {
-    background: linear-gradient(135deg, var(--banking-primary-light) 0%, #0088cc 100%);
-    color: var(--banking-text-inverse);
-}
-
-/* Secondary Button */
-.btn-secondary,
-.btn-default {
-    background: var(--banking-bg-card);
-    border: 1px solid var(--banking-border-dark);
-    color: var(--banking-text-primary);
-}
-
-.btn-secondary:hover,
-.btn-default:hover {
-    background: var(--banking-bg-hover);
-    border-color: var(--banking-primary-light);
-    color: var(--banking-primary);
-}
-
-/* Status Buttons */
-.btn-success {
-    background: var(--banking-success);
-    color: var(--banking-text-inverse);
-}
-
-.btn-success:hover {
-    background: #0d9474;
-}
-
-.btn-danger {
-    background: var(--banking-danger);
-    color: var(--banking-text-inverse);
-}
-
-.btn-danger:hover {
-    background: #c02a2a;
-}
-
-/* --- Form Controls & Inputs --- */
+/* =========================
+   5) Inputs (tight + readable)
+   ========================= */
 .form-control,
-.input-with-feedback,
+input.input-with-feedback:not([type="checkbox"]):not([type="radio"]),
 .frappe-control input[type="text"],
 .frappe-control input[type="email"],
 .frappe-control input[type="password"],
@@ -150,12 +142,36 @@ button.btn-primary:hover {
 .frappe-control input[type="date"],
 .frappe-control textarea,
 .frappe-control select,
-.frappe-control .control-input,
-.frappe-control .control-value,
 input.input-with-feedback {
-    border-bottom: 2px solid var(--banking-border-dark);
-    color: var(--banking-text-primary);
-    background-color: transparent;
+  background: #fff !important;
+  color: var(--ui-text) !important;
+  border: 1px solid var(--ui-border-2) !important;
+  border-radius: 8px !important;
+  min-height: 32px !important;
+  padding: 6px 10px !important;
+  font-size: 15px !important;
+}
+
+/* Editable fields background (NOT disabled/read-only) */
+.form-control:not([readonly]):not(:disabled),
+.input-with-feedback:not([readonly]):not(:disabled),
+.frappe-control input:not([type="checkbox"]):not([type="radio"]):not([readonly]):not(:disabled),
+.frappe-control select:not([readonly]):not(:disabled),
+.frappe-control textarea:not([readonly]):not(:disabled) {
+  background: var(--ui-input-bg-editable) !important;
+}
+
+.form-control:not([readonly]):not(:disabled):hover,
+.frappe-control input:not([readonly]):not(:disabled):hover,
+.frappe-control select:not([readonly]):not(:disabled):hover,
+.frappe-control textarea:not([readonly]):not(:disabled):hover {
+  background: var(--ui-input-bg-hover) !important;
+}
+
+/* Wrapper */
+.frappe-control .control-input {
+  background: transparent !important;
+  border: 0 !important;
 }
 
 .form-control:focus,
@@ -163,451 +179,353 @@ input.input-with-feedback {
 .frappe-control input:focus,
 .frappe-control textarea:focus,
 .frappe-control select:focus {
-    border-color: var(--banking-primary);
-    background-color: transparent;
+  border-color: var(--banking-primary) !important;
+  outline: 2px solid rgba(10, 127, 63, 0.15) !important;
+  outline-offset: 0 !important;
 }
 
-.frappe-control .control-input {
-    border: 0;
-    background-color: var(--banking-bg-card);
-}
-
-.frappe-control .control-input:focus-within {
-    border-color: var(--banking-primary);
-}
-
-/* Placeholder text */
 .form-control::placeholder,
 .frappe-control input::placeholder,
 .frappe-control textarea::placeholder {
-    color: var(--banking-text-muted);
+  color: var(--ui-text-muted) !important;
 }
 
-/* Read-only textbox fields */
+/* Disabled/read-only (kept clearly different) */
 .form-control[readonly],
 .form-control:disabled,
-.frappe-control input[type="text"][readonly],
-.frappe-control input[type="email"][readonly],
-.frappe-control input[type="password"][readonly],
-.frappe-control input[type="number"][readonly],
-.frappe-control input[type="date"][readonly],
 .frappe-control input[readonly],
 .frappe-control textarea[readonly],
-.frappe-control input[type="text"][disabled],
-.frappe-control input[type="email"][disabled],
-.frappe-control input[type="password"][disabled],
-.frappe-control input[type="number"][disabled],
-.frappe-control input[type="date"][disabled],
 .frappe-control input[disabled],
 .frappe-control textarea[disabled],
 .control-value.like-disabled-input,
 .frappe-control .control-value.like-disabled-input {
-    background-color: #E0E0E0 !important;
-    color: var(--banking-text-secondary);
-    cursor: not-allowed;
+  background: #E0E0E0 !important;
+  color: var(--ui-text-2) !important;
+  cursor: not-allowed;
+}
+
+/* =========================
+   6) Buttons (global consistency)
+   ========================= */
+.btn-primary,
+button.btn-primary,
+a.btn.btn-primary {
+  background: var(--banking-primary) !important;
+  border-color: var(--banking-primary) !important;
+  color: #fff !important;
+}
+
+/* Force children (icons/spans) to white */
+.btn-primary *,
+button.btn-primary *,
+a.btn.btn-primary * {
+  color: #fff !important;
+  fill: #fff !important;
+  stroke: #fff !important;
+}
+
+.btn-primary:hover,
+button.btn-primary:hover,
+a.btn.btn-primary:hover {
+  background: var(--banking-primary-dark) !important;
+  border-color: var(--banking-primary-dark) !important;
+  color: #fff !important;
+}
+
+.btn-success {
+  background: var(--banking-success) !important;
+  border-color: var(--banking-success) !important;
+  color: #fff !important;
+}
+.btn-success * { color: #fff !important; fill: #fff !important; stroke: #fff !important; }
+
+.btn-danger {
+  background: var(--banking-danger) !important;
+  border-color: var(--banking-danger) !important;
+  color: #fff !important;
+}
+.btn-danger * { color: #fff !important; fill: #fff !important; stroke: #fff !important; }
+
+/* Neutral buttons */
+.btn-default,
+.btn-secondary {
+  background: #fff !important;
+  border: 1px solid var(--ui-border-2) !important;
+  color: var(--ui-text) !important;
+}
+
+.btn-default:hover,
+.btn-secondary:hover {
+  background: var(--ui-bg-hover) !important;
+  border-color: var(--banking-primary) !important;
+  color: var(--banking-primary) !important;
 }
 
 
-/* --- Labels --- */
-.frappe-control label,
-.form-group label,
-.control-label {
-    color: var(--banking-text-primary);
+/* =========================
+   7) Page header (clean + strong)
+   ========================= */
+.page-head {
+  background: #fff !important;
+  border-bottom: 1px solid var(--ui-border) !important;
 }
 
-.frappe-control .help-box,
-.form-group .help-block {
-    color: var(--banking-text-secondary);
-}
-
-/* --- Tables --- */
-.table,
-.datatable,
-.grid-body .rows .data-row {
-    border: 1px solid var(--banking-border);
-}
-
-.table thead,
-.datatable .dt-header,
-.grid-heading-row {
-    background: var(--banking-primary-gradient);
-    color: white;
-}
-
-.table tbody tr,
-.datatable .dt-row,
-.grid-body .rows .data-row {
-    border-bottom: 1px solid var(--banking-divider);
-}
-
-.table tbody tr:hover,
-.datatable .dt-row:hover,
-.grid-body .rows .data-row:hover {
-    background-color: var(--banking-bg-hover);
-}
-
-.table tbody td,
-.datatable .dt-cell,
-.grid-body .rows .data-row .col {
-    border-bottom: 1px solid var(--banking-divider);
-    color: var(--banking-text-primary);
-}
-
-/* --- Custom: White Text for Specific Elements --- */
-.list-row-col,
-.level-item,
-.list-count {
-    color: #ffffff !important;
-}
-
-.frappe-timestamp {
-    color: black !important;
-}
-
-.ellipsis, .awesomplete > [role=listbox]>li, 
-.awesomplete > [role=listbox] > [role=option], 
-.widget.shortcut-widget-box .indicator-pill {
-    color: black;
-}
-
-.datatable .dt-header .dt-cell--header .dt-cell__content {
-    font-weight: 700;
-    font-size: 12px !important;
-    background-color:var(--banking-primary);
-}
-
-/* Make ONLY child table headers white */
-.grid-heading-row .grid-row .static-area {
-    color: #ffffff !important;
-}
-
-/* --- Child Tables / Grid --- */
-.grid-body {
-    border: 1px solid var(--banking-border);
-}
-
-.grid-footer {
-    background: var(--banking-bg-hover);
-    border-top: 1px solid var(--banking-border);
-}
-
-/* --- Page Header --- */
-.page-head,
-.page-title {
-    background: var(--banking-primary-gradient);
-    color: var(--banking-text-inverse);
-}
-
+/* Bigger page title with green underline */
 .page-head .page-title,
-.page-title h3 {
-    color: var(--banking-text-inverse);
+.page-head .page-title h3,
+.page-head .page-title .title-text {
+  background: transparent !important;
+  color: var(--ui-text) !important;
+  font-weight: 800 !important;
+  font-size: 20px !important;
+  line-height: 1.5 !important;
 }
 
 .page-head .page-title .title-text {
-    color: var(--banking-text-inverse);
+  display: inline-block !important;
+  position: relative !important;
+  padding-bottom: 8px !important;
 }
 
-/* --- Sidebar --- */
+.page-head .page-title .title-text::after {
+  content: "" !important;
+  position: absolute !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 3px !important;
+  background: var(--banking-primary) !important;
+  border-radius: 2px !important;
+}
+
+/* Force all buttons in the header to Banking Green */
+.page-head .btn,
+.page-head .btn-group .btn,
+.page-head .actions-btn-group .btn,
+.page-head .standard-actions .btn,
+.page-head .custom-actions .btn {
+  background: var(--banking-primary) !important;
+  border-color: var(--banking-primary) !important;
+  color: #ffffff !important;
+}
+
+/* THE "TRUST RESTORER" ICON FIX:
+   1. We force the stroke and fill to white.
+   2. We use 'filter' to turn anything black into white as a fail-safe.
+*/
+.page-head .btn svg, 
+.page-head .btn svg path, 
+.page-head .btn svg use,
+.page-head .btn i {
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+  color: #ffffff !important;
+  /* This filter forces the icon to turn white regardless of its base color */
+  filter: brightness(0) invert(1) !important; 
+}
+
+/* Fix hover state so it stays green/darker */
+.page-head .btn:hover {
+  background: var(--banking-primary-dark) !important;
+  border-color: var(--banking-primary-dark) !important;
+}
+
+
+/* =========================
+   8) Form tabs: highlight active tab
+   ========================= */
+.form-tabs,
+.form-tabs .nav {
+  gap: 6px !important;
+}
+
+.form-tabs .nav li a,
+.form-tabs .nav-tabs > li > a,
+.form-tabs .nav-link {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  padding: 6px 12px !important;
+  color: var(--ui-text-2) !important;
+  font-weight: 700 !important;
+}
+
+.form-tabs .nav li.active a,
+.form-tabs .nav-tabs > li.active > a,
+.form-tabs .nav-link.active {
+  background: #E6F4EB !important;
+  border-color: var(--banking-primary) !important;
+  color: var(--banking-primary) !important;
+  font-weight: 800 !important;
+}
+
+.form-tabs .nav li a:hover,
+.form-tabs .nav-tabs > li > a:hover,
+.form-tabs .nav-link:hover {
+  background: #F3FAF6 !important;
+  border-color: #B7E1C2 !important;
+}
+
+/* =========================
+   9) Tables / Datatable / Grid
+   ========================= */
+.table,
+.datatable,
+.grid-body {
+  border: 1px solid var(--ui-border) !important;
+}
+
+/* Header bg */
+.table thead,
+.datatable .dt-header,
+.grid-heading-row {
+  background: var(--ui-table-head) !important;
+}
+
+.table thead th,
+.datatable .dt-header .dt-cell__content,
+.datatable .dt-header .dt-cell--header .dt-cell__content,
+.grid-heading-row .grid-row > div,
+.grid-heading-row .grid-static-col,
+.grid-heading-row .grid-row .static-area {
+  color: var(--ui-text) !important;
+  font-weight: 800 !important;
+  font-size: 14px !important;
+  background: transparent !important;
+  text-shadow: none !important;
+}
+
+/* Table data */
+.datatable .dt-row .dt-cell__content,
+.table tbody td,
+.grid-body .rows .data-row .col,
+.grid-body .grid-row .data-col {
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  color: var(--ui-text) !important;
+}
+
+
+/*====================================*/
+
+/* Inputs inside grid/datatable — EXCEPT checkbox/radio */
+.grid-row input:not([type="checkbox"]):not([type="radio"]),
+.grid-row select,
+.grid-row textarea,
+.datatable input:not([type="checkbox"]):not([type="radio"]),
+.datatable select,
+.datatable textarea {
+  font-size: 14px !important;
+  min-height: 30px !important;
+  padding: 4px 8px !important;
+}
+
+
+/*====================================*/
+
+
+/* Hover */
+.table tbody tr:hover,
+.datatable .dt-row:hover,
+.grid-body .rows .data-row:hover {
+  background: var(--ui-bg-hover) !important;
+}
+
+/* =========================
+   12) Sidebar
+   ========================= */
 .layout-side-section,
 .desk-sidebar {
-    background: var(--banking-bg-sidebar);
-    border-right: 1px solid var(--banking-border);
-}
-
-.sidebar-menu .sidebar-label,
-.desk-sidebar .standard-sidebar-label {
-    color: var(--banking-text-primary);
-}
-
-.sidebar-menu .sidebar-label:hover,
-.desk-sidebar .standard-sidebar-item:hover {
-    background: var(--banking-bg-hover);
-    color: var(--banking-primary);
+  background: #fff !important;
+  border-right: 1px solid var(--ui-border) !important;
 }
 
 .sidebar-menu .selected,
 .desk-sidebar .selected {
-    background: var(--banking-primary);
-    color: var(--banking-text-inverse);
+  background: var(--banking-primary) !important;
+  color: #fff !important;
 }
 
-/* --- Indicators / Status Pills --- */
-.indicator.green,
-.indicator-pill.green,
-.badge-success {
-    background-color: var(--banking-success);
-    color: var(--banking-text-inverse);
+.desk-sidebar .standard-sidebar-item.selected,
+.desk-sidebar .standard-sidebar-item.selected a,
+.desk-sidebar .standard-sidebar-item.selected .item-anchor,
+.desk-sidebar .standard-sidebar-item.selected .sidebar-item-label,
+.desk-sidebar .standard-sidebar-item.selected .sidebar-item-icon,
+.sidebar-menu .selected,
+.sidebar-menu .selected .sidebar-label {
+  color: #fff !important;
 }
 
-.indicator.red,
-.indicator-pill.red,
-.badge-danger {
-    background-color: var(--banking-danger);
-    color: var(--banking-text-inverse);
+.desk-sidebar .standard-sidebar-item.selected svg,
+.desk-sidebar .standard-sidebar-item.selected svg * {
+  fill: #fff !important;
+  stroke: #fff !important;
 }
 
-/* .indicator.orange,
-.indicator-pill.orange,
-.badge-warning {
-    background-color: var(--banking-warning);
-    color: var(--banking-text-inverse);
-} */
-
-.indicator.blue,
-.indicator-pill.blue,
-.badge-info {
-    background-color: var(--banking-info);
-    color: var(--banking-text-inverse);
-}
-
-.indicator.gray,
-.indicator-pill.gray,
-.badge-secondary {
-    background-color: var(--banking-text-muted);
-    color: var(--banking-text-inverse);
-}
-
-/* --- Alerts / Messages --- */
-.alert-info {
-    background-color: var(--banking-info-light);
-    color: #1e40af;
-    border-left: 4px solid var(--banking-info);
-}
-
-.alert-success {
-    background-color: var(--banking-success-light);
-    color: #065f46;
-    border-left: 4px solid var(--banking-success);
-}
-
-.alert-warning {
-    background-color: var(--banking-warning-light);
-    color: #92400e;
-    border-left: 4px solid var(--banking-warning);
-}
-
-.alert-danger {
-    background-color: var(--banking-danger-light);
-    color: #991b1b;
-    border-left: 4px solid var(--banking-danger);
-}
-
-/* --- Widgets & Dashboard Cards --- */
-.widget .widget-head,
-.dashboard-card .card-head {
-    border-bottom: 1px solid var(--banking-divider);
-    color: var(--banking-text-primary);
-}
-
-/* --- Links --- */
-a,
-.link-field,
-.frappe-control a {
-    color: var(--banking-primary);
-}
-
-a:hover,
-.link-field:hover,
-.frappe-control a:hover {
-    color: var(--banking-primary-light);
-}
-
-/* --- Tabs --- */
-.nav-tabs {
-    border-bottom: 2px solid var(--banking-divider);
-}
-
-.nav-tabs .nav-link {
-    color: var(--banking-text-secondary);
-    border-bottom: 3px solid transparent;
-}
-
-.nav-tabs .nav-link:hover {
-    color: var(--banking-primary-light);
-    border-bottom-color: var(--banking-primary-light);
-}
-
-.nav-tabs .nav-link.active {
-    color: var(--banking-primary);
-    border-bottom-color: var(--banking-primary);
-    background: transparent;
-}
-
-/* --- Modal / Dialog --- */
-.modal-header {
-    background: var(--banking-primary);
-    color: var(--banking-text-inverse);
-}
-
-.modal-footer {
-    background: var(--banking-bg-page);
-    border-top: 1px solid var(--banking-border);
-}
-
-/* --- Dropdown Menu --- */
-.dropdown-menu {
-    border: 1px solid var(--banking-border);
-}
-
-.dropdown-item {
-    color: var(--banking-text-primary);
-}
-
-.dropdown-item:hover {
-    background: var(--banking-bg-hover);
-    color: var(--banking-primary);
-}
-
-/* --- Form Tabs --- */
-.form-tabs {
-    border-bottom: 2px solid var(--banking-divider);
-}
-
-.form-tabs .nav-link {
-    color: var(--banking-text-secondary);
-    border-bottom: 3px solid transparent;
-}
-
-.form-tabs .nav-link.active {
-    color: var(--banking-primary);
-    border-bottom-color: var(--banking-primary);
-}
-
-/* --- List View --- */
-.list-row {
-    border-bottom: 1px solid var(--banking-divider);
-}
-
-.list-row:hover {
-    background-color: var(--banking-bg-hover);
-}
-
-.list-row-head {
-    background: var(--banking-primary);
-    color: var(--banking-text-inverse);
-}
-
-/* --- Timeline --- */
-.timeline-item {
-    border-left: 2px solid var(--banking-divider);
-}
-
-.timeline-item::before {
-    background: var(--banking-primary);
-    border: 2px solid var(--banking-bg-card);
-}
-
-/* --- Attachments --- */
-.attachment-row {
-    border: 1px solid var(--banking-border);
-}
-
-.attachment-row:hover {
-    background: var(--banking-bg-hover);
-    border-color: var(--banking-primary-light);
+/* RTL sidebar border flip */
+[dir="rtl"] .layout-side-section,
+html[dir="rtl"] .desk-sidebar {
+  border-right: none !important;
+  border-left: 1px solid var(--ui-border) !important;
 }
 
 /* =========================
-   RTL (Arabic) Support
+   13) Alerts
    ========================= */
-[dir="rtl"] body {
-    font-family: var(--banking-font-arabic) !important;
-    font-size: 16px !important;   
-}
+.alert-info { border-left: 4px solid var(--banking-info) !important; }
+.alert-success { border-left: 4px solid var(--banking-success) !important; }
+.alert-warning { border-left: 4px solid var(--banking-warning) !important; }
+.alert-danger { border-left: 4px solid var(--banking-danger) !important; }
 
-[dir="rtl"] .form-control,
-[dir="rtl"] .frappe-control,
-[dir="rtl"] .frappe-control textarea,
-[dir="rtl"] .frappe-control select,
-[dir="rtl"] .frappe-control input,
-[dir="rtl"] .page-title h3,
-[dir="rtl"] .btn {
-    font-family: var(--banking-font-arabic) !important;
-    font-size: 12px !important;
-}
-
-
-[dir="rtl"] .layout-side-section,
-html[dir="rtl"] .desk-sidebar {
-    border-right: none;
-    border-left: 1px solid var(--banking-border);
-}
-
-[dir="rtl"] .form-section .section-head,
-html[dir="rtl"] .form-section .section-head,
-[dir="rtl"] .page-head,
-html[dir="rtl"] .page-head {
-    background: linear-gradient(135deg, var(--banking-primary-light) 0%, var(--banking-primary) 100%);
-}
-
+/* RTL alert borders flip */
 [dir="rtl"] .alert-info,
-html[dir="rtl"] .alert-info {
-    border-left: none;
-    border-right: 4px solid var(--banking-info);
-}
-
 [dir="rtl"] .alert-success,
-html[dir="rtl"] .alert-success {
-    border-left: none;
-    border-right: 4px solid var(--banking-success);
-}
-
 [dir="rtl"] .alert-warning,
-html[dir="rtl"] .alert-warning {
-    border-left: none;
-    border-right: 4px solid var(--banking-warning);
+[dir="rtl"] .alert-danger {
+  border-left: none !important;
 }
+[dir="rtl"] .alert-info { border-right: 4px solid var(--banking-info) !important; }
+[dir="rtl"] .alert-success { border-right: 4px solid var(--banking-success) !important; }
+[dir="rtl"] .alert-warning { border-right: 4px solid var(--banking-warning) !important; }
+[dir="rtl"] .alert-danger { border-right: 4px solid var(--banking-danger) !important; }
 
-[dir="rtl"] .alert-danger,
-html[dir="rtl"] .alert-danger {
-    border-left: none;
-    border-right: 4px solid var(--banking-danger);
-}
-
-[dir="rtl"] .timeline-item,
-html[dir="rtl"] .timeline-item {
-    border-left: none;
-    border-right: 2px solid var(--banking-divider);
-}
-
-[dir="rtl"] .timeline-item::before,
-html[dir="rtl"] .timeline-item::before {
-    left: auto;
-    right: -6px;
-}
-
-/* --- Print Styles --- */
+/* =========================
+   14) Print
+   ========================= */
 @media print {
-    .page-head,
-    .form-section .section-head,
-    .page-title {
-        background: var(--banking-bg-card) !important;
-        color: var(--banking-primary) !important;
-        border: 2px solid var(--banking-primary) !important;
-    }
-
-    .form-layout,
-    .table,
-    .widget {
-        border: 1px solid var(--banking-border-dark) !important;
-    }
-
-    body {
-        background: white !important;
-        font-size: 16px !important;   
-    }
+  body { background: #fff !important; font-size: 13px !important; }
+  .page-head { background: #fff !important; border-bottom: 1px solid #000 !important; }
 }
 
-/* FORCE WHITE TABLE HEADER TEXT IN ERPNext */
-.grid-heading-row .grid-row > div,
-.dt-header .dt-cell__content,
-.table thead th,
-.table thead td,
-.datatable thead th,
-.datatable thead td,
-.grid-heading-row,
-.grid-heading-row .grid-static-col {
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    font-size: 12px !important;
+/* =========================
+   15) ITEMS GRID: THE ABSOLUTE FIX
+   ========================= */
+
+
+/* 5. Hide the gray fieldname tooltips */
+.form-grid .grid-body .data-row .col .field-area .form-control .tooltip,
+.field-controls .tooltip,
+.frappe-control[data-fieldtype="Table"] .grid-row .data-col::after,
+div[class*="fieldname-"]::after,
+.grid-row [data-fieldname]::after,
+.grid-row .data-col .field-area .tooltip-inner,
+.grid-row .data-col .tooltip {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Force normal square checkboxes */
+.grid-row input[type="checkbox"],
+.datatable input[type="checkbox"],
+.frappe-control input[type="checkbox"] {
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+
+  width: 16px !important;
+  height: 16px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border-radius: 2px !important; /* small square corners */
 }

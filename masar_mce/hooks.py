@@ -26,13 +26,12 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/masar_mce/css/masar_mce.css"
-app_include_css = "/assets/masar_mce/css/theme.css"
-# app_include_js = "/assets/masar_mce/js/masar_mce.js"
+# app_include_css = "/assets/masar_mce/css/theme.css"
+# app_include_js = "/assets/masar_mce/js/arabic_digits_fix.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/masar_mce/css/masar_mce.css"
-web_include_css = "/assets/masar_mce/css/theme.css"
-# web_include_js = "/assets/masar_mce/js/masar_mce.js"
+# web_include_js = "/assets/masar_mce/js/arabic_digits_fix.js"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "masar_mce/public/scss/website"
@@ -166,7 +165,8 @@ doc_events = {
     "Purchase Receipt" : {
         "on_submit" : "masar_mce.custom.purchase_receipt.purchase_receipt.on_submit", 
         "validate" :  "masar_mce.custom.purchase_receipt.purchase_receipt.validate", 
-        "before_insert" : "masar_mce.custom.purchase_receipt.purchase_receipt.before_insert"
+        "before_insert" : "masar_mce.custom.purchase_receipt.purchase_receipt.before_insert",
+        "on_cancel" : "masar_mce.custom.purchase_receipt.purchase_receipt.on_cancel"
     }, 
     "Territory": {
         "on_update" : "masar_mce.custom.territory.territory.on_update"
@@ -215,7 +215,8 @@ override_whitelisted_methods = {
 # along with any modifications made in other Frappe apps
 override_doctype_dashboards = {
 	"Blanket Order": "masar_mce.custom.blanket_order.blanket_order_dashboard.custom_blanket_order_dashboard", 
-    "Material Request" : "masar_mce.custom.material_request.material_request_dashboard.custom_material_request_dashboard"
+    "Material Request" : "masar_mce.custom.material_request.material_request_dashboard.custom_material_request_dashboard", 
+    "Purchase Order" : "masar_mce.custom.purchase_order.purchase_order_dashboard.custom_purchase_order_dashboard"
 }
 
 # exempt linked doctypes from being automatically cancelled

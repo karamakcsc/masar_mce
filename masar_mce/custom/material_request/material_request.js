@@ -7,6 +7,26 @@ frappe.ui.form.on("Material Request", {
     }, 
     onload(frm) {
         defaultSection(frm);
+    },
+    before_workflow_action: function(frm) {
+        if (frm.selected_workflow_action === 'Approve') {
+            return new Promise((resolve, reject) => {
+                frappe.db.get_doc('Warehouse', frm.doc.set_from_warehouse)
+                    .then(warehouse => {
+                        let is_authorized = warehouse.custom_users.some(row => row.user === frappe.session.user);
+                        if (is_authorized) {
+                            resolve(); 
+                        } else {
+                            frappe.msgprint(__('You are not authorized to approve for Warehouse: {0}', [frm.doc.set_from_warehouse]));
+                            reject(); 
+                        }
+                    })
+                    .catch(err => {
+                        frappe.msgprint(__('Error verifying warehouse permissions.'));
+                        reject();
+                    });
+            });
+        }
     }
 });
 
