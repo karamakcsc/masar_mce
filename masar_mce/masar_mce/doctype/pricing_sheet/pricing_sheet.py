@@ -56,6 +56,7 @@ class PricingSheet(Document):
 	
 	def on_submit(self): 
 		self.create_item_prices_for_every_item()
+		self.create_pos_item()
 	def calculate_pricing_after_tax_and_there_totals(self):
 			new_total_quantity = local_sa = free_sa = new_purchase_amount = 0
 			
