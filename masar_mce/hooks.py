@@ -26,11 +26,12 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/masar_mce/css/masar_mce.css"
-# app_include_css = "/assets/masar_mce/css/theme.css"
+app_include_css = "/assets/masar_mce/css/theme.css"
 # app_include_js = "/assets/masar_mce/js/arabic_digits_fix.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/masar_mce/css/masar_mce.css"
+web_include_css = "/assets/masar_mce/css/theme.css"
 # web_include_js = "/assets/masar_mce/js/arabic_digits_fix.js"
 
 # include custom scss in every website theme (without file extension ".scss")
@@ -297,7 +298,8 @@ fixtures = [
                 'Material Request',
                 'Material Request Item', 
                 'Item Price' , 
-                'Price List'
+                'Price List', 
+                'Item'
             ]
         ]
     ]},
@@ -335,7 +337,8 @@ fixtures = [
                     'Material Request',
                     'Material Request Item',
                     'Item Price',
-                    'Price List'
+                    'Price List',
+                    'Item'
                 ]
             ]
         ]

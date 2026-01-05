@@ -85,11 +85,11 @@ frappe.form.link_formatters['Item'] = function(value, doc) {
 };
 function CreatePurchaseRequest(frm) {
     if (frm.doc.docstatus === 1 ) {
-            frm.add_custom_button(__('Purchase Request'), function() {
+            frm.add_custom_button(__('Market Purchase Request'), function() {
                 frappe.model.open_mapped_doc({
                     method: "masar_mce.custom.purchase_order.purchase_order.create_purchase_request_from_purchase_order",
                     frm: cur_frm,
-                    freeze_message: __("Creating Purchase Request ..."),
+                    freeze_message: __("Creating Market Purchase Request ..."),
                 });
             }, __('Create'));
         }

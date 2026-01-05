@@ -67,6 +67,7 @@ def get_po_details_for_item(item_code, supplier, used_pos=None):
             po.name AS purchase_order,
             poi.name AS purchase_order_item,
             poi.rate AS rate,
+            poi.stock_uom as uom,
             (poi.qty - IFNULL(poi.received_qty,0) 
                 - IFNULL((
                     SELECT SUM(pri.request_quantity - IFNULL(pri.received_qty,0))
@@ -229,4 +230,61 @@ def make_purchase_receipt_from_purchase_request(source_name, target_doc=None):
 
 
 class MarketPurchaseRequest(Document):
-    pass
+
+    def validate(self):
+        self.validate_po_available_qty()
+    def on_submit(self):
+        self.db_set('status', 'To Receive')
+    def validate_po_available_qty(self):
+        for item in self.items:
+
+            if not item.purchase_order_item:
+                continue
+            po_item = frappe.get_doc(
+                "Purchase Order Item", item.purchase_order_item
+            )
+
+            po_qty = flt(po_item.qty)
+            received_qty = flt(po_item.received_qty)
+            already_requested = frappe.db.sql("""
+                SELECT SUM(pri.request_quantity - IFNULL(pri.received_qty,0))
+                FROM `tabPurchase Request Item` pri
+                INNER JOIN `tabMarket Purchase Request` pr
+                    ON pr.name = pri.parent
+                WHERE
+                    pri.purchase_order_item = %s
+                    AND pr.docstatus = 1
+                    AND pr.name != %s
+            """, (item.purchase_order_item, self.name))[0][0] or 0
+            over_delivery = flt(
+                frappe.db.get_value(
+                    "Item", item.item_code, "over_delivery_receipt_allowance"
+                ) or 0
+            )
+            allowed_qty = (
+                po_qty
+                - received_qty
+                - flt(already_requested)
+                + po_qty * over_delivery
+            )
+            if flt(item.request_quantity) > allowed_qty:
+                frappe.throw(
+                    _(
+                        "Row <b>{6}</b>:Item <b>{0}</b><br><br>"
+                        "Requested Qty: <b>{1}</b><br>"
+                        "Available Qty: <b>{2}</b><br><br>"
+                        "PO Qty: {3}<br>"
+                        "Received: {4}<br>"
+                        "Requested in other PRs: {5}"
+                    ).format(
+                        item.item_code,
+                        item.request_quantity,
+                        allowed_qty,
+                        po_qty,
+                        received_qty,
+                        already_requested,
+                        item.idx,
+                    ),
+                    title=_("Purchase Order Quantity Exceeded"),
+                )
+

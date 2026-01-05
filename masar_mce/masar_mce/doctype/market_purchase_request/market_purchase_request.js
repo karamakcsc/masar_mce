@@ -83,7 +83,9 @@ function GetItemDetails(frm , cdt , cdn){
                     frappe.model.set_value(cdt, cdn, {
                         purchase_order: r.message.purchase_order,
                         purchase_order_item: r.message.purchase_order_item, 
-                        rate:r.message.rate
+                        rate:r.message.rate,
+                        request_quantity:r.message.available_qty,
+                        uom:r.message.uom
                     });
                 } else {
                     frappe.model.set_value(cdt, cdn, "purchase_order", null);
@@ -145,3 +147,43 @@ function GetItemsFromPO(frm) {
     );
 }
 }
+frappe.ui.form.on('Purchase Request Item', {
+    item_code(frm, cdt, cdn) {
+        GetItemDetails(frm , cdt , cdn)
+    }
+});
+function GetItemDetails(frm , cdt , cdn){
+    const row = locals[cdt][cdn];
+        if (!row.item_code || !frm.doc.supplier) return;
+        
+        let used_pos = [];
+        frm.doc.items.forEach(r => {
+            if (r.item_code === row.item_code && r.purchase_order && r.idx !== row.idx) {
+                used_pos.push(r.purchase_order);
+            }
+        });
+        
+        frappe.call({
+            method: "masar_mce.masar_mce.doctype.market_purchase_request.market_purchase_request.get_po_details_for_item",
+            args: {
+                item_code: row.item_code,
+                supplier: frm.doc.supplier,
+                used_pos: used_pos
+            },
+            callback: function(r) {[{'purchase_order': 'PUR-ORD-2026-00002', 'purchase_order_item': '81igh9a41i', 'rate': 2.655, 'uom': 'قطعة', 'available_qty': 30.0}]
+                if (r.message) {
+
+                    frappe.model.set_value(cdt, cdn, {
+                        purchase_order: r.message.purchase_order,
+                        purchase_order_item: r.message.purchase_order_item , 
+                        rate:r.message.rate,
+                        uom:r.message.uom, 
+                        request_quantity:r.message.available_qty
+                    });
+                } else {
+                    frappe.model.set_value(cdt, cdn, "purchase_order", null);
+                    frappe.model.set_value(cdt, cdn, "purchase_order_item", null);
+                }
+            }
+        });
+    }

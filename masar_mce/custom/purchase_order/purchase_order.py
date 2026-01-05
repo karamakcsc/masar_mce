@@ -54,63 +54,47 @@ def get_items_from_active_blanket_order(doctype, txt, searchfield, start, page_l
 
 @frappe.whitelist()
 def create_purchase_request_from_purchase_order(source_name, target_doc=None, args=None):
-	if args is None:
-		args = {}
-	if isinstance(args, str):
-		args = json.loads(args)
+    if args is None:
+        args = {}
+    if isinstance(args, str):
+        args = json.loads(args)
+    def update_item(obj, target, source_parent):
+        target.uom = obj.uom
+        target.item_code = obj.item_code
+        target.description = obj.description
+        target.stock_uom = obj.stock_uom
+        target.request_quantity = flt(obj.qty) - flt(obj.received_qty)
+        target.purchase_order = obj.parent
+        target.purchase_order_item = obj.name
+    def select_item(d):
+        filtered_items = args.get("filtered_children", [])
+        child_filter = d.name in filtered_items if filtered_items else True
+        return child_filter
 
-	has_unit_price_items = frappe.db.get_value("Purchase Order", source_name, "has_unit_price_items")
+    doc = get_mapped_doc(
+        "Purchase Order",
+        source_name,
+        {
+            "Purchase Order": {
+                "doctype": "Market Purchase Request",
+                "field_map": {
+                    "supplier": "supplier", 
+                },
+                "validation": {
+                    "docstatus": ["=", 1],
+                },
+            },
+            "Purchase Order Item": {
+                "doctype": "Purchase Request Item",
+                "field_map": {
+                    "name": "purchase_order_item",
+                    "parent": "purchase_order",
+                },
+                "postprocess": update_item,
+                "condition": lambda doc: select_item(doc),
+            },
+        },
+        target_doc
+    )
 
-	def is_unit_price_row(source):
-		return has_unit_price_items and source.qty == 0
-
-	def update_item(obj, target, source_parent):
-		target.custom_request_quantity , target.qty ,obj.qty= flt(obj.qty) if is_unit_price_row(obj) else flt(obj.qty) - flt(obj.received_qty),1,1
-		target.stock_qty = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.conversion_factor)
-		target.amount = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate)
-		target.base_amount = (
-			(flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate) * flt(source_parent.conversion_rate)
-		)
-
-	def select_item(d):
-		filtered_items = args.get("filtered_children", [])
-		child_filter = d.name in filtered_items if filtered_items else True
-		return child_filter
-
-	doc = get_mapped_doc(
-		"Purchase Order",
-		source_name,
-		{
-			"Purchase Order": {
-				"doctype": "Purchase Receipt",
-				"field_map": {"supplier_warehouse": "supplier_warehouse"},
-				"validation": {
-					"docstatus": ["=", 1],
-				},
-			},
-			"Purchase Order Item": {
-				"doctype": "Purchase Receipt Item",
-				"field_map": {
-					"name": "purchase_order_item",
-					"parent": "purchase_order",
-					"bom": "bom",
-					"material_request": "material_request",
-					"material_request_item": "material_request_item",
-					"sales_order": "sales_order",
-					"sales_order_item": "sales_order_item",
-					"wip_composite_asset": "wip_composite_asset",
-				},
-				"postprocess": update_item,
-				"condition": lambda doc: (
-					True if is_unit_price_row(doc) else abs(doc.received_qty) < abs(doc.qty)
-				)
-				and doc.delivered_by_supplier != 1
-				and select_item(doc),
-			},
-			"Purchase Taxes and Charges": {"doctype": "Purchase Taxes and Charges", "reset_value": True},
-		},
-		target_doc,
-		set_missing_values,
-	)
-
-	return doc
+    return doc

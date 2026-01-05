@@ -1,7 +1,7 @@
 import frappe
 from frappe import get_all , get_doc , delete_doc
 from masar_mce.utils import get_item_barcode, get_tax_for_item, get_item_price
-from masar_mce.api import update_pos_item
+from masar_mce.api import insert_pos_item
 
 def after_insert(self, method):
     sync_specific_parties(self)
@@ -40,37 +40,58 @@ def sync_specific_parties(self):
             
             
 def update_pos_item(self):
-    existing_sp = frappe.db.sql("""
-            SELECT tbo.name
-            FROM `tabBlanket Order Item` tboi 
-            INNER JOIN `tabBlanket Order` tbo ON tboi.parent = tbo.name
-            WHERE tboi.item_code = %s AND tbo.docstatus = 1 AND tbo.custom_status = 'Active'
-            GROUP BY tbo.name
-        """,(self.name,), as_dict=True)
-    
-    if existing_sp:
+    active_sa = None
+    if self.custom_latest_sa:
+        active_sa = self.custom_latest_sa
+    else: 
+        existing_sp = frappe.db.sql("""
+                SELECT tbo.name
+                FROM `tabBlanket Order Item` tboi 
+                INNER JOIN `tabBlanket Order` tbo ON tboi.parent = tbo.name
+                WHERE tboi.item_code = %s AND tbo.docstatus = 1 AND tbo.custom_status = 'Active'
+                GROUP BY tbo.name
+            """,(self.name,), as_dict=True)
+        if existing_sp:
+            active_sa = existing_sp[0].name
+      
+    if active_sa:
+        sa_doc = get_doc("Blanket Order", active_sa)
+        supplier_code = frappe.db.get_value("Supplier", sa_doc.supplier, "custom_supplier_code")
         local_zone_tax = get_tax_for_item(self.name, "Local Zone")
         free_zone_tax = get_tax_for_item(self.name, "Free Zone")
         selling_local_zone, selling_free_zone = get_item_price(self.name)
-        local_zone = {
-            "ITEMNO": self.name,
-            "BARCODE": get_item_barcode(self.name),
-            "ITEMSHORTNAME": self.name,
-            "ITEMTAX": local_zone_tax * 100,
-            "ITEMPRICE": selling_local_zone,
-            "ITEMSTOP": self.disabled,
-            "TRN_TYPE_PRICE": 1
+        payload_local_zone = {
+            "AGREEMENT_NO": active_sa,
+            "COMP_CODE": supplier_code,
+            "AGR_STDATE": sa_doc.from_date,
+			"AGR_ENDATE": sa_doc.to_date,
+            "ITEMS": [
+                {
+                "ITEMNO": self.name,
+                "BARCODE": get_item_barcode(self.name),
+                "ITEMSHORTNAME": self.name,
+                "ITEMTAX": local_zone_tax * 100,
+                "ITEMPRICE": selling_local_zone,
+                "ITEMSTOP": self.disabled,
+                "TRN_TYPE_PRICE": 1
+                }
+            ]
         }
-        free_zone = {
-            "ITEMNO": self.name,
-            "BARCODE": get_item_barcode(self.name),
-            "ITEMSHORTNAME": self.name,
-            "ITEMTAX": free_zone_tax * 100,
-            "ITEMPRICE": selling_free_zone,
-            "ITEMSTOP": self.disabled,
-            "TRN_TYPE_PRICE": 1
+        payload_free_zone = {
+            "AGREEMENT_NO": active_sa,
+            "COMP_CODE": supplier_code,
+            "AGR_STDATE": sa_doc.from_date,
+            "AGR_ENDATE": sa_doc.to_date,
+            "ITEMS": [
+                {
+                "ITEMNO": self.name,
+                "BARCODE": get_item_barcode(self.name),
+                "ITEMSHORTNAME": self.name,
+                "ITEMTAX": free_zone_tax * 100,
+                "ITEMPRICE": selling_free_zone,
+                "ITEMSTOP": self.disabled,
+                "TRN_TYPE_PRICE": 1
+                }
+            ]       
         }
-        
-        # frappe.throw(f"Local Zone: {local_zone} <br> Free Zone: {free_zone}")
-        
-        # update_pos_item(local_zone, free_zone)
+        insert_pos_item(payload_local_zone, payload_free_zone)

@@ -106,11 +106,11 @@
    "fieldtype": "Column Break"
   },
   {
+   "fetch_from": "item_code.sales_uom",
    "fieldname": "uom",
    "fieldtype": "Link",
    "label": "UOM",
-   "options": "UOM",
-   "reqd": 1
+   "options": "UOM"
   },
   {
    "fieldname": "section_break_dtkg",
@@ -120,8 +120,6 @@
   {
    "fieldname": "rate",
    "fieldtype": "Currency",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Rate",
    "read_only": 1
   },
@@ -132,8 +130,6 @@
   {
    "fieldname": "amount",
    "fieldtype": "Currency",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Amount",
    "read_only": 1
   },
@@ -163,6 +159,8 @@
    "allow_on_submit": 1,
    "fieldname": "received_qty",
    "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Received Qty",
    "read_only": 1
   }
@@ -171,7 +169,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-01-04 11:08:02.893041",
+ "modified": "2026-01-04 16:17:55.718672",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Purchase Request Item",

@@ -3,10 +3,11 @@
 
 import frappe 
 from frappe.model.document import Document
-from masar_mce.utils import get_tax_for_item , get_standard_price_list_b_s_sfz , get_current_stock_value_and_quantity
+from masar_mce.utils import get_tax_for_item , get_standard_price_list_b_s_sfz , get_current_stock_value_and_quantity , get_item_barcode
 from frappe.utils import flt
-from frappe import _
+from frappe import _ , get_doc , db
 from datetime import datetime
+from masar_mce.api import insert_pos_item
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_items_by_blanket_order(doctype, txt, searchfield, start, page_len, filters):
@@ -312,3 +313,45 @@ class PricingSheet(Document):
 			last_number = 0
 		new_number = last_number + 1
 		self.name = f"{self.blanket_order}/{new_number}"
+	def create_pos_item(self):
+		sa_doc = get_doc("Blanket Order", self.blanket_order)
+		if sa_doc.docstatus == 1 and sa_doc.custom_status == "Active":
+			items_local_zone = []
+			items_free_zone = []
+			supplier_code = db.get_value("Supplier", self.supplier, "custom_supplier_code")
+			for item in self.items:
+				is_disabled = db.get_value("Item", item.item_code, "disabled")
+				items_local_zone.append({
+					"ITEMNO": item.item_code,
+					"BARCODE": get_item_barcode(item.item_code),
+					"ITEMSHORTNAME": item.item_name,
+					"ITEMTAX":item.local_tax_rate,
+					"ITEMPRICE": item.local_sp,
+					"ITEMSTOP": is_disabled,
+					"TRN_TYPE_PRICE": 1
+				})
+				items_free_zone.append({
+					"ITEMNO": item.item_code,
+					"BARCODE": get_item_barcode(item.item_code),
+					"ITEMSHORTNAME": item.item_name,
+					"ITEMTAX":item.free_tax_rate,
+					"ITEMPRICE": item.free_sp,
+					"ITEMSTOP": is_disabled,
+					"TRN_TYPE_PRICE": 8
+				})
+				
+			payload_local_zone = {
+				"AGREEMENT_NO": self.blanket_order,
+				"ITEMS": items_local_zone,
+				"COMP_CODE": supplier_code if supplier_code else "",
+				"AGR_STDATE": sa_doc.from_date,
+				"AGR_ENDATE": sa_doc.to_date,
+			}
+			payload_free_zone = {
+				"AGREEMENT_NO": self.blanket_order,
+				"ITEMS": items_free_zone,
+				"COMP_CODE": supplier_code if supplier_code else "",
+				"AGR_STDATE": sa_doc.from_date,
+				"AGR_ENDATE": sa_doc.to_date,
+			}
+			insert_pos_item(payload_local_zone, payload_free_zone)

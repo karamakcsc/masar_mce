@@ -22,8 +22,9 @@
   "section_break_adpd",
   "items",
   "section_break_wkwn",
-  "total_quantity",
+  "column_break_zwwd",
   "column_break_rghw",
+  "total_quantity",
   "total",
   "connections_tab"
  ],
@@ -127,6 +128,7 @@
   {
    "fieldname": "total",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Total",
    "read_only": 1
   },
@@ -153,6 +155,10 @@
    "fieldtype": "Tab Break",
    "label": "Connections",
    "show_dashboard": 1
+  },
+  {
+   "fieldname": "column_break_zwwd",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
@@ -165,7 +171,7 @@
    "table_fieldname": "items"
   }
  ],
- "modified": "2026-01-04 13:39:17.546398",
+ "modified": "2026-01-04 16:39:51.371333",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Market Purchase Request",

@@ -20,7 +20,7 @@ def on_submit(self , method):
     self.db_set('custom_status', 'Active')
     validate_duplicate_item_in_active_blanket_orders(self)
     create_pricing_sheet(self)
-    create_pos_item(self)
+    insert_latest_sa_in_item(self)
 def on_cancel(self , method):
     pass
 @frappe.whitelist()
@@ -252,53 +252,8 @@ def create_pricing_sheet(self):
     pricing_sheet.submit()
     frappe.msgprint(f"Pricing Sheet {pricing_sheet.name} created successfully." , alert=1)
     return pricing_sheet.name
-    
-###### MK ######   
-def create_pos_item(self):
-    if self.docstatus == 1 and self.custom_status == "Active":
-        items_local_zone = []
-        items_free_zone = []
-        supplier_code = frappe.db.get_value("Supplier", self.supplier, "custom_supplier_code")
-        for item in self.items:
-            is_disabled = frappe.db.get_value("Item", item.item_code, "disabled")
-            local_zone_tax = get_tax_for_item(item.item_code, "Local Zone")
-            free_zone_tax = get_tax_for_item(item.item_code, "Free Zone")
-            items_local_zone.append({
-                "ITEMNO": item.item_code,
-                "BARCODE": get_item_barcode(item.item_code),
-                "ITEMSHORTNAME": item.item_name,
-                "ITEMTAX": local_zone_tax * 100,
-                "ITEMPRICE": item.custom_selling_price_after_tax,
-                "ITEMSTOP": is_disabled,
-                "TRN_TYPE_PRICE": 1
-            })
-            items_free_zone.append({
-                "ITEMNO": item.item_code,
-                "BARCODE": get_item_barcode(item.item_code),
-                "ITEMSHORTNAME": item.item_name,
-                "ITEMTAX": free_zone_tax * 100,
-                "ITEMPRICE": item.custom_selling_price,
-                "ITEMSTOP": is_disabled,
-                "TRN_TYPE_PRICE": 1
-            })
-            
-        payload_local_zone = {
-            "AGREEMENT_NO": self.name,
-            "ITEMS": items_local_zone,
-            "COMP_CODE": supplier_code if supplier_code else "",
-            "AGR_STDATE": self.from_date,
-            "AGR_ENDATE": self.to_date,
-        }
-        payload_free_zone = {
-            "AGREEMENT_NO": self.name,
-            "ITEMS": items_free_zone,
-            "COMP_CODE": supplier_code if supplier_code else "",
-            "AGR_STDATE": self.from_date,
-            "AGR_ENDATE": self.to_date,
-        }
-        
-        # frappe.throw(f"Local Zone: {payload_local_zone} <br> Free Zone: {payload_free_zone}")
-        
-        # insert_pos_item(payload_local_zone, payload_free_zone)
+def insert_latest_sa_in_item(self):
+    for item in self.items:
+        frappe.db.set_value("Item", item.item_code, "custom_latest_sa", self.name)
         
         
