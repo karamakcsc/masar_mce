@@ -1,0 +1,53 @@
+{
+ "actions": [],
+ "creation": "2026-01-05 14:09:23.588490",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "territory",
+  "column_break_apcb",
+  "number_of_days"
+ ],
+ "fields": [
+  {
+   "fieldname": "territory",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Territory",
+   "link_filters": "[[\"Territory\",\"is_group\",\"=\",0]]",
+   "options": "Territory",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_apcb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "The penalty amount or percentage will be multiplied by the number of delay days.",
+   "fieldname": "number_of_days",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Number of Days",
+   "non_negative": 1,
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-05 14:50:20.494410",
+ "modified_by": "Administrator",
+ "module": "Masar MCE",
+ "name": "Territory Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

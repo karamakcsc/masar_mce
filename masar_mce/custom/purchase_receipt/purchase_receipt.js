@@ -44,29 +44,30 @@ frappe.ui.form.on("Purchase Receipt", {
     } 
 });
 function calculate_delivery_date(frm) {
-    if (!frm.doc.custom_request_date || !frm.doc.set_warehouse) {
+    if (!frm.doc.custom_request_date || !frm.doc.set_warehouse || !frm.doc.supplier) {
         frm.set_value("custom_delivery_date", null);
         return;
     }
-
-    frappe.db.get_value(
-        "Warehouse",
-        frm.doc.set_warehouse,
-        "custom_number_of_days"
-    ).then(r => {
-        const days = cint(r.message?.custom_number_of_days || 0);
-
-        if (!days) {
+    frappe.db.get_value("Warehouse", frm.doc.set_warehouse, "custom_territory")
+    .then(r => {
+        const territory = r.message?.custom_territory;
+        if (!territory) {
             frm.set_value("custom_delivery_date", frm.doc.custom_request_date);
             return;
         }
-
-        const delivery_date = frappe.datetime.add_days(
-            frm.doc.custom_request_date,
-            days
-        );
-
-        frm.set_value("custom_delivery_date", delivery_date);
+        frappe.db.get_doc("Supplier", frm.doc.supplier).then(supplier => {
+            let days = 0;
+            if (supplier.custom_territories && supplier.custom_territories.length) {
+                const row = supplier.custom_territories.find(d => d.territory === territory);
+                if (row) {
+                    days = cint(row.number_of_days || 0);
+                }
+            }
+            const delivery_date = days 
+                ? frappe.datetime.add_days(frm.doc.custom_request_date, days) 
+                : frm.doc.custom_request_date;
+            frm.set_value("custom_delivery_date", delivery_date);
+        });
     });
 }
 function refresh_item_fields(frm) {

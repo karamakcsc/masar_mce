@@ -169,12 +169,6 @@ doc_events = {
         "before_insert" : "masar_mce.custom.purchase_receipt.purchase_receipt.before_insert",
         "on_cancel" : "masar_mce.custom.purchase_receipt.purchase_receipt.on_cancel"
     }, 
-    "Territory": {
-        "on_update" : "masar_mce.custom.territory.territory.on_update"
-    }, 
-    "Terms and Conditions": {
-        "validate" : "masar_mce.custom.terms_and_conditions.terms_and_conditions.validate"
-    }
 }
 
 # Scheduled Tasks

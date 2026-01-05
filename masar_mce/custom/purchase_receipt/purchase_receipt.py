@@ -93,9 +93,18 @@ def create_auto_penalty_entry(self):
     posting_date = getdate(self.posting_date)
     request_date = getdate(self.custom_request_date)
     diff_days = date_diff(posting_date, request_date)
-    if self.set_warehouse is None or self.set_warehouse == "":
+    if not self.set_warehouse:
         frappe.throw(_("Please set 'Accepted Warehouse' before submitting the Purchase Receipt."))
-    allowed_days = frappe.db.get_value('Warehouse' , self.set_warehouse , 'custom_number_of_days')
+    if not self.supplier:
+        frappe.throw(_("Please set 'Supplier' before submitting the Purchase Receipt."))
+    territory = frappe.db.get_value("Warehouse", self.set_warehouse, "custom_territory")
+    allowed_days = 0
+    if territory:
+        supplier_doc = frappe.get_doc("Supplier", self.supplier)
+        for row in supplier_doc.custom_territories:
+            if row.territory == territory:
+                allowed_days = row.number_of_days or 0
+                break
     if diff_days > allowed_days:
         penalties = frappe.db.sql("""
             SELECT name as penalty, penalty_type , account , penalty_percentage

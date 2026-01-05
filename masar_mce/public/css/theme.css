@@ -3,12 +3,15 @@
    ========================================================= */
 
 /* Only keep imports that are actually used by the variables below */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap');
 
 :root {
   /* Fonts */
-  --banking-font-body: "Trebuchet MS", Trebuchet, Arial, sans-serif;
-  --banking-font-arabic: "Noto Sans Arabic", Tahoma, Arial, sans-serif;
+  --banking-font-body: "Trebuchet MS", Trebuchet,
+                       "Noto Sans Arabic",
+                       Tahoma, Arial, sans-serif;
+
+  --banking-font-arabic: "Noto Sans Arabic", "Trebuchet MS", Trebuchet, Tahoma, Arial, sans-serif;
 
   /* Brand colors */
   --banking-primary: #0A7F3F;
@@ -46,10 +49,10 @@
   --ui-input-bg-hover: #EFF7FF;
 }
 
-/* When Arabic UI is active, make body font resolve to Arabic font */
+/* When Arabic UI is active, make body font resolve to Arabic font 
 html[dir="rtl"] {
   --banking-font-body: var(--banking-font-arabic);
-}
+}*/
 
 /* =========================
    1) Base typography + density
@@ -213,6 +216,7 @@ a.btn.btn-primary {
   background: var(--banking-primary) !important;
   border-color: var(--banking-primary) !important;
   color: #fff !important;
+  font-weight: 700 !important;
 }
 
 /* Force children (icons/spans) to white */
@@ -222,6 +226,7 @@ a.btn.btn-primary * {
   color: #fff !important;
   fill: #fff !important;
   stroke: #fff !important;
+  font-weight: 700 !important;
 }
 
 .btn-primary:hover,
@@ -307,6 +312,7 @@ a.btn.btn-primary:hover {
   background: var(--banking-primary) !important;
   border-color: var(--banking-primary) !important;
   color: #ffffff !important;
+  font-weight: 700 !important;
 }
 
 /* THE "TRUST RESTORER" ICON FIX:
@@ -337,6 +343,8 @@ a.btn.btn-primary:hover {
 .form-tabs,
 .form-tabs .nav {
   gap: 6px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
 }
 
 .form-tabs .nav li a,
@@ -348,6 +356,8 @@ a.btn.btn-primary:hover {
   padding: 6px 12px !important;
   color: var(--ui-text-2) !important;
   font-weight: 700 !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
 }
 
 .form-tabs .nav li.active a,
@@ -529,3 +539,31 @@ div[class*="fieldname-"]::after,
   padding: 0 !important;
   border-radius: 2px !important; /* small square corners */
 }
+
+/* =========================
+   Fix: inputs that have a left prefix icon
+   ========================= */
+
+/* Login page (email/password) - add left padding so text clears the icon */
+.page-card .form-group:has(.field-icon) .form-control,
+.page-card .form-group:has(.field-icon) input.input-with-feedback {
+  padding-left: 34px !important; /* adjust 30–40px if needed */
+}
+
+/* Top bar global search - add left padding so text clears the search icon */
+.navbar .search-bar:has(.search-icon) .form-control,
+.navbar .search-bar:has(.search-icon) input {
+  padding-left: 34px !important;
+}
+
+/* RTL: icon will be on the other side, so swap padding */
+[dir="rtl"] .page-card .form-group:has(.field-icon) .form-control,
+[dir="rtl"] .page-card .form-group:has(.field-icon) input.input-with-feedback,
+[dir="rtl"] .navbar .search-bar:has(.search-icon) .form-control,
+[dir="rtl"] .navbar .search-bar:has(.search-icon) input {
+  padding-left: 10px !important;
+  padding-right: 34px !important;
+}
+
+
+/* last update: 3:10pm */

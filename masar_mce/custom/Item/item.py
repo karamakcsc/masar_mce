@@ -69,7 +69,7 @@ def update_pos_item(self):
                 {
                 "ITEMNO": self.name,
                 "BARCODE": get_item_barcode(self.name),
-                "ITEMSHORTNAME": self.name,
+                "ITEMSHORTNAME": self.item_name,
                 "ITEMTAX": local_zone_tax * 100,
                 "ITEMPRICE": selling_local_zone,
                 "ITEMSTOP": self.disabled,
@@ -86,7 +86,7 @@ def update_pos_item(self):
                 {
                 "ITEMNO": self.name,
                 "BARCODE": get_item_barcode(self.name),
-                "ITEMSHORTNAME": self.name,
+                "ITEMSHORTNAME": self.item_name,
                 "ITEMTAX": free_zone_tax * 100,
                 "ITEMPRICE": selling_free_zone,
                 "ITEMSTOP": self.disabled,
