@@ -27,7 +27,7 @@ app_license = "mit"
 # include js, css files in header of desk.html
 # app_include_css = "/assets/masar_mce/css/masar_mce.css"
 app_include_css = "/assets/masar_mce/css/theme.css"
-# app_include_js = "/assets/masar_mce/js/arabic_digits_fix.js"
+app_include_js = "/assets/masar_mce/js/arabic_digits_fix_no_UI_changes.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/masar_mce/css/masar_mce.css"

@@ -9,6 +9,7 @@
   "supplier",
   "supplier_name",
   "purchase_receipt",
+  "purchase_request",
   "column_break_pmvp",
   "company",
   "posting_date",
@@ -48,7 +49,7 @@
    "fieldname": "purchase_receipt",
    "fieldtype": "Link",
    "label": "Purchase Receipt",
-   "link_filters": "[[\"Purchase Receipt\",\"supplier\",\"=\",\"eval: doc.supplier\"],[\"Purchase Receipt\",\"docstatus\",\"=\",\"1\"]]",
+   "link_filters": "[[\"Purchase Receipt\",\"docstatus\",\"=\",\"1\"],[\"Purchase Receipt\",\"supplier\",\"=\",\"eval: doc.supplier\"]]",
    "options": "Purchase Receipt",
    "reqd": 1
   },
@@ -84,10 +85,16 @@
    "options": "Supplier Agreement Penalty Details"
   },
   {
-   "fetch_from": "purchase_receipt.grand_total",
    "fieldname": "pr_total",
    "fieldtype": "Currency",
-   "label": "Purchase Receipt Total",
+   "label": "Purchase Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "purchase_request",
+   "fieldtype": "Link",
+   "label": "Market Purchase Request",
+   "options": "Market Purchase Request",
    "read_only": 1
   }
  ],
@@ -95,7 +102,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-19 15:23:10.548231",
+ "modified": "2026-01-07 12:07:59.917354",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Penalty Entry",

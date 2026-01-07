@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class WarehouseUsersDetails(Document):
+class WarehouseUser(Document):
 	pass

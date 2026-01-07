@@ -10,8 +10,37 @@ from erpnext.controllers.accounts_controller import AccountsController
 from frappe.utils import flt, date_diff, getdate
 
 class PenaltyEntry(AccountsController):
+    @frappe.whitelist()
+    def get_request_details(self):
+        purchase_request = None
+        pr_total = 0
+
+        if self.purchase_receipt:
+            pr_doc = frappe.get_doc("Purchase Receipt", self.purchase_receipt)
+            for row in pr_doc.items:
+                if row.custom_purchase_request:
+                    purchase_request = row.custom_purchase_request
+                    break
+            if purchase_request:
+                pr_total = flt(
+                    frappe.db.get_value(
+                        "Market Purchase Request",
+                        purchase_request,
+                        "total"
+                    )
+                )
+            else:
+                pr_total = flt(pr_doc.grand_total)
+        self.db_set("purchase_request", purchase_request)
+        self.db_set("pr_total", pr_total)
+        print(purchase_request , pr_total)
+        return {
+            "purchase_request": purchase_request,
+            "pr_total": pr_total
+        }
     def validate(self): 
         self.calculate_amount_values()
+        self.get_request_details()
     
     def on_submit(self): 
         self.create_gl_entry()

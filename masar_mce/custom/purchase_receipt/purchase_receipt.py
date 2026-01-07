@@ -181,6 +181,9 @@ def validate_qty(self):
 def set_purchase_order_rate(self):
     for i in self.items:
         i.rate = flt(frappe.db.get_value('Purchase Order Item' , i.purchase_order_item , 'rate'))
+        request_status = frappe.db.get_value('Purchase Request' , i.custom_purchase_request , 'status')
+        if request_status == 'Closed':
+            frappe.throw(_('Cannot create Purchase Receipt against a closed Purchase Request: {0}').format(i.custom_purchase_request))
         
         
 def update_received_qty(doc):

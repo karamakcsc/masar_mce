@@ -27,7 +27,7 @@ function set_item_code_query(frm) {
     };
 }
 
-frappe.ui.form.on('Market Purchase Request Item', {
+frappe.ui.form.on('Purchase Request Item', {
     item_code(frm, cdt, cdn) {
         GetItemDetails(frm , cdt , cdn)
     }, 
@@ -55,7 +55,7 @@ function GetTotals(frm){
     let total_quantity = 0;
     frm.doc.items.forEach(r => {
         total_amount += r.amount ? r.amount : 0;
-        total_quantity += r.request_quantity ? r.request_quantity : 0;
+        total_quantity += flt(r.request_quantity) ? flt(r.request_quantity) : 0;
     });
     frm.set_value("total", total_amount);
     frm.set_value("total_quantity", total_quantity);
@@ -132,20 +132,40 @@ function GetItemsFromPO(frm) {
             __("Get Items From")
         );
     }
-    if (frm.doc.docstatus === 1) {
-    frm.add_custom_button(
-        __("Purchase Receipt"),
-        function () {
-            frappe.model.open_mapped_doc({
-            method: "masar_mce.masar_mce.doctype.market_purchase_request.market_purchase_request.make_purchase_receipt_from_purchase_request",
-            frm: frm,
-            freeze_message: __("Creating Purchase Receipt ..."),
-        });
-
-        },
-        __("Create")
-    );
-}
+        if (frm.doc.docstatus === 1 && frm.doc.status !== "Closed") {
+            frm.add_custom_button(
+                __("Purchase Receipt"),
+                () => {
+                    frappe.model.open_mapped_doc({
+                        method: "masar_mce.masar_mce.doctype.market_purchase_request.market_purchase_request.make_purchase_receipt_from_purchase_request",
+                        frm: frm,
+                        freeze_message: __("Creating Purchase Receipt ..."),
+                    });
+                },
+                __("Create")
+            );
+        }
+        if (frm.doc.docstatus === 1 && frm.doc.status !== "Closed") {
+            frm.add_custom_button(
+                __("Close"),
+                () => {
+                    frappe.confirm(
+                        __("Are you sure you want to close this document?"),
+                        () => {
+                            frm.set_value("status", "Closed").then(() => {
+                                frm.save("Update");
+                            });
+                        }
+                    );
+                },
+                __("Status")
+            );
+        }
+        if (frm.doc.status === "Closed") {
+            frm.page.clear_primary_action();
+            frm.page.clear_secondary_action();
+            frm.page.clear_menu();
+        }
 }
 frappe.ui.form.on('Purchase Request Item', {
     item_code(frm, cdt, cdn) {

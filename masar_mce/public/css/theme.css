@@ -150,10 +150,50 @@ input.input-with-feedback {
   color: var(--ui-text) !important;
   border: 1px solid var(--ui-border-2) !important;
   border-radius: 8px !important;
-  min-height: 32px !important;
+  min-height: 36px !important;
   padding: 6px 10px !important;
   font-size: 15px !important;
+  line-height: 1.2 !important;   /* <-- add this */
 }
+
+
+
+
+
+
+/* Native SELECT closed-state: prevent glyph clipping */
+select.form-control,
+select.input-with-feedback.form-control,
+.frappe-control select {
+  height: 40px !important;
+  min-height: 40px !important;
+
+  /* key: don’t rely on vertical padding */
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+
+  /* key: center text inside the control */
+  line-height: 38px !important; /* 40px height - 2px borders */
+}
+
+/* Reserve space for the dropdown arrow area */
+html[dir="rtl"] select.form-control,
+html[dir="rtl"] select.input-with-feedback.form-control,
+html[dir="rtl"] .frappe-control select {
+  padding-left: 34px !important;   /* arrow is usually on the left in RTL */
+  padding-right: 10px !important;
+}
+
+html[dir="ltr"] select.form-control,
+html[dir="ltr"] select.input-with-feedback.form-control,
+html[dir="ltr"] .frappe-control select {
+  padding-right: 34px !important;  /* arrow is usually on the right in LTR */
+  padding-left: 10px !important;
+}
+
+
+
+
 
 /* Editable fields background (NOT disabled/read-only) */
 .form-control:not([readonly]):not(:disabled),

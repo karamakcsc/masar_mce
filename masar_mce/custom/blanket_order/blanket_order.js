@@ -56,6 +56,23 @@ frappe.ui.form.on("Blanket Order", {
                 });
             });
         }
+    },
+    custom_terms_template(frm) {
+    if (!frm.doc.custom_terms_template) {
+        frm.clear_table("custom_other_terms");
+        frm.refresh_field("custom_other_terms");
+        return;
+    }
+    frappe.db.get_doc("Terms Template", frm.doc.custom_terms_template)
+        .then(doc => {
+            frm.clear_table("custom_other_terms");
+            (doc.terms || []).forEach(row => {
+                let new_row = frm.add_child("custom_other_terms");
+                new_row.tcs_terms = row.tcs_terms;
+                new_row.terms = row.terms;
+            });
+            frm.refresh_field("custom_other_terms");
+        });
     }
 });
 

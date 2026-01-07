@@ -233,8 +233,22 @@ class MarketPurchaseRequest(Document):
 
     def validate(self):
         self.validate_po_available_qty()
+        self.get_total_and_total_qty()
     def on_submit(self):
         self.db_set('status', 'To Receive')
+        self.set_order_qty_in_purchase_order()
+    def on_cancel(self):
+        self.db_set('status', 'Cancelled')
+        self.revert_order_qty_in_purchase_order()
+    def get_total_and_total_qty(self):
+        total = 0
+        total_qty = 0
+        for item in self.items:
+            item.amount = flt(item.request_quantity) * flt(item.rate)
+            total += flt(item.amount)
+            total_qty += flt(item.request_quantity)
+        self.total = total
+        self.total_quantity = total_qty
     def validate_po_available_qty(self):
         for item in self.items:
 
@@ -262,10 +276,10 @@ class MarketPurchaseRequest(Document):
                 ) or 0
             )
             allowed_qty = (
-                po_qty
-                - received_qty
+                flt(po_qty)
+                - flt(received_qty)
                 - flt(already_requested)
-                + po_qty * over_delivery
+                + flt(po_qty) * flt(over_delivery)
             )
             if flt(item.request_quantity) > allowed_qty:
                 frappe.throw(
@@ -286,5 +300,39 @@ class MarketPurchaseRequest(Document):
                         item.idx,
                     ),
                     title=_("Purchase Order Quantity Exceeded"),
+                )
+    def set_order_qty_in_purchase_order(self):
+        for item in self.items:
+            if item.purchase_order_item and flt(item.request_quantity):
+                current_qty = flt(frappe.db.get_value(
+                    "Purchase Order Item",
+                    item.purchase_order_item,
+                    "custom_ordered_qty"
+                )) or 0
+
+                frappe.db.set_value(
+                    "Purchase Order Item",
+                    item.purchase_order_item,
+                    "custom_ordered_qty",
+                    current_qty + flt(item.request_quantity),
+                    update_modified=False
+                )
+    def revert_order_qty_in_purchase_order(self):
+        for item in self.items:
+            if item.purchase_order_item and flt(item.request_quantity):
+                current_qty = flt(frappe.db.get_value(
+                    "Purchase Order Item",
+                    item.purchase_order_item,
+                    "custom_ordered_qty"
+                )) or 0
+
+                new_qty = current_qty - flt(item.request_quantity)
+
+                frappe.db.set_value(
+                    "Purchase Order Item",
+                    item.purchase_order_item,
+                    "custom_ordered_qty",
+                    max(new_qty, 0),
+                    update_modified=False
                 )
 
