@@ -16,6 +16,34 @@ def on_submit(self , method):
     update_received_qty(self)
 def before_insert(self , method):
     set_purchase_order_rate(self)
+    set_selling_price_list(self)
+def set_selling_price_list(self):
+    if self.is_return == 0 :
+        return
+    for item in self.items:
+        cost_zone = frappe.db.get_value('Warehouse', item.warehouse, 'custom_cost_zone')
+        SQL = f"""
+                SELECT 
+                    ROUND(IFNULL(ip.price_list_rate , 0 ) , 3)
+                FROM 
+                    `tabItem Price` ip
+                WHERE 
+                    ip.item_code = '{item.item_code}'
+                    AND ip.selling = 1
+                    AND ip.custom_free_zone = {'1' if cost_zone == 'Free Zone' else '0'}
+                    AND ip.valid_from = (
+                        SELECT 
+                            MAX(valid_from)
+                        FROM 
+                            `tabItem Price`
+                        WHERE 
+                            item_code = '{item.item_code}'
+            )
+        """
+        price_list_rate = frappe.db.sql(SQL , as_list = 1)
+        if price_list_rate and price_list_rate[0][0]:
+            item.rate = flt(price_list_rate[0][0])
+        
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_len, filters):
@@ -179,6 +207,8 @@ def validate_qty(self):
                     elif item[args["target_ref_field"]]:
                         check_overflow_with_allowance(self , item, args)
 def set_purchase_order_rate(self):
+    if self.is_return == 1 :
+        return
     for i in self.items:
         i.rate = flt(frappe.db.get_value('Purchase Order Item' , i.purchase_order_item , 'rate'))
         request_status = frappe.db.get_value('Purchase Request' , i.custom_purchase_request , 'status')

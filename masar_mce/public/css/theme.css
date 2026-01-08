@@ -136,7 +136,9 @@ body .datatable, body .grid-body {
 /* =========================
    5) Inputs (tight + readable)
    ========================= */
-.form-control,
+input.form-control:not([type="checkbox"]):not([type="radio"]),
+select.form-control,
+textarea.form-control,
 input.input-with-feedback:not([type="checkbox"]):not([type="radio"]),
 .frappe-control input[type="text"],
 .frappe-control input[type="email"],
@@ -236,9 +238,9 @@ html[dir="ltr"] .frappe-control select {
 /* Disabled/read-only (kept clearly different) */
 .form-control[readonly],
 .form-control:disabled,
-.frappe-control input[readonly],
+.frappe-control input:not([type="checkbox"]):not([type="radio"])[readonly],
 .frappe-control textarea[readonly],
-.frappe-control input[disabled],
+.frappe-control input:not([type="checkbox"]):not([type="radio"])[disabled],
 .frappe-control textarea[disabled],
 .control-value.like-disabled-input,
 .frappe-control .control-value.like-disabled-input {
@@ -567,7 +569,7 @@ div[class*="fieldname-"]::after,
 }
 
 /* Force normal square checkboxes */
-.grid-row input[type="checkbox"],
+/* .grid-row input[type="checkbox"],
 .datatable input[type="checkbox"],
 .frappe-control input[type="checkbox"] {
   appearance: auto !important;
@@ -577,8 +579,8 @@ div[class*="fieldname-"]::after,
   height: 16px !important;
   min-height: 0 !important;
   padding: 0 !important;
-  border-radius: 2px !important; /* small square corners */
-}
+  border-radius: 2px !important; 
+} */
 
 /* =========================
    Fix: inputs that have a left prefix icon
@@ -606,4 +608,4 @@ div[class*="fieldname-"]::after,
 }
 
 
-/* last update: 3:10pm */
+/* last update: 1:48pm */
