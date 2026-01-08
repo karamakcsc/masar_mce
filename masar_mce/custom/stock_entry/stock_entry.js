@@ -40,10 +40,24 @@ function FilterForSupplierAgreement(frm) {
                 }
             };
         }
+        if (
+            doc.stock_entry_type &&
+            doc.stock_entry_type === "Return to Supplier" &&
+            doc.custom_supplier
+        ) {
+            return {
+                query: "masar_mce.custom.stock_entry.stock_entry.get_items_from_party_specific_item",
+                filters: {
+                    party: doc.custom_supplier,
+                    party_type: "Supplier"
+                }
+            };
+        }
         if (typeof item_code_field.original_get_query === "function") {
             return item_code_field.original_get_query(doc, cdt, cdn);
         }
         return {};
+
     };
 }
 frappe.form.link_formatters['Item'] = function(value, doc) {

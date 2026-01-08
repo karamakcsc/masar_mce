@@ -482,7 +482,7 @@
    "dependencies": "",
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u0625\u062a\u0641\u0627\u0642\u064a\u0629 \u0627\u0644\u0645\u0648\u0631\u062f",
+   "label": "Supplier Agreement",
    "link_count": 0,
    "link_to": "Blanket Order",
    "link_type": "DocType",
@@ -492,7 +492,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u0633\u0646\u062f \u062a\u0633\u0639\u064a\u0631",
+   "label": "Pricing Sheet",
    "link_count": 0,
    "link_to": "Pricing Sheet",
    "link_type": "DocType",
@@ -503,7 +503,7 @@
    "dependencies": "",
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u0623\u0645\u0631 \u0634\u0631\u0627\u0621",
+   "label": "Purchase Order",
    "link_count": 0,
    "link_to": "Purchase Order",
    "link_type": "DocType",
@@ -513,7 +513,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u0637\u0644\u0628\u064a\u0629 \u0623\u0633\u0648\u0627\u0642",
+   "label": "Market Purchase Request",
    "link_count": 0,
    "link_to": "Market Purchase Request",
    "link_type": "DocType",
@@ -524,7 +524,7 @@
    "dependencies": "",
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u0627\u0633\u062a\u0644\u0627\u0645 \u0627\u0644\u0645\u0634\u062a\u0631\u064a\u0627\u062a",
+   "label": "Purchase Receipt",
    "link_count": 0,
    "link_to": "Purchase Receipt",
    "link_type": "DocType",
@@ -534,7 +534,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u0641\u0627\u062a\u0648\u0631\u0629 \u0645\u0634\u062a\u0631\u064a\u0627\u062a",
+   "label": "Purchase Invoice",
    "link_count": 0,
    "link_to": "Purchase Invoice",
    "link_type": "DocType",
@@ -544,7 +544,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u0637\u0644\u0628 \u0645\u0648\u0627\u062f",
+   "label": "Material Request",
    "link_count": 0,
    "link_to": "Material Request",
    "link_type": "DocType",
@@ -554,7 +554,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u062d\u0631\u0643\u0629 \u0645\u062e\u0632\u0648\u0646",
+   "label": "Stock Entry",
    "link_count": 0,
    "link_to": "Stock Entry",
    "link_type": "DocType",
@@ -564,7 +564,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u0641\u062d\u0635 \u0627\u0644\u062c\u0648\u062f\u0629",
+   "label": "Quality Inspection",
    "link_count": 0,
    "link_to": "Quality Inspection",
    "link_type": "DocType",
@@ -574,7 +574,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u062a\u0633\u062c\u064a\u0644 \u063a\u0631\u0627\u0645\u0629",
+   "label": "Penalty Entry",
    "link_count": 0,
    "link_to": "Penalty Entry",
    "link_type": "DocType",
@@ -582,7 +582,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-01-08 14:43:56.962827",
+ "modified": "2026-01-08 15:28:56.357055",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Home",
