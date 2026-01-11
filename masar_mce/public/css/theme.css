@@ -146,16 +146,20 @@ input.input-with-feedback:not([type="checkbox"]):not([type="radio"]),
 .frappe-control input[type="number"],
 .frappe-control input[type="date"],
 .frappe-control textarea,
-.frappe-control select,
-input.input-with-feedback {
+.frappe-control select {
   background: #fff !important;
   color: var(--ui-text) !important;
   border: 1px solid var(--ui-border-2) !important;
   border-radius: 8px !important;
+
   min-height: 36px !important;
+  height: 36px !important;
+  box-sizing: border-box !important;
   padding: 6px 10px !important;
   font-size: 15px !important;
-  line-height: 1.2 !important;   /* <-- add this */
+  line-height: 22px !important;
+
+
 }
 
 
@@ -167,15 +171,13 @@ input.input-with-feedback {
 select.form-control,
 select.input-with-feedback.form-control,
 .frappe-control select {
-  height: 40px !important;
-  min-height: 40px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  line-height: 22px !important;
+  box-sizing: border-box !important;
 
-  /* key: don’t rely on vertical padding */
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-
-  /* key: center text inside the control */
-  line-height: 38px !important; /* 40px height - 2px borders */
 }
 
 /* Reserve space for the dropdown arrow area */
@@ -199,7 +201,7 @@ html[dir="ltr"] .frappe-control select {
 
 /* Editable fields background (NOT disabled/read-only) */
 .form-control:not([readonly]):not(:disabled),
-.input-with-feedback:not([readonly]):not(:disabled),
+input.input-with-feedback:not([type="checkbox"]):not([type="radio"]):not([readonly]):not(:disabled),
 .frappe-control input:not([type="checkbox"]):not([type="radio"]):not([readonly]):not(:disabled),
 .frappe-control select:not([readonly]):not(:disabled),
 .frappe-control textarea:not([readonly]):not(:disabled) {
@@ -207,11 +209,12 @@ html[dir="ltr"] .frappe-control select {
 }
 
 .form-control:not([readonly]):not(:disabled):hover,
-.frappe-control input:not([readonly]):not(:disabled):hover,
+.frappe-control input:not([type="checkbox"]):not([type="radio"]):not([readonly]):not(:disabled):hover,
 .frappe-control select:not([readonly]):not(:disabled):hover,
 .frappe-control textarea:not([readonly]):not(:disabled):hover {
   background: var(--ui-input-bg-hover) !important;
 }
+
 
 /* Wrapper */
 .frappe-control .control-input {
@@ -220,8 +223,8 @@ html[dir="ltr"] .frappe-control select {
 }
 
 .form-control:focus,
-.input-with-feedback:focus,
-.frappe-control input:focus,
+input.input-with-feedback:not([type="checkbox"]):not([type="radio"]):focus,
+.frappe-control input:not([type="checkbox"]):not([type="radio"]):focus,
 .frappe-control textarea:focus,
 .frappe-control select:focus {
   border-color: var(--banking-primary) !important;
@@ -247,7 +250,22 @@ html[dir="ltr"] .frappe-control select {
   background: #E0E0E0 !important;
   color: var(--ui-text-2) !important;
   cursor: not-allowed;
+
+  /* Match input width WITHOUT forcing hidden elements to show */
+  border: 1px solid var(--ui-border-2) !important;
+  border-radius: 8px !important;
 }
+
+
+/* Make disabled/read-only DISPLAY value full-width only when the control is actually in hide-control mode */
+.frappe-control.hide-control .control-value.like-disabled-input {
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  min-height: 36px !important;
+  padding: 6px 10px !important;
+}
+
 
 /* =========================
    6) Buttons (global consistency)
@@ -589,7 +607,7 @@ div[class*="fieldname-"]::after,
 /* Login page (email/password) - add left padding so text clears the icon */
 .page-card .form-group:has(.field-icon) .form-control,
 .page-card .form-group:has(.field-icon) input.input-with-feedback {
-  padding-left: 34px !important; /* adjust 30–40px if needed */
+  padding-left: 34px !important; /* adjust 30–36px if needed */
 }
 
 /* Top bar global search - add left padding so text clears the search icon */

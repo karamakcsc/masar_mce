@@ -55,8 +55,8 @@ def get_supplier_account(self):
     if account is not None: 
         return account
     company_doc = frappe.get_doc('Company' , self.company)
-    if company_doc.default_receivable_account:
-        return company_doc.default_receivable_account
+    if company_doc.default_payable_account:
+        return company_doc.default_payable_account
     return None
 @frappe.whitelist()
 def get_items_from_party_specific_item(doctype, txt, searchfield, start, page_len, filters):
