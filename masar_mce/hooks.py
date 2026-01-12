@@ -336,6 +336,15 @@ fixtures = [
                 ]
             ]
         ]
+    },
+     {
+        "dt": "Role"
+    },
+    {
+        "dt": "Custom DocPerm"
+    },
+    {
+        "dt": "Role Profile"
     }
 ]
 
