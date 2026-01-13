@@ -59,49 +59,36 @@ class PricingSheet(Document):
 		self.create_pos_item()
 	def calculate_pricing_after_tax_and_there_totals(self):
 			new_total_quantity = local_sa = free_sa = new_purchase_amount = 0
-			
 			for i in self.items:
 				free_tax_rate = get_tax_for_item(i.item_code, 'Free Zone')
 				local_tax_rate = get_tax_for_item(i.item_code, 'Local Zone')
-				
 				local_stock = get_current_stock_value_and_quantity(i.item_code, cost_zone='Local Zone')
 				free_stock = get_current_stock_value_and_quantity(i.item_code, cost_zone='Free Zone')
-				
 				i.local_curr_qty = flt(local_stock.get("quantity", 0))
 				i.local_curr_stock_value = flt(local_stock.get("stock_value", 0))
 				i.local_curr_val_rate = flt(local_stock.get("valuation_rate", 0))
 				i.free_curr_qty = flt(free_stock.get("quantity", 0))
 				i.free_curr_stock_value = flt(free_stock.get("stock_value", 0))
 				i.free_curr_cal_rate = flt(free_stock.get("valuation_rate", 0))
-				
 				i.global_curr_stock_value = flt(i.local_curr_stock_value) + flt(i.free_curr_stock_value)
 				i.global_new_stock_value = flt(i.global_curr_stock_value) + (flt(i.new_purchase_price) * flt(i.new_quantity))
 				total_quantity = flt(i.local_curr_qty) + flt(i.free_curr_qty) + flt(i.new_quantity)
 				i.global_val_rate = i.global_new_stock_value / total_quantity if total_quantity > 0 else 0
-				
 				i.local_tax_rate = local_tax_rate * 100
 				i.free_tax_rate = free_tax_rate * 100
 				local_tax_decimal = local_tax_rate
 				free_tax_decimal = free_tax_rate
-				
-				# Ensure local_sp and free_sp are set (selling before tax)
 				if not i.local_sp and i.local_sp_after_tax:
 					i.local_sp = flt(i.local_sp_after_tax) / (1 + local_tax_decimal)
 				elif i.local_sp and not i.local_sp_after_tax:
 					i.local_sp_after_tax = flt(i.local_sp) * (1 + local_tax_decimal)
-				
 				if not i.free_sp and i.free_sp_after_tax:
 					i.free_sp = flt(i.free_sp_after_tax) / (1 + free_tax_decimal)
 				elif i.free_sp and not i.free_sp_after_tax:
 					i.free_sp_after_tax = flt(i.free_sp) * (1 + free_tax_decimal)
-				
 				if self.pricing_type == "Buying Price Basis":
-					# Start with purchase price
 					i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_decimal)
 					i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_decimal)
-					
-					# Calculate selling before tax from markup
-					# Formula: sp = pp_after_tax * (1 + markup/100)
 					if flt(i.local_mp) or flt(i.local_mp) == 0:
 						i.local_sp = flt(i.local_pp_after_tax) * (1 + flt(i.local_mp) / 100)
 					else:
@@ -111,65 +98,48 @@ class PricingSheet(Document):
 						i.free_sp = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp) / 100)
 					else:
 						i.free_sp = flt(i.free_pp_after_tax)
-					
-					# Calculate selling after tax
 					i.local_sp_after_tax = flt(i.local_sp) * (1 + local_tax_decimal)
 					i.free_sp_after_tax = flt(i.free_sp) * (1 + free_tax_decimal)
 						
 				elif self.pricing_type == "Selling Price Basis":
-					# Start with selling price (local zone drives purchase price)
 					if flt(i.local_sp):
-						# Calculate selling after tax
 						i.local_sp_after_tax = flt(i.local_sp) * (1 + local_tax_decimal)
 						
 						if flt(i.local_mp) or flt(i.local_mp) == 0:
 							if flt(i.local_mp) != -100:
-								# Calculate purchase after tax from selling before tax and markup
-								# Formula: pp_after_tax = sp * (1 - markup/100)
-								i.local_pp_after_tax = flt(i.local_sp) * (1 - flt(i.local_mp) / 100)
+								i.local_pp_after_tax = flt(i.local_sp) - (flt(i.local_sp) * (flt(i.local_mp) / 100))
 								i.new_purchase_price = flt(i.local_pp_after_tax) / (1 + local_tax_decimal)
 							else:
 								i.local_pp_after_tax = 0
 								i.new_purchase_price = 0
 						else:
-							# If no markup, selling before tax = purchase after tax
 							i.local_pp_after_tax = flt(i.local_sp)
 							i.new_purchase_price = flt(i.local_sp) / (1 + local_tax_decimal)
 					else:
-						# If no selling price, start with purchase price
 						i.local_sp = 0
 						i.local_sp_after_tax = 0
 						i.new_purchase_price = flt(i.new_purchase_price or 0)
 						i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_decimal)
-					
-					# Calculate free zone based on purchase price
 					i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_decimal)
 					
 					if flt(i.free_mp) or flt(i.free_mp) == 0:
 						if flt(i.free_mp) != -100:
-							# Calculate free zone selling before tax from markup
 							i.free_sp = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp) / 100)
 						else:
 							i.free_sp = 0
 					else:
 						i.free_sp = flt(i.free_pp_after_tax)
-					
-					# Calculate free zone selling after tax
 					if flt(i.free_sp):
 						i.free_sp_after_tax = flt(i.free_sp) * (1 + free_tax_decimal)
 					else:
 						i.free_sp_after_tax = 0
-						
 				else:
-					# Default to Buying Price Basis logic
 					i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_decimal)
 					i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_decimal)
-					
 					if flt(i.local_mp) or flt(i.local_mp) == 0:
 						i.local_sp = flt(i.local_pp_after_tax) * (1 + flt(i.local_mp) / 100)
 					else:
 						i.local_sp = flt(i.local_pp_after_tax)
-						
 					if flt(i.free_mp) or flt(i.free_mp) == 0:
 						i.free_sp = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp) / 100)
 					else:
@@ -177,13 +147,11 @@ class PricingSheet(Document):
 					
 					i.local_sp_after_tax = flt(i.local_sp) * (1 + local_tax_decimal)
 					i.free_sp_after_tax = flt(i.free_sp) * (1 + free_tax_decimal)
-				
-				# Recalculate markup based on the formula: (sp - pp_after_tax) / pp_after_tax * 100
 				if flt(i.local_pp_after_tax) > 0:
 					i.local_mp = ((flt(i.local_sp or 0) - flt(i.local_pp_after_tax)) / flt(i.local_sp))  *100
 				else:
 					if flt(i.local_sp) > 0:
-						i.local_mp = 100  # If purchase after tax is 0 but selling is positive
+						i.local_mp = 100 
 					else:
 						i.local_mp = 0
 					
@@ -191,21 +159,17 @@ class PricingSheet(Document):
 					i.free_mp = ((flt(i.free_sp or 0) - flt(i.free_pp_after_tax)) / flt(i.free_sp)) * 100
 				else:
 					if flt(i.free_sp) > 0:
-						i.free_mp = 100  # If purchase after tax is 0 but selling is positive
+						i.free_mp = 100  
 					else:
 						i.free_mp = 0
-				
-				# Calculate totals
 				new_total_quantity += flt(i.new_quantity or 0)
 				local_sa += flt(i.new_quantity or 0) * flt(i.local_sp or 0)
 				free_sa += flt(i.new_quantity or 0) * flt(i.free_sp or 0)
 				new_purchase_amount += flt(i.new_quantity or 0) * flt(i.new_purchase_price or 0)
-			
 			self.new_total_quantity = new_total_quantity
 			self.local_sa = local_sa
 			self.free_sa = free_sa
 			self.new_purchase_amount = new_purchase_amount
-  
   
 	def validate_items_from_blanket_order(self):
      

@@ -47,6 +47,14 @@
   /* Editable input background (distinct from disabled/read-only) */
   --ui-input-bg-editable: #F7FBFF;
   --ui-input-bg-hover: #EFF7FF;
+
+  /* Unified control sizing */
+  --ui-control-height: 36px;
+  --ui-control-padding-y: 6px;
+  --ui-control-padding-x: 10px;
+  --ui-control-line-height: 22px; /* 36 - (6*2) - (1px border*2) = 22 */
+
+
 }
 
 /* When Arabic UI is active, make body font resolve to Arabic font 
@@ -133,8 +141,9 @@ body .datatable, body .grid-body {
   font-size: 14px !important;
 }
 
+
 /* =========================
-   5) Inputs (tight + readable)
+   5) Inputs (tight + readable) — unified sizing
    ========================= */
 input.form-control:not([type="checkbox"]):not([type="radio"]),
 select.form-control,
@@ -152,17 +161,14 @@ input.input-with-feedback:not([type="checkbox"]):not([type="radio"]),
   border: 1px solid var(--ui-border-2) !important;
   border-radius: 8px !important;
 
-  min-height: 36px !important;
-  height: 36px !important;
+  height: var(--ui-control-height) !important;
+  min-height: var(--ui-control-height) !important;
   box-sizing: border-box !important;
-  padding: 6px 10px !important;
+
+  padding: var(--ui-control-padding-y) var(--ui-control-padding-x) !important;
   font-size: 15px !important;
-  line-height: 22px !important;
-
-
+  line-height: var(--ui-control-line-height) !important;
 }
-
-
 
 
 
@@ -171,14 +177,17 @@ input.input-with-feedback:not([type="checkbox"]):not([type="radio"]),
 select.form-control,
 select.input-with-feedback.form-control,
 .frappe-control select {
-  height: 36px !important;
-  min-height: 36px !important;
-  padding-top: 6px !important;
-  padding-bottom: 6px !important;
-  line-height: 22px !important;
+  height: var(--ui-control-height) !important;
+  min-height: var(--ui-control-height) !important;
   box-sizing: border-box !important;
-
+  padding-top: var(--ui-control-padding-y) !important;
+  padding-bottom: var(--ui-control-padding-y) !important;
+  line-height: var(--ui-control-line-height) !important;
 }
+
+
+
+
 
 /* Reserve space for the dropdown arrow area */
 html[dir="rtl"] select.form-control,
@@ -257,14 +266,35 @@ input.input-with-feedback:not([type="checkbox"]):not([type="radio"]):focus,
 }
 
 
-/* Make disabled/read-only DISPLAY value full-width only when the control is actually in hide-control mode */
-.frappe-control.hide-control .control-value.like-disabled-input {
-  display: block !important;
-  width: 100% !important;
+
+/* Make disabled/read-only DISPLAY value match input height (fixes "short" disabled fields) */
+.frappe-control.hide-control .control-input-wrapper > .control-value.like-disabled-input {
   box-sizing: border-box !important;
-  min-height: 36px !important;
-  padding: 6px 10px !important;
+
+  height: var(--ui-control-height) !important;
+  min-height: var(--ui-control-height) !important;
+
+  padding: var(--ui-control-padding-y) var(--ui-control-padding-x) !important;
+  line-height: var(--ui-control-line-height) !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  background: #E0E0E0 !important;
+  color: var(--ui-text-2) !important;
+  border: 1px solid var(--ui-border-2) !important;
+  border-radius: 8px !important;
+  cursor: not-allowed !important;
+  width: 100% !important;
 }
+
+/* Prevent duplicate rendering: when Frappe switches to display-value mode, hide the actual input */
+.frappe-control.hide-control .control-input-wrapper > .control-input {
+  display: none !important;
+}
+
+
+
 
 
 /* =========================
@@ -567,38 +597,6 @@ html[dir="rtl"] .desk-sidebar {
   .page-head { background: #fff !important; border-bottom: 1px solid #000 !important; }
 }
 
-/* =========================
-   15) ITEMS GRID: THE ABSOLUTE FIX
-   ========================= */
-
-
-/* 5. Hide the gray fieldname tooltips */
-.form-grid .grid-body .data-row .col .field-area .form-control .tooltip,
-.field-controls .tooltip,
-.frappe-control[data-fieldtype="Table"] .grid-row .data-col::after,
-div[class*="fieldname-"]::after,
-.grid-row [data-fieldname]::after,
-.grid-row .data-col .field-area .tooltip-inner,
-.grid-row .data-col .tooltip {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
-
-/* Force normal square checkboxes */
-/* .grid-row input[type="checkbox"],
-.datatable input[type="checkbox"],
-.frappe-control input[type="checkbox"] {
-  appearance: auto !important;
-  -webkit-appearance: checkbox !important;
-
-  width: 16px !important;
-  height: 16px !important;
-  min-height: 0 !important;
-  padding: 0 !important;
-  border-radius: 2px !important; 
-} */
 
 /* =========================
    Fix: inputs that have a left prefix icon
@@ -626,4 +624,4 @@ div[class*="fieldname-"]::after,
 }
 
 
-/* last update: 1:48pm */
+/* last update: 12-Jan-26 @ 17:04pm */
