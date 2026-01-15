@@ -177,65 +177,35 @@ def create_pricing_sheet(self):
         free_tax_rate = get_tax_for_item(i.item_code, 'Free Zone')
         local_tax_rate = get_tax_for_item(i.item_code, 'Local Zone')
         markup_percentage = flt(i.custom_markup_percentage or 0)
-        selling_after_tax = flt(i.custom_selling_price_after_tax or 0)
+        selling_price = flt(i.custom_selling_price or 0)
         purchase_price = flt(i.rate or 0)
         if self.custom_pricing_type == "Buying Price Basis":
-            local_pp_after_tax = purchase_price * (1 + local_tax_rate)
-            free_pp_after_tax = purchase_price * (1 + free_tax_rate)
-            local_sp_after_tax = local_pp_after_tax * (1 + markup_percentage / 100)
-            free_sp_after_tax = free_pp_after_tax * (1 + markup_percentage / 100)
-            local_sp = local_sp_after_tax / (1 + local_tax_rate)
-            free_sp = free_sp_after_tax / (1 + free_tax_rate)
-            
-        elif self.custom_pricing_type == "Selling Price Basis":
-            if selling_after_tax:
-                local_sp_after_tax = selling_after_tax
-                free_sp_after_tax = selling_after_tax
-                local_sp = local_sp_after_tax / (1 + local_tax_rate)
-                free_sp = free_sp_after_tax / (1 + free_tax_rate)
-                if markup_percentage and markup_percentage != -100:
-                    local_pp_after_tax = local_sp_after_tax / (1 + markup_percentage / 100)
-                    free_pp_after_tax = free_sp_after_tax / (1 + markup_percentage / 100)
-                    purchase_price = local_pp_after_tax / (1 + local_tax_rate)
-                elif markup_percentage == -100:
-                    local_pp_after_tax = 0
-                    free_pp_after_tax = 0
-                    purchase_price = 0
-                else:
-                    local_pp_after_tax = local_sp_after_tax
-                    free_pp_after_tax = free_sp_after_tax
-                    purchase_price = local_sp_after_tax / (1 + local_tax_rate)
-            else:
-                local_pp_after_tax = purchase_price * (1 + local_tax_rate)
-                free_pp_after_tax = purchase_price * (1 + free_tax_rate)
-                local_sp_after_tax = local_pp_after_tax * (1 + markup_percentage / 100)
-                free_sp_after_tax = free_pp_after_tax * (1 + markup_percentage / 100)
-                local_sp = local_sp_after_tax / (1 + local_tax_rate)
-                free_sp = free_sp_after_tax / (1 + free_tax_rate)
-        else:
-            local_pp_after_tax = purchase_price * (1 + local_tax_rate)
-            free_pp_after_tax = purchase_price * (1 + free_tax_rate)
-            local_sp_after_tax = local_pp_after_tax * (1 + markup_percentage / 100)
-            free_sp_after_tax = free_pp_after_tax * (1 + markup_percentage / 100)
-            local_sp = local_sp_after_tax / (1 + local_tax_rate)
-            free_sp = free_sp_after_tax / (1 + free_tax_rate)
-        rows.append({
+           rows.append({
             'item_code': i.item_code, 
             'item_name': i.item_name, 
             'new_purchase_price': purchase_price, 
             'new_quantity': i.qty,
-            'local_sp': local_sp,
-            'free_sp': free_sp, 
             'local_tax_rate': local_tax_rate * 100,
             'free_tax_rate': free_tax_rate * 100,  
-            'local_pp_after_tax': local_pp_after_tax,
-            'free_pp_after_tax': free_pp_after_tax,
             'local_mp': markup_percentage,
             'free_mp': markup_percentage, 
-            'local_sp_after_tax': local_sp_after_tax,
-            'free_sp_after_tax': free_sp_after_tax,  
             'blanket_order_item': i.name 
         })
+            
+        elif self.custom_pricing_type == "Selling Price Basis":
+            
+            rows.append({
+                'item_code': i.item_code, 
+                'item_name': i.item_name, 
+                'new_purchase_price': purchase_price, 
+                'new_quantity': i.qty,
+                'local_sp': selling_price,
+                'local_tax_rate': local_tax_rate * 100,
+                'free_tax_rate': free_tax_rate * 100,  
+                'local_mp': markup_percentage,
+                'free_mp': markup_percentage,  
+                'blanket_order_item': i.name 
+            })
     pricing_sheet = frappe.new_doc('Pricing Sheet')
     pricing_sheet.update({
         'blanket_order': self.name,
@@ -248,7 +218,6 @@ def create_pricing_sheet(self):
     for row in rows:
         pricing_sheet.append('items', row)
     pricing_sheet.save(ignore_permissions=True)
-    pricing_sheet.calculate_pricing_after_tax_and_there_totals()
     pricing_sheet.submit()
     frappe.msgprint(f"Pricing Sheet {pricing_sheet.name} created successfully." , alert=1)
     return pricing_sheet.name

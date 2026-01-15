@@ -30,24 +30,17 @@ frappe.ui.form.on("Blanket Order", {
                             row.custom_purchase_price_after_tax = flt(row.rate) * (1 + flt(tax));
                         }
                         if (flt(row.custom_markup_percentage)) {
-                            // New markup calculation: selling_price_before_tax - purchase_after_tax / selling_before_tax * 100
-                            // Rearranged to calculate selling_before_tax from purchase_after_tax and markup
-                            // selling_before_tax = purchase_after_tax / (1 - markup/100)
-                            const selling_before_tax = flt(row.custom_purchase_price_after_tax) / (1 - flt(row.custom_markup_percentage) / 100);
+                            const selling_before_tax = flt(row.custom_purchase_price_after_tax) * (1 + flt(row.custom_markup_percentage) / 100);
                             row.custom_selling_price = selling_before_tax;
                             row.custom_selling_price_after_tax = selling_before_tax * (1 + flt(tax));
                         }
-                        // CalculateSellingBeforeTax(row, tax); // Not needed as we already calculated it above
                     } else {
-                        // Selling Price Basis
                         if (flt(row.custom_selling_price_after_tax)) {
-                            // First calculate selling before tax
                             const selling_before_tax = flt(row.custom_selling_price_after_tax) / (1 + flt(tax));
                             row.custom_selling_price = selling_before_tax;
                             
                             if (flt(row.custom_markup_percentage)) {
-                                // New purchase calculation: purchase_after_tax = selling_before_tax * (1 - markup/100)
-                                row.custom_purchase_price_after_tax = selling_before_tax * (1 - flt(row.custom_markup_percentage) / 100);
+                                row.custom_purchase_price_after_tax = selling_before_tax / (1 + flt(row.custom_markup_percentage) / 100);
                                 row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
                             }
                         }
@@ -84,28 +77,21 @@ frappe.ui.form.on("Blanket Order Item", {
 
             if (frm.doc.custom_pricing_type === "Buying Price Basis") {
                 if (flt(row.custom_markup_percentage)) {
-                    // Calculate selling before tax using new formula: selling_before_tax = purchase_after_tax / (1 - markup/100)
-                    const selling_before_tax = flt(row.custom_purchase_price_after_tax) / (1 - flt(row.custom_markup_percentage) / 100);
+                    const selling_before_tax = flt(row.custom_purchase_price_after_tax) * (1 + flt(row.custom_markup_percentage) / 100);
                     row.custom_selling_price = selling_before_tax;
                     row.custom_selling_price_after_tax = selling_before_tax * (1 + flt(tax));
                 } else {
-                    // If no markup, selling price equals purchase price
                     row.custom_selling_price = flt(row.custom_purchase_price_after_tax);
                     row.custom_selling_price_after_tax = flt(row.custom_purchase_price_after_tax) * (1 + flt(tax));
                 }
-                // CalculateSellingBeforeTax(row, tax); // Not needed as we already calculated it
             } else {
-                // Selling Price Basis - Calculate markup based on new formula
                 if (flt(row.custom_selling_price_after_tax)) {
                     const selling_before_tax = flt(row.custom_selling_price_after_tax) / (1 + flt(tax));
                     row.custom_selling_price = selling_before_tax;
-                    
                     if (flt(row.custom_purchase_price_after_tax)) {
-                        // New markup formula: (selling_before_tax - purchase_after_tax) / selling_before_tax * 100
-                        row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_selling_price)) * 100;
+                        row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_purchase_price_after_tax)) * 100;
                     }
                 }
-                // CalculateSellingBeforeTax(row, tax); // Already calculated above
             }
             
             CalculateAmount(frm, cdt, cdn);
@@ -118,21 +104,16 @@ frappe.ui.form.on("Blanket Order Item", {
 
         getTaxRate(row.item_code, tax => {
             if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-                // Calculate selling price from purchase price and markup
                 if (flt(row.custom_purchase_price_after_tax) && flt(row.custom_markup_percentage)) {
-                    const selling_before_tax = flt(row.custom_purchase_price_after_tax) / (1 - flt(row.custom_markup_percentage) / 100);
+                    const selling_before_tax = flt(row.custom_purchase_price_after_tax) * (1 + flt(row.custom_markup_percentage) / 100);
                     row.custom_selling_price = selling_before_tax;
                     row.custom_selling_price_after_tax = selling_before_tax * (1 + flt(tax));
                 }
-                // CalculateSellingBeforeTax(row, tax); // Already calculated
             } else {
-                // Selling Price Basis - Calculate purchase price from selling price and markup
                 if (flt(row.custom_selling_price_after_tax) && flt(row.custom_markup_percentage)) {
                     const selling_before_tax = flt(row.custom_selling_price_after_tax) / (1 + flt(tax));
                     row.custom_selling_price = selling_before_tax;
-                    
-                    // New calculation: purchase_after_tax = selling_before_tax * (1 - markup/100)
-                    row.custom_purchase_price_after_tax = selling_before_tax * (1 - flt(row.custom_markup_percentage) / 100);
+                    row.custom_purchase_price_after_tax = selling_before_tax - (selling_before_tax * flt(row.custom_markup_percentage) / 100);
                     row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
                     CalculateAmount(frm, cdt, cdn);
                 }
@@ -141,37 +122,30 @@ frappe.ui.form.on("Blanket Order Item", {
         });
     },
 
-    custom_selling_price_after_tax(frm, cdt, cdn) {
-        const row = locals[cdt][cdn];
-        getTaxRate(row.item_code, tax => {
-            // Always calculate selling before tax
-            const selling_before_tax = flt(row.custom_selling_price_after_tax) / (1 + flt(tax));
-            row.custom_selling_price = selling_before_tax;
+    // custom_selling_price_after_tax(frm, cdt, cdn) {
+    //     const row = locals[cdt][cdn];
+    //     getTaxRate(row.item_code, tax => {
+    //         const selling_before_tax = flt(row.custom_selling_price_after_tax) / (1 + flt(tax));
+    //         row.custom_selling_price = selling_before_tax;
             
-            if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-                // Calculate markup based on new formula
-                if (flt(row.custom_purchase_price_after_tax)) {
-                    // New markup formula: (selling_before_tax - purchase_after_tax) / selling_before_tax * 100
-                    row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_selling_price)) * 100;
-                }
-            } else {
-                // Selling Price Basis
-                if (flt(row.custom_markup_percentage)) {
-                    // Calculate purchase price from selling price and markup
-                    row.custom_purchase_price_after_tax = flt(row.custom_selling_price) * (1 - flt(row.custom_markup_percentage) / 100);
-                    row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
-                    CalculateAmount(frm, cdt, cdn);
-                } else {
-                    // If no markup, purchase price equals selling price
-                    row.custom_purchase_price_after_tax = flt(row.custom_selling_price);
-                    row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
-                    CalculateAmount(frm, cdt, cdn);
-                }
-            }
-            // CalculateSellingBeforeTax(row, tax); // Already calculated
-            refresh(frm, cdt);
-        });
-    },
+    //         if (frm.doc.custom_pricing_type === "Buying Price Basis") {
+    //             if (flt(row.custom_purchase_price_after_tax)) {
+    //                 row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_purchase_price_after_tax)) * 100;
+    //             }
+    //         } else {
+    //             if (flt(row.custom_markup_percentage)) {
+    //                 row.custom_purchase_price_after_tax = flt(row.custom_selling_price) - (flt(row.custom_selling_price) * flt(row.custom_markup_percentage) / 100);
+    //                 row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
+    //                 CalculateAmount(frm, cdt, cdn);
+    //             } else {
+    //                 row.custom_purchase_price_after_tax = flt(row.custom_selling_price);
+    //                 row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
+    //                 CalculateAmount(frm, cdt, cdn);
+    //             }
+    //         }
+    //         refresh(frm, cdt);
+    //     });
+    // },
 
     custom_purchase_price_after_tax(frm, cdt, cdn) {
         const row = locals[cdt][cdn];
@@ -181,24 +155,18 @@ frappe.ui.form.on("Blanket Order Item", {
             
             if (frm.doc.custom_pricing_type === "Buying Price Basis") {
                 if (flt(row.custom_markup_percentage)) {
-                    // Calculate selling price from purchase price and markup
-                    const selling_before_tax = flt(row.custom_purchase_price_after_tax) / (1 - flt(row.custom_markup_percentage) / 100);
+                    const selling_before_tax = flt(row.custom_purchase_price_after_tax) * (1 + flt(row.custom_markup_percentage) / 100);
                     row.custom_selling_price = selling_before_tax;
                     row.custom_selling_price_after_tax = selling_before_tax * (1 + flt(tax));
                 } else {
-                    // If no markup, selling price equals purchase price
                     row.custom_selling_price = flt(row.custom_purchase_price_after_tax);
                     row.custom_selling_price_after_tax = flt(row.custom_purchase_price_after_tax) * (1 + flt(tax));
                 }
-                // CalculateSellingBeforeTax(row, tax); // Already calculated
             } else {
-                // Selling Price Basis - Calculate markup based on new formula
                 if (flt(row.custom_selling_price_after_tax)) {
                     const selling_before_tax = flt(row.custom_selling_price_after_tax) / (1 + flt(tax));
                     row.custom_selling_price = selling_before_tax;
-                    
-                    // New markup formula: (selling_before_tax - purchase_after_tax) / selling_before_tax * 100
-                    row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_selling_price)) * 100;
+                    row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_purchase_price_after_tax)) * 100;
                 }
             }       
             CalculateAmount(frm, cdt, cdn);
@@ -209,24 +177,19 @@ frappe.ui.form.on("Blanket Order Item", {
     custom_selling_price(frm, cdt, cdn) {
         const row = locals[cdt][cdn];
         getTaxRate(row.item_code, tax => {
-            // Calculate selling after tax from selling before tax
             row.custom_selling_price_after_tax = flt(row.custom_selling_price) * (1 + flt(tax));
             
             if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-                // Calculate markup based on new formula
                 if (flt(row.custom_purchase_price_after_tax)) {
-                    row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_selling_price)) * 100;
+                    row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_purchase_price_after_tax)) * 100;
                 }
             } else {
-                // Selling Price Basis
                 if (flt(row.custom_markup_percentage)) {
-                    // Calculate purchase price from selling price and markup
-                    row.custom_purchase_price_after_tax = flt(row.custom_selling_price) * (1 - flt(row.custom_markup_percentage) / 100);
+                    row.custom_purchase_price_after_tax = flt(row.custom_selling_price) - (flt(row.custom_selling_price) * flt(row.custom_markup_percentage) / 100);
                     row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
                     CalculateAmount(frm, cdt, cdn);
                 } else if (flt(row.custom_purchase_price_after_tax)) {
-                    // Calculate markup if purchase price exists
-                    row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_selling_price)) * 100;
+                    row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_purchase_price_after_tax)) * 100;
                 }
             }
             refresh(frm, cdt);
@@ -243,8 +206,6 @@ frappe.ui.form.on("Blanket Order Item", {
 });
 
 function CalculateSellingBeforeTax(row, tax) {
-    // This function is now deprecated as we calculate selling_price directly in the event handlers
-    // But kept for backward compatibility
     if (flt(row.custom_selling_price_after_tax)) {
         row.custom_selling_price = flt(row.custom_selling_price_after_tax) / (1 + flt(tax));
     }

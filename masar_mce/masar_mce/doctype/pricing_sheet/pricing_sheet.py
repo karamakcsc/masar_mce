@@ -85,17 +85,23 @@ class PricingSheet(Document):
 				if not i.free_sp and i.free_sp_after_tax:
 					i.free_sp = flt(i.free_sp_after_tax) / (1 + free_tax_decimal)
 				elif i.free_sp and not i.free_sp_after_tax:
-					i.free_sp_after_tax = flt(i.free_sp) * (1 + free_tax_decimal)
+					i.free_sp_after_tax = flt(i.free_sp) * (1 + free_tax_decimal)		
 				if self.pricing_type == "Buying Price Basis":
 					i.local_pp_after_tax = flt(i.new_purchase_price) * (1 + local_tax_decimal)
-					i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_decimal)
+					i.free_pp_after_tax = flt(i.new_purchase_price) * (1 + free_tax_decimal)		
 					if flt(i.local_mp) or flt(i.local_mp) == 0:
-						i.local_sp = flt(i.local_pp_after_tax) * (1 + flt(i.local_mp) / 100)
+						if flt(i.local_mp) == -100:
+							i.local_sp = 0
+						else:
+							i.local_sp = flt(i.local_pp_after_tax) * (1 + flt(i.local_mp) / 100)
 					else:
 						i.local_sp = flt(i.local_pp_after_tax)
 					
 					if flt(i.free_mp) or flt(i.free_mp) == 0:
-						i.free_sp = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp) / 100)
+						if flt(i.free_mp) == -100:
+							i.free_sp = 0
+						else:
+							i.free_sp = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp) / 100)
 					else:
 						i.free_sp = flt(i.free_pp_after_tax)
 					i.local_sp_after_tax = flt(i.local_sp) * (1 + local_tax_decimal)
@@ -124,11 +130,12 @@ class PricingSheet(Document):
 					
 					if flt(i.free_mp) or flt(i.free_mp) == 0:
 						if flt(i.free_mp) != -100:
-							i.free_sp = flt(i.free_pp_after_tax) * (1 + flt(i.free_mp) / 100)
+							i.free_sp = flt(i.free_pp_after_tax) / (1 - flt(i.free_mp) / 100)
 						else:
 							i.free_sp = 0
 					else:
 						i.free_sp = flt(i.free_pp_after_tax)
+					
 					if flt(i.free_sp):
 						i.free_sp_after_tax = flt(i.free_sp) * (1 + free_tax_decimal)
 					else:
@@ -147,21 +154,39 @@ class PricingSheet(Document):
 					
 					i.local_sp_after_tax = flt(i.local_sp) * (1 + local_tax_decimal)
 					i.free_sp_after_tax = flt(i.free_sp) * (1 + free_tax_decimal)
-				if flt(i.local_pp_after_tax) > 0:
-					i.local_mp = ((flt(i.local_sp or 0) - flt(i.local_pp_after_tax)) / flt(i.local_sp))  *100
+				if self.pricing_type == "Buying Price Basis":
+					if flt(i.local_pp_after_tax) > 0:
+						i.local_mp = flt(((flt(i.local_sp or 0) - flt(i.local_pp_after_tax)) / flt(i.local_pp_after_tax)) * 100 , 3)
+					else:
+						if flt(i.local_sp) > 0:
+							i.local_mp = 100
+						else:
+							i.local_mp = 0
+					
+					if flt(i.free_pp_after_tax) > 0:
+						i.free_mp = flt(((flt(i.free_sp or 0) - flt(i.free_pp_after_tax)) / flt(i.free_pp_after_tax)) * 100 , 3)
+					else:
+						if flt(i.free_sp) > 0:
+							i.free_mp = 100
+						else:
+							i.free_mp = 0
 				else:
 					if flt(i.local_sp) > 0:
-						i.local_mp = 100 
+						i.local_mp = flt(((flt(i.local_sp or 0) - flt(i.local_pp_after_tax)) / flt(i.local_sp)) * 100 , 3)
 					else:
-						i.local_mp = 0
+						if flt(i.local_pp_after_tax) > 0:
+							i.local_mp = -100 
+						else:
+							i.local_mp = 0
 					
-				if flt(i.free_pp_after_tax) > 0:
-					i.free_mp = ((flt(i.free_sp or 0) - flt(i.free_pp_after_tax)) / flt(i.free_sp)) * 100
-				else:
 					if flt(i.free_sp) > 0:
-						i.free_mp = 100  
+						i.free_mp = flt(((flt(i.free_sp or 0) - flt(i.free_pp_after_tax)) / flt(i.free_sp)) * 100 , 3)
 					else:
-						i.free_mp = 0
+						if flt(i.free_pp_after_tax) > 0:
+							i.free_mp = -100 
+						else:
+							i.free_mp = 0
+				
 				new_total_quantity += flt(i.new_quantity or 0)
 				local_sa += flt(i.new_quantity or 0) * flt(i.local_sp or 0)
 				free_sa += flt(i.new_quantity or 0) * flt(i.free_sp or 0)
@@ -170,7 +195,7 @@ class PricingSheet(Document):
 			self.local_sa = local_sa
 			self.free_sa = free_sa
 			self.new_purchase_amount = new_purchase_amount
-  
+	
 	def validate_items_from_blanket_order(self):
      
 		if not self.blanket_order:
@@ -286,6 +311,11 @@ class PricingSheet(Document):
 			supplier_code = db.get_value("Supplier", self.supplier, "custom_supplier_code")
 			for item in self.items:
 				is_disabled = db.get_value("Item", item.item_code, "disabled")
+				is_disabled_sales = db.get_value("Item", item.item_code, "is_sales_item")
+				if is_disabled == 1 or is_disabled_sales == 0:
+					is_disabled = 1
+				else:
+					is_disabled = 0
 				items_local_zone.append({
 					"ITEMNO": item.item_code,
 					"BARCODE": get_item_barcode(item.item_code),

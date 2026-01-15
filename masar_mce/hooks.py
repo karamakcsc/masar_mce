@@ -345,7 +345,14 @@ fixtures = [
     },
     {
         "dt": "Role Profile"
-    }
+    },
+    {
+        "dt": "User",
+        "filters": [
+            ["enabled", "=", 1],
+            ["name", "not in", ["Administrator", "Guest"]]
+        ]
+    },
 ]
 
 from erpnext.buying import utils as buying_utils
