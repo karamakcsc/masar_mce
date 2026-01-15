@@ -72,7 +72,7 @@ def update_pos_item(self):
                 "ITEMSHORTNAME": self.item_name,
                 "ITEMTAX": local_zone_tax * 100,
                 "ITEMPRICE": selling_local_zone,
-                "ITEMSTOP": self.disabled,
+                "ITEMSTOP": self.disabled or self.is_sales_item == 0,
                 "TRN_TYPE_PRICE": 1
                 }
             ]
@@ -89,7 +89,7 @@ def update_pos_item(self):
                 "ITEMSHORTNAME": self.item_name,
                 "ITEMTAX": free_zone_tax * 100,
                 "ITEMPRICE": selling_free_zone,
-                "ITEMSTOP": self.disabled,
+                "ITEMSTOP": self.disabled or self.is_sales_item == 0,
                 "TRN_TYPE_PRICE": 1
                 }
             ]       

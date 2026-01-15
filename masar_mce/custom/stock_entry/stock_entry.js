@@ -42,7 +42,7 @@ function FilterForSupplierAgreement(frm) {
         }
         if (
             doc.stock_entry_type &&
-            doc.stock_entry_type === "Return to Supplier" &&
+            (doc.stock_entry_type === "Return to Supplier" || doc.stock_entry_type ===  "إرجاع إلى المورد") &&
             doc.custom_supplier
         ) {
             return {
