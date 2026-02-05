@@ -169,6 +169,9 @@ doc_events = {
         "before_insert" : "masar_mce.custom.purchase_receipt.purchase_receipt.before_insert",
         "on_cancel" : "masar_mce.custom.purchase_receipt.purchase_receipt.on_cancel"
     }, 
+    "Purchase Order":{
+        "on_submit" : "masar_mce.custom.purchase_order.purchase_order.on_submit"
+    }
 }
 
 # Scheduled Tasks

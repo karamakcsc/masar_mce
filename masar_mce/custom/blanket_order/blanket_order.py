@@ -6,6 +6,7 @@ from datetime import datetime
 from masar_mce.utils import get_tax_for_item, get_item_barcode
 from masar_mce.api import insert_pos_item
 def validate(self , method):
+    set_none_posting_date(self)
     calculate_amounts_and_total(self)
     if self.is_new():
         get_default_penalty(self)
@@ -23,6 +24,10 @@ def on_submit(self , method):
     insert_latest_sa_in_item(self)
 def on_cancel(self , method):
     pass
+def set_none_posting_date(self):
+    if self.docstatus == 0 :
+        self.custom_posting_date = None
+        frappe.db.set_value(self.doctype , self.name , "custom_posting_date" , None , update_modified = False)
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_items_by_supplier(doctype, txt, searchfield, start, page_len, filters):
@@ -224,5 +229,4 @@ def create_pricing_sheet(self):
 def insert_latest_sa_in_item(self):
     for item in self.items:
         frappe.db.set_value("Item", item.item_code, "custom_latest_sa", self.name)
-        
         

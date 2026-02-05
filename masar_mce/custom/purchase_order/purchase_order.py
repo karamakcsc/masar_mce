@@ -1,5 +1,5 @@
 import frappe , json
-from frappe.utils import flt
+from frappe.utils import flt ,date_diff, add_days
 from frappe.model.mapper import get_mapped_doc
 from erpnext.buying.doctype.purchase_order.purchase_order import set_missing_values
 @frappe.whitelist()
@@ -98,3 +98,33 @@ def create_purchase_request_from_purchase_order(source_name, target_doc=None, ar
     )
 
     return doc
+    
+def on_submit(self , method):
+    set_agreement_date(self)
+    
+
+def set_agreement_date(self):
+    agreements = frappe.db.sql("""
+        SELECT DISTINCT poi.blanket_order
+        FROM `tabPurchase Order Item` poi
+        WHERE poi.parent = %s
+          AND poi.blanket_order IS NOT NULL
+    """, self.name, as_dict=1)
+
+    for agr in agreements:
+        if not agr.blanket_order:
+            continue
+
+        agr_doc = frappe.get_doc("Blanket Order", agr.blanket_order)
+
+        if not agr_doc.custom_posting_date:
+            diff_days = date_diff(self.transaction_date, agr_doc.from_date)
+
+            new_from_date = add_days(agr_doc.from_date, diff_days)
+            new_to_date   = add_days(agr_doc.to_date, diff_days)
+
+            frappe.db.set_value("Blanket Order", agr.blanket_order, {
+                "custom_posting_date": agr_doc.from_date,
+                "from_date": new_from_date,
+                "to_date": new_to_date
+            })
