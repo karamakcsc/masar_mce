@@ -14,6 +14,7 @@
   "posting_date",
   "last_sync",
   "pricing_type",
+  "from_agreement",
   "section_break_lvjk",
   "items",
   "section_break_ugmy",
@@ -127,13 +128,21 @@
    "label": "Pricing Type",
    "options": "Buying Price Basis\nSelling Price Basis",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "from_agreement",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "from Agreement",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-09 14:47:16.677596",
+ "modified": "2026-02-15 13:33:38.263749",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Pricing Sheet",

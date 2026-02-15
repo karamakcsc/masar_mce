@@ -161,7 +161,8 @@ doc_events = {
         "validate" : "masar_mce.custom.blanket_order.blanket_order.validate", 
         "on_submit" : "masar_mce.custom.blanket_order.blanket_order.on_submit", 
         "before_update_after_submit" : "masar_mce.custom.blanket_order.blanket_order.before_update_after_submit",
-        "on_cancel" : "masar_mce.custom.blanket_order.blanket_order.on_cancel"
+        "on_cancel" : "masar_mce.custom.blanket_order.blanket_order.on_cancel",
+        "on_update" : "masar_mce.custom.blanket_order.blanket_order.on_update"
     }, 
     "Purchase Receipt" : {
         "on_submit" : "masar_mce.custom.purchase_receipt.purchase_receipt.on_submit", 

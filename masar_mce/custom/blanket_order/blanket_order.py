@@ -13,14 +13,20 @@ def validate(self , method):
     if self.custom_submit_after_inspection and self.docstatus == 1:
         check_inspection_result(self)
         
-def before_update_after_submit(self , method) : 
-    if self.custom_status == 'Active': 
+def on_update(self, method):
+    if self.docstatus == 0:
+        sync_pricing_sheet_from_agreement(self, submit_if_needed=False)
+
+def before_update_after_submit(self, method):
+    sync_pricing_sheet_from_agreement(self, submit_if_needed=False)
+    if self.custom_status == "Active":
         validate_duplicate_item_in_active_blanket_orders(self)
-        
-def on_submit(self , method): 
-    self.db_set('custom_status', 'Active')
+
+def on_submit(self, method):
+    self.db_set("custom_status", "Active")
     validate_duplicate_item_in_active_blanket_orders(self)
-    create_pricing_sheet(self)
+    sync_pricing_sheet_from_agreement(self, submit_if_needed=True)
+
     insert_latest_sa_in_item(self)
 def on_cancel(self , method):
     pass
@@ -176,56 +182,69 @@ def validate_duplicate_item_in_active_blanket_orders(self):
             msg_lines.append("- {0} in {1}".format(d['item_code'] , d['blanket_order']))
         frappe.throw("<br>".join(msg_lines))
         
-def create_pricing_sheet(self):
-    rows = list()
-    for i in self.items: 
-        free_tax_rate = get_tax_for_item(i.item_code, 'Free Zone')
-        local_tax_rate = get_tax_for_item(i.item_code, 'Local Zone')
+def sync_pricing_sheet_from_agreement(blanket_order_doc, submit_if_needed=False):
+    ps_name = frappe.db.get_value(
+        "Pricing Sheet",
+        filters={
+            "blanket_order": blanket_order_doc.name,
+            "from_agreement": 1,
+        },
+        fieldname="name",
+        order_by="modified desc",
+    )
+
+    if ps_name:
+        ps = frappe.get_doc("Pricing Sheet", ps_name)
+    else:
+        ps = frappe.new_doc("Pricing Sheet")
+        ps.from_agreement = 1
+        ps.blanket_order = blanket_order_doc.name
+
+    ps.supplier = blanket_order_doc.supplier
+    ps.supplier_name = blanket_order_doc.supplier_name
+    ps.company = blanket_order_doc.company
+    ps.posting_date = blanket_order_doc.from_date or frappe.utils.nowdate()
+    ps.pricing_type = blanket_order_doc.custom_pricing_type or "Buying Price Basis"
+
+    ps.set("items", [])
+
+    for i in (blanket_order_doc.items or []):
+        free_tax_rate = get_tax_for_item(i.item_code, "Free Zone")
+        local_tax_rate = get_tax_for_item(i.item_code, "Local Zone")
         markup_percentage = flt(i.custom_markup_percentage or 0)
         selling_price = flt(i.custom_selling_price or 0)
         purchase_price = flt(i.rate or 0)
-        if self.custom_pricing_type == "Buying Price Basis":
-           rows.append({
-            'item_code': i.item_code, 
-            'item_name': i.item_name, 
-            'new_purchase_price': purchase_price, 
-            'new_quantity': i.qty,
-            'local_tax_rate': local_tax_rate * 100,
-            'free_tax_rate': free_tax_rate * 100,  
-            'local_mp': markup_percentage,
-            'free_mp': markup_percentage, 
-            'blanket_order_item': i.name 
-        })
-            
-        elif self.custom_pricing_type == "Selling Price Basis":
-            
-            rows.append({
-                'item_code': i.item_code, 
-                'item_name': i.item_name, 
-                'new_purchase_price': purchase_price, 
-                'new_quantity': i.qty,
-                'local_sp': selling_price,
-                'local_tax_rate': local_tax_rate * 100,
-                'free_tax_rate': free_tax_rate * 100,  
-                'local_mp': markup_percentage,
-                'free_mp': markup_percentage,  
-                'blanket_order_item': i.name 
-            })
-    pricing_sheet = frappe.new_doc('Pricing Sheet')
-    pricing_sheet.update({
-        'blanket_order': self.name,
-        'supplier': self.supplier,
-        'supplier_name': self.supplier_name,
-        'company': self.company,
-        'posting_date': self.from_date or frappe.utils.nowdate(),
-        'pricing_type': self.custom_pricing_type or "Buying Price Basis"  # Use same pricing type
-    })
-    for row in rows:
-        pricing_sheet.append('items', row)
-    pricing_sheet.save(ignore_permissions=True)
-    pricing_sheet.submit()
-    frappe.msgprint(f"Pricing Sheet {pricing_sheet.name} created successfully." , alert=1)
-    return pricing_sheet.name
+
+        row = {
+            "item_code": i.item_code,
+            "item_name": i.item_name,
+            "new_purchase_price": purchase_price,
+            "new_quantity": i.qty,
+            "local_tax_rate": flt(local_tax_rate) * 100,
+            "free_tax_rate": flt(free_tax_rate) * 100,
+            "local_mp": markup_percentage,
+            "free_mp": markup_percentage,
+            "blanket_order_item": i.name,
+        }
+
+        if ps.pricing_type == "Selling Price Basis":
+            row["local_sp"] = selling_price
+
+        ps.append("items", row)
+
+    frappe.flags.in_agreement_sync = True
+    try:
+        ps.save(ignore_permissions=True)
+
+        # ✅ submit only once, and only if it's still draft
+        if submit_if_needed and blanket_order_doc.docstatus == 1 and ps.docstatus == 0:
+            ps.submit()
+
+    finally:
+        frappe.flags.in_agreement_sync = False
+
+    return ps.name
+
 def insert_latest_sa_in_item(self):
     for item in self.items:
         frappe.db.set_value("Item", item.item_code, "custom_latest_sa", self.name)

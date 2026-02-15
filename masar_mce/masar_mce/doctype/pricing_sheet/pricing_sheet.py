@@ -47,6 +47,9 @@ def get_items_for_dialog(blanket_order):
 
 class PricingSheet(Document):
 	def validate(self): 
+		if getattr(self, "from_agreement", 0) and not getattr(frappe.flags, "in_agreement_sync", False):
+			if not self.is_new():
+				frappe.throw(_("This Pricing Sheet is created from Supplier Agreement and cannot be edited. Create a new Pricing Sheet to modify."))
 		self.calculate_pricing_after_tax_and_there_totals()
 		self.validate_items_from_blanket_order()
 		self.validate_duplicate_items()

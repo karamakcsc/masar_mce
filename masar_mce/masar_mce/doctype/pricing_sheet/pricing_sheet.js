@@ -9,6 +9,14 @@ frappe.ui.form.on("Pricing Sheet", {
         set_item_query(frm);
         GetItemsDialog(frm);
         GetLastSync(frm);
+        if (frm.doc.from_agreement) {
+            frm.set_read_only();
+            frm.disable_save();
+            frm.dashboard && frm.dashboard.set_headline &&
+                frm.dashboard.set_headline(
+                    __("This Pricing Sheet is auto-generated from Supplier Agreement and is read-only.")
+                );
+        }
     },
     blanket_order(frm) {
         set_item_query(frm);
