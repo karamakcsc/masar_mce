@@ -236,7 +236,6 @@ def sync_pricing_sheet_from_agreement(blanket_order_doc, submit_if_needed=False)
     try:
         ps.save(ignore_permissions=True)
 
-        # ✅ submit only once, and only if it's still draft
         if submit_if_needed and blanket_order_doc.docstatus == 1 and ps.docstatus == 0:
             ps.submit()
 

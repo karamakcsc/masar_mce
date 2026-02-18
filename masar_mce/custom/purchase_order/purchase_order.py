@@ -128,3 +128,31 @@ def set_agreement_date(self):
                 "from_date": new_from_date,
                 "to_date": new_to_date
             })
+            
+def before_insert(self, method):
+
+    item_codes = [d.item_code for d in self.items]
+
+    prices = frappe.db.sql("""
+        SELECT 
+            ip.item_code,
+            ip.price_list_rate
+        FROM `tabItem Price` ip
+        INNER JOIN (
+            SELECT 
+                item_code,
+                MAX(valid_from) AS latest_date
+            FROM `tabItem Price`
+            WHERE buying = 1
+              AND item_code IN %(items)s
+            GROUP BY item_code
+        ) latest
+            ON latest.item_code = ip.item_code
+           AND latest.latest_date = ip.valid_from
+        WHERE ip.buying = 1
+    """, {"items": tuple(item_codes)}, as_dict=1)
+
+    price_map = {p.item_code: p.price_list_rate for p in prices}
+
+    for i in self.items:
+        i.rate = price_map.get(i.item_code, 0)

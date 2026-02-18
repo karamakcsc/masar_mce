@@ -152,7 +152,7 @@ def create_auto_penalty_entry(self):
 
 def check_request_to_accepted_qty(self): 
     for i in self.items: 
-        if flt(i.qty) + flt(i.rejected_qty) > flt(i.custom_request_quantity):
+        if flt(i.qty) + flt(i.rejected_qty) > flt(i.custom_request_quantity) and i.custom_purchase_request not in [None, '']:
             frappe.throw(
                 _("""The total of Accepted Qty ({0}) and Rejected Qty ({1}) cannot exceed the Requested Quantity ({2}) for item {3}.
                 """.format(flt(i.qty) ,flt(i.rejected_qty) , flt(i.custom_request_quantity) , i.item_code)

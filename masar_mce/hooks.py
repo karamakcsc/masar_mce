@@ -171,7 +171,8 @@ doc_events = {
         "on_cancel" : "masar_mce.custom.purchase_receipt.purchase_receipt.on_cancel"
     }, 
     "Purchase Order":{
-        "on_submit" : "masar_mce.custom.purchase_order.purchase_order.on_submit"
+        "on_submit" : "masar_mce.custom.purchase_order.purchase_order.on_submit", 
+        "before_insert" : "masar_mce.custom.purchase_order.purchase_order.before_insert",
     }
 }
 
@@ -349,3 +350,9 @@ from erpnext.buying import utils as buying_utils
 from masar_mce.override._utils import validate_stock_item_warehouse , validate_for_items
 buying_utils.validate_stock_item_warehouse = validate_stock_item_warehouse
 buying_utils.validate_for_items = validate_for_items
+
+
+from erpnext.manufacturing.doctype.blanket_order import blanket_order
+from masar_mce.override._blanket_order import validate_against_blanket_order as custom_validate_against_blanket_order
+blanket_order.validate_against_blanket_order = custom_validate_against_blanket_order
+
