@@ -68,5 +68,41 @@ def qi_on_submit(self):
         notification_doc.from_user = frappe.session.user
         notification_doc.for_user = frappe.session.user
         notification_doc.insert(ignore_permissions=True)
-        
-    
+       
+     
+@frappe.whitelist()
+def make_penalty_entry(source_name, target_doc=None):
+    from frappe.model.mapper import get_mapped_doc
+
+    def set_missing_values(source, target):
+        supplier = None
+        supplier_name = None
+        if source.reference_type == "Stock Entry" and source.reference_name:
+            supplier = frappe.db.get_value(
+                "Stock Entry",
+                source.reference_name,
+                "custom_supplier"
+            )
+            if supplier:
+                supplier_name = frappe.db.get_value(
+                    "Supplier",
+                    supplier, 
+                    "supplier_name"
+                )
+        target.supplier = supplier
+        target.supplier_name = supplier_name
+        target.reference_type = "Quality Inspection"
+        target.quality_inspection = source.name
+        target.reference_name = source.reference_name 
+    doc = get_mapped_doc(
+        "Quality Inspection",
+        source_name,
+        {
+            "Quality Inspection": {
+                "doctype": "Penalty Entry",
+            }
+        },
+        target_doc,
+        set_missing_values
+    )
+    return doc

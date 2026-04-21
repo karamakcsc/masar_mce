@@ -25,6 +25,9 @@ frappe.ui.form.on("Purchase Receipt", {
     supplier(frm) {
         set_item_code_query(frm);
     },
+    set_warehouse(frm) {
+        set_item_code_query(frm);
+    },
     workflow_state(frm) {
         if (frm.doc.docstatus === 0) {
             refresh_item_fields(frm);   
@@ -100,7 +103,8 @@ function set_item_code_query(frm) {
         return {
             query: "masar_mce.custom.purchase_receipt.purchase_receipt.get_items_from_open_purchase_orders",
             filters: {
-                supplier: frm.doc.supplier
+                supplier: frm.doc.supplier, 
+                warehouse : frm.doc.set_warehouse
             }
         };
     };

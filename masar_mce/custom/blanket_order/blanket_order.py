@@ -10,6 +10,8 @@ def validate(self , method):
     calculate_amounts_and_total(self)
     if self.is_new():
         get_default_penalty(self)
+    # validate_some_markets_checkbox(self)
+    # validate_some_markets(self)
     if self.custom_submit_after_inspection and self.docstatus == 1:
         check_inspection_result(self)
         
@@ -26,6 +28,7 @@ def on_submit(self, method):
     self.db_set("custom_status", "Active")
     validate_duplicate_item_in_active_blanket_orders(self)
     sync_pricing_sheet_from_agreement(self, submit_if_needed=True)
+    set_receipt_allowance_for_items(self)
 
     insert_latest_sa_in_item(self)
 def on_cancel(self , method):
@@ -234,6 +237,8 @@ def sync_pricing_sheet_from_agreement(blanket_order_doc, submit_if_needed=False)
 
     frappe.flags.in_agreement_sync = True
     try:
+        if ps.docstatus == 1:
+            return ps.name
         ps.save(ignore_permissions=True)
 
         if submit_if_needed and blanket_order_doc.docstatus == 1 and ps.docstatus == 0:
@@ -248,3 +253,44 @@ def insert_latest_sa_in_item(self):
     for item in self.items:
         frappe.db.set_value("Item", item.item_code, "custom_latest_sa", self.name)
         
+def set_receipt_allowance_for_items(self):
+    if not self.custom_receipt_allowance_check and self.custom_receipt_allowance == 0 :
+        return
+    item_codes =  [d.item_code for d in self.items]
+    placeholders = ", ".join(["%s"] * len(item_codes)) 
+    query = f"""
+    UPDATE `tabItem`
+    SET over_delivery_receipt_allowance = %s
+    WHERE item_code IN ({placeholders})
+    """
+    params = [self.custom_receipt_allowance] + item_codes
+    frappe.db.sql(query, params)
+    
+# def validate_some_markets(self):
+#     for item in self.items:
+#         custom_markets = frappe.db.get_all(
+#             "Item Markets",
+#             filters={"parent": item.item_code, "parentfield": "custom_markets"},
+#             fields=["warehouse"]
+#         )
+#         if item.custom_some_markets:
+#             if not custom_markets:
+#                 frappe.throw(
+#                     _("Item {0} is marked as 'Some Markets' but has no markets specified in its master record.")
+#                     .format(item.item_code)
+#                 )
+#         else:
+#             if custom_markets:
+#                 frappe.throw(
+#                     _("Item {0} is not marked as 'Some Markets' but has markets specified in its master record. "
+#                       "Please either check 'Some Markets' or clear the markets in the item master.")
+#                     .format(item.item_code)
+#                 )
+# def validate_some_markets_checkbox(self):
+#     if self.custom_some_markets:
+#         has_some_markets = any(item.custom_some_markets for item in self.items)
+        
+#         if not has_some_markets:
+#             frappe.throw(
+#                 _("At least one item must be marked as 'Some Markets' when 'Some Markets' is checked.")
+#             )

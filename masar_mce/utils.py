@@ -146,3 +146,49 @@ def get_item_price(item_code):
     if local_zone_rate and free_zone_rate:
         return local_zone_rate, free_zone_rate
     return None, None
+
+
+
+
+def get_inspection_status(item_codes):
+    if isinstance(item_codes, list):
+        placeholders = ", ".join(["%s"] * len(item_codes))
+
+        query = f"""
+            SELECT 
+                tboi.item_code,
+                CASE 
+                    WHEN tboi.custom_inspection_is_required = 0 THEN 'Accepted'
+                    WHEN tboi.custom_inspection_is_required = 1 
+                         AND tboi.custom_quality_inspection_status IS NULL THEN 'Rejected'
+                    ELSE tboi.custom_quality_inspection_status
+                END AS inspection_status
+            FROM `tabBlanket Order` tbo
+            INNER JOIN `tabBlanket Order Item` tboi 
+                ON tbo.name = tboi.parent
+            WHERE tbo.docstatus = 1
+            AND tbo.custom_status = 'Active'
+            AND tboi.item_code IN ({placeholders})
+        """
+        data = frappe.db.sql(query, tuple(item_codes), as_dict=True)
+        # convert to {item_code: status}
+        return {d["item_code"]: d["inspection_status"] for d in data}
+    else:
+        query = """
+            SELECT 
+                CASE 
+                    WHEN tboi.custom_inspection_is_required = 0 THEN 'Accepted'
+                    WHEN tboi.custom_inspection_is_required = 1 
+                         AND tboi.custom_quality_inspection_status IS NULL THEN 'Rejected'
+                    ELSE tboi.custom_quality_inspection_status
+                END AS inspection_status
+            FROM `tabBlanket Order` tbo
+            INNER JOIN `tabBlanket Order Item` tboi 
+                ON tbo.name = tboi.parent
+            WHERE tbo.docstatus = 1
+            AND tbo.custom_status = 'Active'
+            AND tboi.item_code = %s
+            LIMIT 1
+        """
+        result = frappe.db.sql(query, (item_codes,))
+        return result[0][0] if result else None

@@ -51,7 +51,8 @@ doctype_js = {
     "Purchase Order" : "custom/purchase_order/purchase_order.js", 
     "Purchase Receipt" : "custom/purchase_receipt/purchase_receipt.js",
     # "Purchase Invoice" : "custom/purchase_invoice/purchase_invoice.js", 
-    "Material Request" : "custom/material_request/material_request.js"
+    "Material Request" : "custom/material_request/material_request.js", 
+    "Quality Inspection" : "custom/quality_inspection/quality_inspection.js"
     }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -155,6 +156,7 @@ doc_events = {
         "on_submit": "masar_mce.custom.quality_inspection.quality_inspection.on_submit"
     }, 
     "Stock Entry":{
+        "validate" : "masar_mce.custom.stock_entry.stock_entry.validate",
         "on_submit": "masar_mce.custom.stock_entry.stock_entry.on_submit"
     }, 
     "Blanket Order" : {
@@ -173,7 +175,12 @@ doc_events = {
     "Purchase Order":{
         "on_submit" : "masar_mce.custom.purchase_order.purchase_order.on_submit", 
         "before_insert" : "masar_mce.custom.purchase_order.purchase_order.before_insert",
+        "validate" : "masar_mce.custom.purchase_order.purchase_order.validate"
+    },
+    "Material Request" : {
+        "validate" : "masar_mce.custom.material_request.material_request.validate"
     }
+    
 }
 
 # Scheduled Tasks

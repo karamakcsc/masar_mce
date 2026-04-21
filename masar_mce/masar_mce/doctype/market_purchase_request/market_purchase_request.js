@@ -14,6 +14,9 @@ frappe.ui.form.on("Market Purchase Request", {
     },
     supplier(frm) {
         set_item_code_query(frm);
+    },
+    set_warehouse(frm) {
+        set_item_code_query(frm);
     }
 });
 function set_item_code_query(frm) {
@@ -21,7 +24,8 @@ function set_item_code_query(frm) {
         return {
             query: "masar_mce.masar_mce.doctype.market_purchase_request.market_purchase_request.get_items_from_open_purchase_orders",
             filters: {
-                supplier: frm.doc.supplier
+                supplier: frm.doc.supplier, 
+                warehouse: frm.doc.set_warehouse
             }
         };
     };

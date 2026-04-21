@@ -5,11 +5,13 @@ import frappe, json
 from frappe.model.document import Document
 from frappe.utils import flt
 from frappe.model.mapper import get_mapped_doc
+from masar_mce.utils import get_inspection_status
 from frappe import _
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_len, filters):
     supplier = filters.get("supplier")
+    warehouse = filters.get("warehouse")
 
     query = """
         SELECT
@@ -17,28 +19,38 @@ def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_l
             poi.item_name,
             po.name AS purchase_order,
             poi.name AS purchase_order_item,
-            (poi.qty - IFNULL(poi.received_qty,0) 
-                - IFNULL((
-                    SELECT SUM(pri.request_quantity - IFNULL(pri.received_qty,0))
-                    FROM `tabPurchase Request Item` pri
-                    WHERE pri.purchase_order_item = poi.name AND pri.docstatus = 1
-                ),0)
-                + poi.qty * IFNULL(item.over_delivery_receipt_allowance,0)
-            ) AS available_qty
+            poi.qty - IFNULL(poi.received_qty, 0) 
+                + poi.qty * IFNULL(item.over_delivery_receipt_allowance, 0) AS available_qty
         FROM `tabPurchase Order` po
         INNER JOIN `tabPurchase Order Item` poi ON po.name = poi.parent
         INNER JOIN `tabItem` item ON poi.item_code = item.name
         WHERE po.supplier = %(supplier)s
           AND po.docstatus = 1
-          AND po.status NOT IN ('Closed','Hold')
+          AND po.status NOT IN ('Closed', 'Hold')
           AND item.disabled = 0
           AND (poi.item_code LIKE %(txt)s OR item.item_name LIKE %(txt)s)
+          AND (
+                NOT EXISTS (
+                    SELECT 1 
+                    FROM `tabItem Markets` im2
+                    WHERE im2.item_code = poi.item_code
+                      AND im2.disabled = 0
+                )
+                OR EXISTS (
+                    SELECT 1 
+                    FROM `tabItem Markets` im3
+                    WHERE im3.item_code = poi.item_code
+                      AND im3.disabled = 0
+                      AND im3.warehouse = %(warehouse)s
+                )
+          )
         HAVING available_qty > 0
         ORDER BY poi.item_code, po.transaction_date
         LIMIT %(start)s, %(page_len)s
     """
     result = frappe.db.sql(query, {
         "supplier": supplier,
+        "warehouse": warehouse,
         "txt": f"%{txt}%",
         "start": start,
         "page_len": page_len
@@ -47,8 +59,11 @@ def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_l
     return [
         (
             row.item_code,
-            f"<b>Name:</b> {row.item_name}, <b>PO:</b> {row.purchase_order}, <b>Qty:</b> {flt(row.available_qty)}<br>"
-        ) for row in result
+            f"<b>Name:</b> {row.item_name}, "
+            f"<b>PO:</b> {row.purchase_order}, "
+            f"<b>Qty:</b> {frappe.utils.fmt_money(row.available_qty, currency=None)}<br>"
+        )
+        for row in result
     ]
 
 
@@ -233,6 +248,8 @@ class MarketPurchaseRequest(Document):
 
     def validate(self):
         self.validate_po_available_qty()
+        self.validate_inspection_status()
+        self.validate_some_markets_warehouse()
         self.get_total_and_total_qty()
     def on_submit(self):
         self.db_set('status', 'To Receive')
@@ -335,4 +352,40 @@ class MarketPurchaseRequest(Document):
                     max(new_qty, 0),
                     update_modified=False
                 )
+    def validate_inspection_status(self):
+        item_codes = [d.item_code for d in self.items]
+        inspection_statuses = get_inspection_status(item_codes)
 
+        invalid_items = [
+            (item.item_code, inspection_statuses.get(item.item_code))
+            for item in self.items
+            if inspection_statuses.get(item.item_code)
+            and inspection_statuses.get(item.item_code) != "Accepted"
+        ]
+
+        if invalid_items:
+            msg = "<br>".join(
+                _("Item {0} has inspection status '{1}' which does not allow it to be included.")
+                .format(code, status)
+                for code, status in invalid_items
+            )
+            frappe.throw(msg)
+    def validate_some_markets_warehouse(self):
+        if not self.items:
+            return
+        warehouse = self.set_warehouse
+        if not warehouse:
+            frappe.throw(_("Please set Warehouse before validating Item Markets restrictions."))
+        for row in self.items:
+            item_code = row.item_code
+            has_restriction = frappe.db.exists(
+                "Item Markets",{"item_code": item_code,"disabled": 0})
+            if has_restriction:
+                allowed = frappe.db.exists(
+                    "Item Markets",{"item_code": item_code,"warehouse": warehouse,"disabled": 0})
+                if not allowed:
+                    frappe.throw(
+                        _(
+                            "Row #{0}: Item <b>{1}</b> is not allowed in Warehouse <b>{2}</b> as per Item Markets."
+                        ).format(row.idx, item_code, warehouse)
+                    )

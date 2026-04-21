@@ -3,6 +3,54 @@ from frappe import _
 from frappe.utils import flt
 from erpnext.accounts.general_ledger import make_gl_entries
 
+
+
+
+def validate(self , method ):
+    validate_item_markets_for_stock_entry(self)
+
+def validate_item_markets_for_stock_entry(self):
+    if not self.items:
+        return
+    if self.purpose not in ["Material Receipt", "Material Transfer"]:
+        return
+    for row in self.items:
+        item_code = row.item_code
+        if self.purpose == "Material Receipt":
+            warehouse = row.t_warehouse or self.to_warehouse
+        elif self.purpose == "Material Transfer":
+            warehouse = row.t_warehouse
+        else:
+            warehouse = None
+        if not warehouse:
+            frappe.throw(
+                _("Row #{0}: Target Warehouse is required for item {1}")
+                .format(row.idx, item_code)
+            )
+        has_restriction = frappe.db.exists(
+            "Item Markets",
+            {
+                "item_code": item_code,
+                "disabled": 0
+            }
+        )
+        if has_restriction:
+            allowed = frappe.db.exists(
+                "Item Markets",
+                {
+                    "item_code": item_code,
+                    "warehouse": warehouse,
+                    "disabled": 0
+                }
+            )
+            if not allowed:
+                frappe.throw(
+                    _(
+                        "Row #{0}: Item <b>{1}</b> is not allowed in Warehouse <b>{2}</b> as per Item Markets."
+                    ).format(row.idx, item_code, warehouse)
+                )
+
+
 def on_submit(self , method):
     if self.stock_entry_type  in ['Material Receipt for Inspection' , 'سند إستلام لفحص الجودة' ]:
         check_agreement_items(self)

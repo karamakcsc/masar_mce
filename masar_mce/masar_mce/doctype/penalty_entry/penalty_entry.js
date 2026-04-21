@@ -25,6 +25,26 @@ frappe.ui.form.on("Penalty Entry", {
                 }
             }
         });
+    },
+    supplier: function(frm) {
+        frm.set_query("quality_inspection", function() {
+            return {
+                query: "masar_mce.masar_mce.doctype.penalty_entry.penalty_entry.get_filtered_quality_inspections",
+                filters: {
+                    supplier: frm.doc.supplier
+                }
+            };
+        });
+    },
+    setup: function(frm) {
+        frm.set_query("quality_inspection", function() {
+            return {
+                query: "masar_mce.masar_mce.doctype.penalty_entry.penalty_entry.get_filtered_quality_inspections",
+                filters: {
+                    supplier: frm.doc.supplier
+                }
+            };
+        });
     }
 });
 

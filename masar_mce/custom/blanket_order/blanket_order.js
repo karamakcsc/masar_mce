@@ -1,6 +1,10 @@
 frappe.ui.form.on("Blanket Order", {
     onload(frm) {
         init_form(frm);
+        if (frm.doc.from_date && !frm.doc.to_date) {
+            let to_date = frappe.datetime.add_days(frm.doc.from_date, 365);
+            frm.set_value("to_date", to_date);
+        }
     },
     refresh(frm) {
         init_form(frm);
@@ -66,6 +70,17 @@ frappe.ui.form.on("Blanket Order", {
             });
             frm.refresh_field("custom_other_terms");
         });
+    },
+    from_date(frm) {
+        if (frm.doc.from_date && !frm.doc.to_date) {
+            let to_date = frappe.datetime.add_days(frm.doc.from_date, 365);
+            frm.set_value("to_date", to_date);
+        }
+    },
+    supplier(frm) {
+        if (frm.doc.supplier) {
+            frm.set_value("custom_title", `اتفاقية: ${frm.doc.supplier}`);
+        }
     }
 });
 

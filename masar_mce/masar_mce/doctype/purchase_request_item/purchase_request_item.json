@@ -161,7 +161,7 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Received Qty",
+   "label": "Received Quantity",
    "read_only": 1
   }
  ],

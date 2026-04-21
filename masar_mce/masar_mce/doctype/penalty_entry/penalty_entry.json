@@ -8,6 +8,7 @@
   "section_break_umc0",
   "supplier",
   "supplier_name",
+  "reference_type",
   "purchase_receipt",
   "purchase_request",
   "column_break_pmvp",
@@ -15,6 +16,7 @@
   "posting_date",
   "amended_from",
   "pr_total",
+  "quality_inspection",
   "section_break_trrw",
   "penalties"
  ],
@@ -46,12 +48,13 @@
    "fieldtype": "Column Break"
   },
   {
+   "depends_on": "eval:doc.reference_type === \"Purchase Receipt\"",
    "fieldname": "purchase_receipt",
    "fieldtype": "Link",
    "label": "Purchase Receipt",
    "link_filters": "[[\"Purchase Receipt\",\"docstatus\",\"=\",\"1\"],[\"Purchase Receipt\",\"supplier\",\"=\",\"eval: doc.supplier\"]]",
-   "options": "Purchase Receipt",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.reference_type === \"Purchase Receipt\"",
+   "options": "Purchase Receipt"
   },
   {
    "fetch_from": "supplier.supplier_name",
@@ -85,28 +88,45 @@
    "options": "Supplier Agreement Penalty Details"
   },
   {
+   "depends_on": "eval:doc.reference_type === \"Purchase Receipt\"",
    "fieldname": "pr_total",
    "fieldtype": "Currency",
    "label": "Purchase Total",
    "read_only": 1
   },
   {
+   "depends_on": "eval:doc.reference_type === \"Purchase Receipt\"",
    "fieldname": "purchase_request",
    "fieldtype": "Link",
    "label": "Market Purchase Request",
    "options": "Market Purchase Request",
    "read_only": 1
+  },
+  {
+   "fieldname": "reference_type",
+   "fieldtype": "Select",
+   "label": "Reference Type",
+   "options": "Purchase Receipt\nQuality Inspection",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.reference_type === \"Quality Inspection\"",
+   "fieldname": "quality_inspection",
+   "fieldtype": "Link",
+   "label": "Quality Inspection",
+   "mandatory_depends_on": "eval:doc.reference_type === \"Quality Inspection\"",
+   "options": "Quality Inspection"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-07 12:07:59.917354",
+ "modified": "2026-04-20 16:48:41.291337",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Penalty Entry",
- "naming_rule": "Expression",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
@@ -124,6 +144,7 @@
   }
  ],
  "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

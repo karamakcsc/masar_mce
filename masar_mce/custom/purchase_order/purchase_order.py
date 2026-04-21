@@ -1,7 +1,9 @@
 import frappe , json
 from frappe.utils import flt ,date_diff, add_days
 from frappe.model.mapper import get_mapped_doc
-from erpnext.buying.doctype.purchase_order.purchase_order import set_missing_values
+# from erpnext.buying.doctype.purchase_order.purchase_order import set_missing_values
+from masar_mce.utils import get_inspection_status
+from frappe import _
 @frappe.whitelist()
 def get_blanket_order_for_item(item_code, supplier):
     if not item_code or not supplier:
@@ -156,3 +158,62 @@ def before_insert(self, method):
 
     for i in self.items:
         i.rate = price_map.get(i.item_code, 0)
+        
+def validate(self, method):
+    validate_inspection_status(self)
+    
+    
+def validate_inspection_status(self):
+    item_codes = [d.item_code for d in self.items]
+    inspection_statuses = get_inspection_status(item_codes)
+
+    invalid_items = [
+        (item.item_code, inspection_statuses.get(item.item_code))
+        for item in self.items
+        if inspection_statuses.get(item.item_code)
+        and inspection_statuses.get(item.item_code) != "Accepted"
+    ]
+
+    if invalid_items:
+        msg = "<br>".join(
+            _("Item {0} has inspection status '{1}' which does not allow it to be included.")
+            .format(code, status)
+            for code, status in invalid_items
+        )
+        frappe.throw(msg)
+        
+#     filter_warehouses_by_markets(self)
+
+# def filter_warehouses_by_markets(self):
+#     for item in self.items:
+#         if not item.blanket_order:
+#             continue
+        
+#         blanket_order_item = frappe.db.get_value(
+#             "Blanket Order Item",
+#             {"parent": item.blanket_order, "item_code": item.item_code},
+#             "custom_some_markets"
+#         )
+#         if not blanket_order_item:
+#             continue
+        
+#         if not item.warehouse:
+#             continue
+
+#         allowed_markets = frappe.db.get_all(
+#             "Item Markets",
+#             filters={"parent": item.item_code, "parentfield": "custom_markets"},
+#             fields=["warehouse"]
+#         )
+
+#         allowed_warehouses = [m.warehouse for m in allowed_markets]
+
+#         if not allowed_warehouses:
+#             continue
+
+#         if item.warehouse not in allowed_warehouses:
+#             frappe.msgprint(
+#                 _("Warehouse {0} for Item {1} is not in the allowed markets. Warehouse has been cleared.")
+#                 .format(item.warehouse, item.item_code)
+#             )
+#             item.warehouse = None

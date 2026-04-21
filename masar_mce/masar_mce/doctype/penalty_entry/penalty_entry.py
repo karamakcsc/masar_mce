@@ -8,7 +8,29 @@ from frappe.utils.safe_exec import safe_eval
 from erpnext.accounts.general_ledger import make_gl_entries
 from erpnext.controllers.accounts_controller import AccountsController
 from frappe.utils import flt, date_diff, getdate
+@frappe.whitelist()
+def get_filtered_quality_inspections(doctype, txt, searchfield, start, page_len, filters):
+    supplier = filters.get("supplier")
 
+    return frappe.db.sql("""
+        SELECT qi.name ,  qi.item_code , qi.reference_name
+        FROM `tabQuality Inspection` qi
+        INNER JOIN `tabStock Entry` se 
+            ON qi.reference_name = se.name
+        WHERE 
+            qi.docstatus = 1
+            AND qi.status = 'Rejected'
+            AND qi.reference_type = 'Stock Entry'
+            AND se.custom_supplier = %(supplier)s
+            AND qi.name LIKE %(txt)s
+        ORDER BY qi.modified DESC
+        LIMIT %(start)s, %(page_len)s
+    """, {
+        "supplier": supplier,
+        "txt": f"%{txt}%",
+        "start": start,
+        "page_len": page_len
+    })
 class PenaltyEntry(AccountsController):
     @frappe.whitelist()
     def get_request_details(self):
@@ -33,14 +55,51 @@ class PenaltyEntry(AccountsController):
                 pr_total = flt(pr_doc.grand_total)
         self.db_set("purchase_request", purchase_request)
         self.db_set("pr_total", pr_total)
-        print(purchase_request , pr_total)
         return {
             "purchase_request": purchase_request,
             "pr_total": pr_total
         }
+        
+    def validate_quality_inspection(self):
+        if self.reference_type != "Quality Inspection":
+            return 
+        if not self.quality_inspection:
+            return
+        
+        qi = frappe.db.get_value(
+            "Quality Inspection",
+            self.quality_inspection,
+            ["status", "docstatus", "reference_type", "reference_name"],
+            as_dict=1
+        )
+        if not qi:
+            frappe.throw("Quality Inspection not found")
+        if qi.docstatus != 1:
+            frappe.throw("Quality Inspection must be Submitted")
+        if qi.status != "Rejected":
+            frappe.throw("Only Rejected Quality Inspections are allowed")
+        if qi.reference_type != "Stock Entry":
+            frappe.throw("Quality Inspection must be linked to a Stock Entry")
+        supplier = frappe.db.get_value(
+            "Stock Entry",
+            qi.reference_name,
+            "custom_supplier"
+        )
+        if not supplier:
+            frappe.throw("Supplier not found in linked Stock Entry")
+        if supplier != self.supplier:
+            frappe.throw(
+                f"Supplier mismatch: Quality Inspection belongs to supplier {supplier}"
+            )        
+        for row in self.penalties:
+                if row.penalty_type != "Fixed Value":
+                    frappe.throw(_("Only Fixed Value penalties are allowed for Quality Inspection reference type for row {0}").format(bold(row.idx)))
+
+
     def validate(self): 
         self.calculate_amount_values()
         self.get_request_details()
+        self.validate_quality_inspection()
     
     def on_submit(self): 
         self.create_gl_entry()
