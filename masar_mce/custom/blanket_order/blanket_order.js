@@ -2,7 +2,7 @@ frappe.ui.form.on("Blanket Order", {
     onload(frm) {
         init_form(frm);
         if (frm.doc.from_date && !frm.doc.to_date) {
-            let to_date = frappe.datetime.add_days(frm.doc.from_date, 365);
+            let to_date = frappe.datetime.add_days(frm.doc.from_date, 364);
             frm.set_value("to_date", to_date);
         }
     },

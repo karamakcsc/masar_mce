@@ -15,4 +15,4 @@ def insert_pos_item(payload_local_zone, payload_free_zone):
         if free_zone_response.status_code in [200, 201, 202] and local_zone_response.status_code in [200, 201, 202]:
             frappe.msgprint("Item Successfully inserted", alert=True, indicator="green")
         else:
-            frappe.throw(f"Error in inserting item:<br>Local Zone response: {local_zone_response.text}<br>Free Zone response: {free_zone_response.text}")
+            frappe.throw(f"Error in inserting item:<br>Local Zone response: {local_zone_response.text}<br>Free Zone response: {free_zone_response.text}") 

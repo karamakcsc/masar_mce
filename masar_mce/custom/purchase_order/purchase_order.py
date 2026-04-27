@@ -180,7 +180,10 @@ def validate_inspection_status(self):
             .format(code, status)
             for code, status in invalid_items
         )
-        frappe.throw(msg)
+        if self.docstatus == 1 :
+            frappe.throw(msg)
+        else:
+            frappe.msgprint(msg)
         
 #     filter_warehouses_by_markets(self)
 

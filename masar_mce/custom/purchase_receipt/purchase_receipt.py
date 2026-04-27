@@ -288,7 +288,10 @@ def validate_inspection_status(self):
             .format(code, status)
             for code, status in invalid_items
         )
-        frappe.throw(msg)
+        if self.docstatus == 1 :
+            frappe.throw(msg)
+        else:
+            frappe.msgprint(msg)
         
         
 def validate_some_markets_warehouse(self):
@@ -296,7 +299,14 @@ def validate_some_markets_warehouse(self):
         return
     warehouse = self.set_warehouse
     if not warehouse:
-        frappe.throw(_("Please set Warehouse before validating Item Markets restrictions."))
+        msg = _("Please set Warehouse before validating Item Markets restrictions.")
+        if self.docstatus == 1 :
+            frappe.throw(msg)
+        else:
+            frappe.msgprint(msg)
+    wh_type = frappe.db.get_value("Warehouse", warehouse, "warehouse_type") if warehouse else None
+    if wh_type not in ("Store", "سوق"):
+        return 
     for row in self.items:
         item_code = row.item_code
         row_warehouse = row.warehouse or warehouse
@@ -306,8 +316,10 @@ def validate_some_markets_warehouse(self):
             allowed = frappe.db.exists(
                 "Item Markets",{"item_code": item_code,"warehouse": row_warehouse,"disabled": 0})
             if not allowed:
-                frappe.throw(
-                    _(
+                msg = _(
                         "Row #{0}: Item <b>{1}</b> is not allowed in Warehouse <b>{2}</b> as per Item Markets."
                     ).format(row.idx, item_code, row_warehouse)
-                )
+                if self.docstatus == 1 :
+                    frappe.throw(msg)
+                else:
+                    frappe.msgprint(msg)
