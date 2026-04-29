@@ -4,7 +4,8 @@ import frappe
 def on_submit(self , method):
     update_stock_entry(self)
     qi_on_submit(self)
-    
+def on_cancel(self , method):
+    delinked_supplier_agreement(self)
 def update_stock_entry(self): 
     db.set_value(self.reference_type , self.reference_name  ,'inspection_required' , 1)
     se_doc = get_doc(self.reference_type , self.reference_name)
@@ -106,3 +107,19 @@ def make_penalty_entry(source_name, target_doc=None):
         set_missing_values
     )
     return doc
+
+def delinked_supplier_agreement(self):
+    if self.custom_supplier_agreement is None:
+        return
+    sa_doc = get_doc('Blanket Order' , self.custom_supplier_agreement)
+    for i in sa_doc.items:
+        if i.custom_quality_inspection == self.name:
+            db.set_value(i.doctype , i.name , {
+                'custom_quality_inspection' : None , 
+                'custom_quality_inspection_status' : None , 
+                'custom_quality_inspection_remarks' : None , 
+                'custom_quality_inspection_quantity' : None,
+                'custom_inspection_is_required' : 0} 
+            )
+    db.set_value(self.doctype , self.name , 'custom_supplier_agreement' , None)
+    frappe.db.commit()

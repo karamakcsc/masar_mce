@@ -26,12 +26,12 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/masar_mce/css/masar_mce.css"
-app_include_css = "/assets/masar_mce/css/theme.css"
-app_include_js = "/assets/masar_mce/js/arabic_digits_fix_no_UI_changes.js"
+# app_include_css = "/assets/masar_mce/css/theme.css"
+# app_include_js = "/assets/masar_mce/js/arabic_digits_fix_no_UI_changes.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/masar_mce/css/masar_mce.css"
-web_include_css = "/assets/masar_mce/css/theme.css"
+# web_include_css = "/assets/masar_mce/css/theme.css"
 # web_include_js = "/assets/masar_mce/js/arabic_digits_fix.js"
 
 # include custom scss in every website theme (without file extension ".scss")
@@ -153,7 +153,8 @@ doc_events = {
         "on_update": "masar_mce.custom.Item.item.on_update",
     }, 
     "Quality Inspection": {
-        "on_submit": "masar_mce.custom.quality_inspection.quality_inspection.on_submit"
+        "on_submit": "masar_mce.custom.quality_inspection.quality_inspection.on_submit",
+        "on_cancel":  "masar_mce.custom.quality_inspection.quality_inspection.on_cancel"
     }, 
     "Stock Entry":{
         "validate" : "masar_mce.custom.stock_entry.stock_entry.validate",

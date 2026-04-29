@@ -32,7 +32,7 @@ def on_submit(self, method):
 
     insert_latest_sa_in_item(self)
 def on_cancel(self , method):
-    pass
+    delinked_qualitiy_inspection(self)
 def set_none_posting_date(self):
     if self.docstatus == 0 :
         self.custom_posting_date = None
@@ -265,7 +265,17 @@ def set_receipt_allowance_for_items(self):
     """
     params = [self.custom_receipt_allowance] + item_codes
     frappe.db.sql(query, params)
-    
+def delinked_qualitiy_inspection(self):
+    linked_inspections = frappe.db.sql("""
+                                SELECT name FROM `tabQuality Inspection`
+                                WHERE docstatus =1 and custom_supplier_agreement = %s""",
+                                self.name, as_dict=True)
+    for inspection in linked_inspections:
+        in_doc = frappe.get_doc("Quality Inspection", inspection.name)
+        in_doc.cancel()
+        in_doc.db_set("custom_supplier_agreement", None)
+        frappe.db.commit()
+        
 # def validate_some_markets(self):
 #     for item in self.items:
 #         custom_markets = frappe.db.get_all(
