@@ -1,8 +1,10 @@
 import frappe 
+import json
 from frappe import _
 from frappe.utils import flt, get_link_to_form, getdate , date_diff
 from erpnext.controllers.status_updater import StatusUpdater
 from masar_mce.utils import get_inspection_status
+from frappe.model.mapper import get_mapped_doc
 
 check_overflow_with_allowance = StatusUpdater.check_overflow_with_allowance
 limits_crossed_error = StatusUpdater.limits_crossed_error
@@ -12,7 +14,7 @@ def validate(self , method ):
     validate_some_markets_warehouse(self)
 def on_cancel(self , method):
     update_received_qty_on_cancel(self)  
-def on_submit(self , method): 
+def on_submit(self , method):
     if self.is_return == 0 :
         create_auto_penalty_entry(self)
         check_request_to_accepted_qty(self)
@@ -323,3 +325,51 @@ def validate_some_markets_warehouse(self):
                     frappe.throw(msg)
                 else:
                     frappe.msgprint(msg)
+
+
+
+@frappe.whitelist()
+def create_material_inspection(source_name, target_doc=None, args=None):
+    if args is None:
+        args = {}
+    if isinstance(args, str):
+        args = json.loads(args)
+    def update_item(source, target, source_parent):
+        target.item_code = source.item_code
+        target.item_name = source.item_name
+        target.description = source.description
+        target.quantity_supplied = flt(source.qty)
+        target.batch_number = source.batch_no
+        target.production_date = None
+        target.expiry_date = None
+
+    def select_item(d):
+        filtered_items = args.get("filtered_children", [])
+        return d.name in filtered_items if filtered_items else True
+    doc = get_mapped_doc(
+        "Purchase Receipt",
+        source_name,
+        {
+            "Purchase Receipt": {
+                "doctype": "Material Inspection",
+                "field_map": {
+                    "name": "purchase_receipt",
+                    "company": "company"
+                },
+                "validation": {
+                    "docstatus": ["=", 0],
+                },
+            },
+            "Purchase Receipt Item": {
+                "doctype": "Material Inspection Details",
+                "field_map": {
+                    "parent": "purchase_receipt",
+                    "name": "purchase_receipt_item"
+                },
+                "postprocess": update_item,
+                "condition": lambda doc: select_item(doc),
+            },
+        },
+        target_doc
+    )
+    return doc

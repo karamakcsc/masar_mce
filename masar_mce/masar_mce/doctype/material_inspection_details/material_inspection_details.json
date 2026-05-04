@@ -1,0 +1,178 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-04 14:33:50.641182",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "country",
+  "column_break_vlwm",
+  "weight",
+  "brand",
+  "section_break_zhce",
+  "selling_price",
+  "quantity_supplied",
+  "supplier_agreement",
+  "column_break_vbla",
+  "batch_number",
+  "laboratory_remarks",
+  "remarks",
+  "section_break_ixht",
+  "supply_date",
+  "production_date",
+  "expiry_date",
+  "column_break_cyqd",
+  "product_lifespan",
+  "production_exceeded",
+  "delay_period"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_vlwm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weight",
+   "fieldtype": "Float",
+   "label": "Weight"
+  },
+  {
+   "fetch_from": "item_code.brand",
+   "fieldname": "brand",
+   "fieldtype": "Data",
+   "label": "Brand",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_code.country_of_origin",
+   "fieldname": "country",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Country of Origin",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_zhce",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "selling_price",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Selling Price",
+   "read_only": 1
+  },
+  {
+   "fieldname": "production_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Production Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "expiry_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Expiry Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_vbla",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "batch_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Batch Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "product_lifespan",
+   "fieldtype": "Data",
+   "hide_seconds": 1,
+   "in_list_view": 1,
+   "label": "Product Lifespan",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_ixht",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "supply_date",
+   "fieldtype": "Date",
+   "label": "Supply Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_cyqd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "delay_period",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Delay Period",
+   "read_only": 1
+  },
+  {
+   "fieldname": "production_exceeded",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Production Exceeded",
+   "read_only": 1
+  },
+  {
+   "fieldname": "quantity_supplied",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Quantity Supplied"
+  },
+  {
+   "fieldname": "laboratory_remarks",
+   "fieldtype": "Select",
+   "label": "Laboratory Remarks",
+   "options": "Conforming without any issues\nNon-conforming with a note indicating physical damage\nUnfit for human consumption\nUnsuitable for use\nNot recommended for sale"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fetch_from": "item_code.custom_latest_sa",
+   "fieldname": "supplier_agreement",
+   "fieldtype": "Link",
+   "label": "Supplier Agreement",
+   "options": "Blanket Order",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-05-04 16:44:42.849617",
+ "modified_by": "Administrator",
+ "module": "Masar MCE",
+ "name": "Material Inspection Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

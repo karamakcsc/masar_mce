@@ -8,6 +8,7 @@ frappe.ui.form.on("Purchase Receipt", {
         set_item_code_query(frm);
         hide_buttons(frm);
         ChangeLabels(frm);
+        CreateMaterialInspection(frm);
     }, 
     onload(frm) {
         set_item_code_query(frm);
@@ -27,6 +28,7 @@ frappe.ui.form.on("Purchase Receipt", {
     },
     set_warehouse(frm) {
         set_item_code_query(frm);
+        CreateMaterialInspection(frm);
     },
     workflow_state(frm) {
         if (frm.doc.docstatus === 0) {
@@ -156,4 +158,15 @@ function ChangeLabels(frm) {
             isReturn ? "Return Details" : "Receipt Details"
         );
     });
+}
+function CreateMaterialInspection(frm) {
+    if (frm.doc.docstatus === 0 && ["Store", "سوق"].includes(frm.doc.custom_accepted_warehouse_type)) {
+            frm.add_custom_button(__('Material Inspection'), function() {
+                frappe.model.open_mapped_doc({
+                    method: "masar_mce.custom.purchase_receipt.purchase_receipt.create_material_inspection",
+                    frm: cur_frm,
+                    freeze_message: __("Creating Material Inspection ..."),
+                });
+            }, __('Create'));
+        }
 }
