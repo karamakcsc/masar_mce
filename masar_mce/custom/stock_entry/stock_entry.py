@@ -8,7 +8,8 @@ from erpnext.accounts.general_ledger import make_gl_entries
 
 def validate(self , method ):
     validate_item_markets_for_stock_entry(self)
-
+    if self.stock_entry_type in ["Bonus Receipt" , 'سند استلام بونص']:
+        validate_bonus_receipt(self)
 def validate_item_markets_for_stock_entry(self):
     if not self.items:
         return
@@ -65,6 +66,17 @@ def on_submit(self , method):
     if self.stock_entry_type  in ['Return to Supplier' , 'إرجاع إلى المورد' ]:
         validate_party_specific_item(self)
         make_gl_entry(self)    
+    
+        
+def validate_bonus_receipt(self):
+    for i in self.items:
+        if hasattr(i , "to_bonus_warehouse") :
+            i.to_bonus_warehouse = self.custom_bonus_warehouse
+        i.allow_zero_valuation_rate = 1 
+        i.basic_rate = 0 
+        i.valuation_rate = 0    
+            
+        
 def create_quality_inspection(self):
     exist_items = list()
     for i in self.items:
