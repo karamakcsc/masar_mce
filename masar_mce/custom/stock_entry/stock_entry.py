@@ -8,7 +8,7 @@ from erpnext.accounts.general_ledger import make_gl_entries
 
 def validate(self , method ):
     validate_item_markets_for_stock_entry(self)
-    if self.stock_entry_type in ["Bonus Receipt" , 'سند استلام بونص']:
+    if self.stock_entry_type in ["Bonus Receipt" ,'سند استلام البونص']:
         validate_bonus_receipt(self)
 def validate_item_markets_for_stock_entry(self):
     if not self.items:
@@ -69,6 +69,14 @@ def on_submit(self , method):
     
         
 def validate_bonus_receipt(self):
+    if frappe.db.get_value(
+        "Warehouse",
+        self.to_warehouse,
+        "warehouse_type"
+    ) not in ["Bouns", "بونص"]:
+        frappe.throw(
+            _("For Bonus Type, the Target Warehouse must be a Bonus Warehouse Type.")
+        )
     for i in self.items:
         if hasattr(i , "to_bonus_warehouse") :
             i.to_bonus_warehouse = self.custom_bonus_warehouse

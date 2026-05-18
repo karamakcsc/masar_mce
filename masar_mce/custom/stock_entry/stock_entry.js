@@ -2,17 +2,21 @@ frappe.ui.form.on("Stock Entry", {
     onload: function(frm) {
         FilterForSupplierAgreement(frm);
         FilterWarehouseForInspection(frm);
+        FilterWarehouseForBonus(frm);
     }, 
     refresh:function(frm) {
         FilterForSupplierAgreement(frm);
         FilterWarehouseForInspection(frm);
+        FilterWarehouseForBonus(frm);
     }, 
     setup: function(frm) {
         FilterWarehouseForInspection(frm);
         FilterForSupplierAgreement(frm);
+        FilterWarehouseForBonus(frm);
     },
     stock_entry_type: function(frm) {
         FilterWarehouseForInspection(frm);
+        FilterWarehouseForBonus(frm);
         FilterForSupplierAgreement(frm);
     },
 });
@@ -90,5 +94,41 @@ function FilterWarehouseForInspection(frm) {
     else {
         frm.fields_dict.to_warehouse.get_query = frm._original_to_warehouse_query || null;
         tWarehouseField.get_query = tWarehouseField.original_get_query || null;
+    }
+}
+function FilterWarehouseForBonus(frm) {
+    const isBonus =
+        frm.doc.stock_entry_type === "Bonus Receipt" ||
+        frm.doc.stock_entry_type === 'سند استلام البونص';
+
+    const grid = frm.fields_dict["items"].grid;
+    const tWarehouseField = grid.get_field("t_warehouse");
+
+    if (!frm._original_bonus_to_warehouse_query) {
+        frm._original_bonus_to_warehouse_query =
+            frm.fields_dict.to_warehouse.get_query;
+    }
+
+    if (!tWarehouseField.original_bonus_get_query) {
+        tWarehouseField.original_bonus_get_query =
+            tWarehouseField.get_query;
+    }
+
+    if (isBonus) {
+        frm.set_query("to_warehouse", function () {
+            return {
+                filters: {
+                    warehouse_type: ["in", ["Bouns", "بونص"]]
+                }
+            };
+        });
+
+        tWarehouseField.get_query = function () {
+            return {
+                filters: {
+                    warehouse_type: ["in", ["Bouns", "بونص"]]
+                }
+            };
+        };
     }
 }

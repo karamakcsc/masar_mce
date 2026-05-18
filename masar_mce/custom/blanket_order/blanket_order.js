@@ -91,7 +91,7 @@ frappe.ui.form.on("Blanket Order Item", {
             row.custom_purchase_price_after_tax = flt(row.rate) * (1 + flt(tax));
 
             if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-                if (flt(row.custom_markup_percentage)) {
+                if (flt(row.custom_markup_percentage) >= 0) {
                     const selling_before_tax = flt(row.custom_purchase_price_after_tax) * (1 + flt(row.custom_markup_percentage) / 100);
                     row.custom_selling_price = selling_before_tax;
                     row.custom_selling_price_after_tax = selling_before_tax * (1 + flt(tax));
@@ -169,7 +169,7 @@ frappe.ui.form.on("Blanket Order Item", {
             row.rate = flt(row.custom_purchase_price_after_tax) / (1 + flt(tax));
             
             if (frm.doc.custom_pricing_type === "Buying Price Basis") {
-                if (flt(row.custom_markup_percentage)) {
+                if (flt(row.custom_markup_percentage) >= 0 ) {
                     const selling_before_tax = flt(row.custom_purchase_price_after_tax) * (1 + flt(row.custom_markup_percentage) / 100);
                     row.custom_selling_price = selling_before_tax;
                     row.custom_selling_price_after_tax = selling_before_tax * (1 + flt(tax));
@@ -199,7 +199,7 @@ frappe.ui.form.on("Blanket Order Item", {
                     row.custom_markup_percentage = ((flt(row.custom_selling_price) - flt(row.custom_purchase_price_after_tax)) / flt(row.custom_purchase_price_after_tax)) * 100;
                 }
             } else {
-                if (flt(row.custom_markup_percentage)) {
+                if (flt(row.custom_markup_percentage) >= 0 ) {
                     row.custom_purchase_price_after_tax = flt(row.custom_selling_price) - (flt(row.custom_selling_price) * flt(row.custom_markup_percentage) / 100);
                     row.rate = row.custom_purchase_price_after_tax / (1 + flt(tax));
                     CalculateAmount(frm, cdt, cdn);
