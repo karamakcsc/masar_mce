@@ -3,7 +3,7 @@ from frappe.utils import flt
 from frappe.model.mapper import get_mapped_doc
 from frappe import _
 from datetime import datetime
-from masar_mce.utils import get_tax_for_item, get_item_barcode
+from masar_mce.utils import get_tax_for_item, get_item_barcode, get_tax_rates_bulk
 from masar_mce.api import insert_pos_item
 def validate(self , method):
     set_none_posting_date(self)
@@ -17,17 +17,17 @@ def validate(self , method):
         
 def on_update(self, method):
     if self.docstatus == 0:
-        sync_pricing_sheet_from_agreement(self, submit_if_needed=False)
+        _maybe_enqueue_pricing_sync(self, submit_if_needed=False)
 
 def before_update_after_submit(self, method):
-    sync_pricing_sheet_from_agreement(self, submit_if_needed=False)
+    _maybe_enqueue_pricing_sync(self, submit_if_needed=False)
     if self.custom_status == "Active":
         validate_duplicate_item_in_active_blanket_orders(self)
 
 def on_submit(self, method):
     self.db_set("custom_status", "Active")
     validate_duplicate_item_in_active_blanket_orders(self)
-    sync_pricing_sheet_from_agreement(self, submit_if_needed=True)
+    _maybe_enqueue_pricing_sync(self, submit_if_needed=True)
     set_receipt_allowance_for_items(self)
 
     insert_latest_sa_in_item(self)
@@ -62,15 +62,19 @@ def get_items_by_supplier(doctype, txt, searchfield, start, page_len, filters):
         'page_len': page_len
     })
 def calculate_amounts_and_total(self):
-    total , total_qty  = 0  , 0 
+    item_codes = [i.item_code for i in self.items]
+    tax_map = get_tax_rates_bulk(item_codes, categories=["Local Zone"])
+
+    total, total_qty = 0, 0
     for i in self.items:
         amount = flt(i.qty) * flt(i.rate)
         i.custom_amount = amount
         total += amount
         total_qty += i.qty
-        tax_rate = get_tax_for_item(item_code=i.item_code)
+        tax_rate = tax_map.get((i.item_code, "Local Zone"), 0)
         i.custom_purchase_price_after_tax = flt(i.rate) + flt(i.rate) * tax_rate
         i.custom_selling_price_after_tax = flt(i.custom_selling_price) + flt(i.custom_selling_price) * tax_rate
+
     self.custom_total_quantity = total_qty
     self.custom_agreement_total = total
     
@@ -185,6 +189,28 @@ def validate_duplicate_item_in_active_blanket_orders(self):
             msg_lines.append("- {0} in {1}".format(d['item_code'] , d['blanket_order']))
         frappe.throw("<br>".join(msg_lines))
         
+_PRICING_SYNC_THRESHOLD = 250
+
+def _maybe_enqueue_pricing_sync(blanket_order_doc, submit_if_needed=False):
+    if len(blanket_order_doc.items or []) > _PRICING_SYNC_THRESHOLD:
+        frappe.enqueue(
+            "masar_mce.custom.blanket_order.blanket_order._sync_pricing_sheet_enqueued",
+            blanket_order_name=blanket_order_doc.name,
+            submit_if_needed=submit_if_needed,
+            queue="long",
+            timeout=600,
+            enqueue_after_commit=True,
+        )
+    else:
+        sync_pricing_sheet_from_agreement(blanket_order_doc, submit_if_needed=submit_if_needed)
+
+
+def _sync_pricing_sheet_enqueued(blanket_order_name, submit_if_needed=False):
+    """Background job entry point — reloads the doc after commit then syncs."""
+    blanket_order_doc = frappe.get_doc("Blanket Order", blanket_order_name)
+    sync_pricing_sheet_from_agreement(blanket_order_doc, submit_if_needed=submit_if_needed)
+
+
 def sync_pricing_sheet_from_agreement(blanket_order_doc, submit_if_needed=False):
     ps_name = frappe.db.get_value(
         "Pricing Sheet",
@@ -211,9 +237,14 @@ def sync_pricing_sheet_from_agreement(blanket_order_doc, submit_if_needed=False)
 
     ps.set("items", [])
 
-    for i in (blanket_order_doc.items or []):
-        free_tax_rate = get_tax_for_item(i.item_code, "Free Zone")
-        local_tax_rate = get_tax_for_item(i.item_code, "Local Zone")
+    all_items = blanket_order_doc.items or []
+    item_codes = [i.item_code for i in all_items]
+    tax_map = get_tax_rates_bulk(item_codes, categories=["Free Zone", "Local Zone"])
+    is_selling_basis = ps.pricing_type == "Selling Price Basis"
+
+    for i in all_items:
+        free_tax_rate = tax_map.get((i.item_code, "Free Zone"), 0)
+        local_tax_rate = tax_map.get((i.item_code, "Local Zone"), 0)
         markup_percentage = flt(i.custom_markup_percentage or 0)
         selling_price = flt(i.custom_selling_price or 0)
         purchase_price = flt(i.rate or 0)
@@ -230,7 +261,7 @@ def sync_pricing_sheet_from_agreement(blanket_order_doc, submit_if_needed=False)
             "blanket_order_item": i.name,
         }
 
-        if ps.pricing_type == "Selling Price Basis":
+        if is_selling_basis:
             row["local_sp"] = selling_price
 
         ps.append("items", row)
@@ -250,8 +281,14 @@ def sync_pricing_sheet_from_agreement(blanket_order_doc, submit_if_needed=False)
     return ps.name
 
 def insert_latest_sa_in_item(self):
-    for item in self.items:
-        frappe.db.set_value("Item", item.item_code, "custom_latest_sa", self.name)
+    if not self.items:
+        return
+    item_codes = [item.item_code for item in self.items]
+    placeholders = ", ".join(["%s"] * len(item_codes))
+    frappe.db.sql(
+        f"UPDATE `tabItem` SET custom_latest_sa = %s WHERE name IN ({placeholders})",
+        [self.name] + item_codes,
+    )
         
 def set_receipt_allowance_for_items(self):
     if not self.custom_receipt_allowance_check and self.custom_receipt_allowance == 0 :
