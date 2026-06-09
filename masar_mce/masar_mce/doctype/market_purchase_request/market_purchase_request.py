@@ -130,7 +130,7 @@ def make_purchase_request(source_name, target_doc=None, args=None):
             FROM `tabPurchase Request Item` pri
             WHERE pri.purchase_order_item = %s AND pri.docstatus = 1
         """, source.name)[0][0] or 0)
-        qty = flt(source.qty) - flt(source.received_qty or 0) - pending_pr_qty + flt(source.qty) * over_delivery
+        qty =0 # flt(source.qty) - flt(source.received_qty or 0) - pending_pr_qty + flt(source.qty) * over_delivery
         target.request_quantity = qty
         target.rate = flt(source.rate)
         target.amount = qty * flt(source.rate)

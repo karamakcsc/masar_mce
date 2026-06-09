@@ -88,7 +88,7 @@ function GetItemDetails(frm , cdt , cdn){
                         purchase_order: r.message.purchase_order,
                         purchase_order_item: r.message.purchase_order_item, 
                         rate:r.message.rate,
-                        request_quantity:r.message.available_qty,
+                        // request_quantity:r.message.available_qty,
                         uom:r.message.uom
                     });
                 } else {
@@ -202,7 +202,7 @@ function GetItemDetails(frm , cdt , cdn){
                         purchase_order_item: r.message.purchase_order_item , 
                         rate:r.message.rate,
                         uom:r.message.uom, 
-                        request_quantity:r.message.available_qty
+                        // request_quantity:r.message.available_qty
                     });
                 } else {
                     frappe.model.set_value(cdt, cdn, "purchase_order", null);

@@ -15,7 +15,7 @@ def get_data(filters):
     if filters.get("role"):
         conditions += f" AND r.name = '{filters.get('role')}'"
 
-    sql = frappe.db.sql(f"""
+    rows = frappe.db.sql(f"""
         SELECT
 			r.name AS Role,
 			dt.name AS DocType,
@@ -65,7 +65,17 @@ def get_data(filters):
 		ORDER BY r.name, dt.name;
 	""")
     
-    return sql
+    result = []
+    last_role = None
+    for row in rows:
+        row = list(row)
+        if row[0] == last_role:
+            row[0] = ""
+        else:
+            last_role = row[0]
+        result.append(row)
+
+    return result
 
 def get_columns():
     return [
