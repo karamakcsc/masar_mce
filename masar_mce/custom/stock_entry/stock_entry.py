@@ -325,3 +325,23 @@ def make_gl_entry(self):
             cancel=False,
             update_outstanding="Yes"
         )
+        
+@frappe.whitelist()
+def get_transit_warehouse(company):
+    warehouse = frappe.db.get_value('Company', company, 'default_in_transit_warehouse')
+
+    if not warehouse:
+        warehouse = frappe.db.get_value(
+            'Warehouse',
+            {'warehouse_type': 'Transit', 'company': company},
+            'name'
+        )
+
+    if not warehouse:
+        frappe.throw(
+            _('No transit warehouse found for company {0}. Please either set a Default In-Transit Warehouse in the Company settings or create a warehouse with type "Transit".').format(
+                frappe.bold(company)
+            )
+        )
+
+    return warehouse
