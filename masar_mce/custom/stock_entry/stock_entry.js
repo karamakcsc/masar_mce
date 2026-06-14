@@ -103,12 +103,12 @@ function FilterWarehouseForInspection(frm) {
 }
 function FilterWarehouseForBonus(frm) {
     frm.set_query("custom_target_location", function () {
-            return {
-                filters: {
-                    warehouse_type: "مستودع"
-                }
-            };
-        });
+        return {
+            filters: {
+                warehouse_type: ["in", ["سوق", "مستودع"]]
+            }
+        };
+    });
     const isBonus =
         frm.doc.stock_entry_type === "Bonus Receipt" ||
         frm.doc.stock_entry_type === 'سند استلام البونص';
