@@ -127,9 +127,11 @@ doctype_js = {
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
+permission_query_conditions = {
+	"Purchase Receipt": "masar_mce.permissions.purchase_receipt.get_permission_query_conditions",
+    "Material Inspection": "masar_mce.permissions.material_inspection.get_permission_query_conditions",
+    "Material Request": "masar_mce.permissions.material_request.get_permission_query_conditions"
+}
 #
 # has_permission = {
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",
@@ -180,6 +182,9 @@ doc_events = {
     },
     "Material Request" : {
         "validate" : "masar_mce.custom.material_request.material_request.validate"
+    }, 
+    "Supplier" :{
+        "after_insert" : "masar_mce.custom.supplier.supplier.after_insert"
     }
     
 }

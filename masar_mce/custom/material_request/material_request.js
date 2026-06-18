@@ -1,8 +1,48 @@
 frappe.ui.form.on("Material Request", {
     setup(frm) {
         defaultSection(frm);
+        const grid = frm.fields_dict["items"].grid;
+        const tWarehouseField = grid.get_field("from_warehouse");
+        if (!tWarehouseField.original_bonus_get_query) {
+            tWarehouseField.original_bonus_get_query =
+                tWarehouseField.get_query;
+        }
+        tWarehouseField.get_query = function () {
+            return {
+                filters: {
+                    warehouse_type: ["in", ["مركزي"]]
+                }
+            };
+        };
+        frm.set_query("set_from_warehouse", function () {
+        return {
+            filters: {
+                warehouse_type: ["in", ["مركزي"]]
+            }
+        };
+    });
     }, 
     refresh(frm) {
+                const grid = frm.fields_dict["items"].grid;
+        const tWarehouseField = grid.get_field("from_warehouse");
+        if (!tWarehouseField.original_bonus_get_query) {
+            tWarehouseField.original_bonus_get_query =
+                tWarehouseField.get_query;
+        }
+        tWarehouseField.get_query = function () {
+            return {
+                filters: {
+                    warehouse_type: ["in", ["مركزي"]]
+                }
+            };
+        };
+        frm.set_query("set_from_warehouse", function () {
+        return {
+            filters: {
+                warehouse_type: ["in", ["مركزي"]]
+            }
+        };
+    });
         defaultSection(frm);
     }, 
     onload(frm) {
