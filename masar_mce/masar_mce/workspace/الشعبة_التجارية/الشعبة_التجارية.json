@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"DtT5EVovYo\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">\u0627\u0644\u0634\u0639\u0628\u0629 \u0627\u0644\u062a\u062c\u0627\u0631\u064a\u0629</span>\",\"col\":12}},{\"id\":\"09yw9EsCVq\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"PRQdZBVdSB\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item\",\"col\":4}},{\"id\":\"BvS9izhmYs\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item Group\",\"col\":4}},{\"id\":\"eZHYnmt0e-\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Supplier\",\"col\":4}},{\"id\":\"OVP_3x2C5d\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pricing Sheet\",\"col\":4}},{\"id\":\"4fjlXvRb6p\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"Fq9QbS2BYU\",\"type\":\"card\",\"data\":{\"card_name\":\"Master Data\",\"col\":4}}]",
+ "content": "[{\"id\":\"DtT5EVovYo\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">\u0627\u0644\u0634\u0639\u0628\u0629 \u0627\u0644\u062a\u062c\u0627\u0631\u064a\u0629</span>\",\"col\":12}},{\"id\":\"09yw9EsCVq\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"PRQdZBVdSB\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item\",\"col\":4}},{\"id\":\"BvS9izhmYs\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item Group\",\"col\":4}},{\"id\":\"eZHYnmt0e-\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Supplier\",\"col\":4}},{\"id\":\"OVP_3x2C5d\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pricing Sheet\",\"col\":4}},{\"id\":\"4fjlXvRb6p\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"Fq9QbS2BYU\",\"type\":\"card\",\"data\":{\"card_name\":\"Master Data\",\"col\":4}},{\"id\":\"h27LueYvN8\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
  "creation": "2026-06-18 16:29:04.010645",
  "custom_blocks": [],
  "docstatus": 0,
@@ -61,9 +61,98 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Reports",
+   "link_count": 8,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Stock Balance",
+   "link_count": 0,
+   "link_to": "Stock Balance",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Stock Analytics",
+   "link_count": 0,
+   "link_to": "Stock Analytics",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Stock Ageing",
+   "link_count": 0,
+   "link_to": "Stock Ageing",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Stock Ledger",
+   "link_count": 0,
+   "link_to": "Stock Ledger",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Purchase Analytics",
+   "link_count": 0,
+   "link_to": "Purchase Analytics",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Item-wise Purchase History",
+   "link_count": 0,
+   "link_to": "Item-wise Purchase History",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Purchase Order Analysis",
+   "link_count": 0,
+   "link_to": "Purchase Order Analysis",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Role Permissions Per Doctype",
+   "link_count": 0,
+   "link_to": "Role Permissions Per Doctype",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2026-06-18 16:34:38.432449",
+ "modified": "2026-06-18 17:03:39.188226",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "\u0627\u0644\u0634\u0639\u0628\u0629 \u0627\u0644\u062a\u062c\u0627\u0631\u064a\u0629",
