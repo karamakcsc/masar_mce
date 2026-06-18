@@ -16,11 +16,11 @@
  "doctype": "Workspace",
  "for_user": "",
  "hide_custom": 0,
- "icon": "getting-started",
+ "icon": "color-review-points",
  "idx": 0,
  "indicator_color": "green",
  "is_hidden": 0,
- "label": "Home",
+ "label": "MCE Setting",
  "links": [
   {
    "dependencies": "",
@@ -612,10 +612,10 @@
    "type": "Link"
   }
  ],
- "modified": "2026-06-18 19:23:46.803848",
+ "modified": "2026-06-18 19:31:12.114677",
  "modified_by": "Administrator",
  "module": "Masar MCE",
- "name": "Home",
+ "name": "MCE Setting",
  "number_cards": [
   {
    "label": "Active Suppliers",
@@ -637,13 +637,13 @@
  "restrict_to_domain": "",
  "roles": [
   {
-   "role": "Administrator"
+   "role": "System Manager"
   },
   {
    "role": "\u0645\u062f\u064a\u0631 \u0627\u0644\u0646\u0638\u0627\u0645"
   }
  ],
- "sequence_id": 2.0,
+ "sequence_id": 33.0,
  "shortcuts": [
   {
    "doc_view": "",
@@ -698,5 +698,5 @@
    "type": "DocType"
   }
  ],
- "title": "Home"
+ "title": "MCE Setting"
 }

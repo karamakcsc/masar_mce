@@ -1,7 +1,7 @@
 {
  "charts": [],
- "content": "[{\"id\":\"uXB2xQlggo\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">\u0627\u0644\u0645\u0633\u062a\u0648\u062f\u0639\u0627\u062a</span>\",\"col\":12}},{\"id\":\"2aCGG6OGd4\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"clSeMSgfNC\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Stock Entry\",\"col\":4}},{\"id\":\"P9ytn7D6-S\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase Order\",\"col\":4}},{\"id\":\"IzNCOAf9LY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Market Purchase Request\",\"col\":4}},{\"id\":\"RzTKYrnNKP\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase Receipt\",\"col\":4}},{\"id\":\"uxIKAHuZkG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Material Request\",\"col\":4}},{\"id\":\"SM7tfNx_kK\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Material Inspection\",\"col\":4}},{\"id\":\"FVhDsG-RUG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Penalty Entry\",\"col\":4}},{\"id\":\"s3ZjRa-ls5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Quality Inspection\",\"col\":4}},{\"id\":\"Y9xqXfyR2R\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Warehouse\",\"col\":4}},{\"id\":\"R_W3FiamnZ\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"1MnKojRpQF\",\"type\":\"card\",\"data\":{\"card_name\":\"Master Data\",\"col\":4}},{\"id\":\"-C_mMZjnyZ\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
- "creation": "2026-06-18 16:32:13.339939",
+ "content": "[{\"id\":\"thCVfHj0vh\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Markets</span>\",\"col\":12}},{\"id\":\"NbVSo-E3ph\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"QPB6tlJZ_x\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Market Purchase Request\",\"col\":4}},{\"id\":\"QBqur68ayx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Material Request\",\"col\":4}},{\"id\":\"WEb4j_dUwK\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Stock Entry\",\"col\":4}},{\"id\":\"dEqThp4wzg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item\",\"col\":4}},{\"id\":\"mjMi2RZcP_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Supplier\",\"col\":4}},{\"id\":\"PX_RHnRrXj\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase Order\",\"col\":4}},{\"id\":\"dC5RFXsGYk\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"CVvpCCxiN8\",\"type\":\"card\",\"data\":{\"card_name\":\"Master Data\",\"col\":4}},{\"id\":\"r_FrfiuZ6k\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
+ "creation": "2026-06-18 16:43:16.336594",
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
@@ -11,46 +11,16 @@
  "idx": 0,
  "indicator_color": "green",
  "is_hidden": 0,
- "label": "\u0627\u0644\u0645\u0633\u062a\u0648\u062f\u0639\u0627\u062a",
+ "label": "Markets",
  "links": [
   {
    "hidden": 0,
    "is_query_report": 0,
    "label": "Master Data",
-   "link_count": 9,
+   "link_count": 6,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Stock Entry",
-   "link_count": 0,
-   "link_to": "Stock Entry",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Purchase Order",
-   "link_count": 0,
-   "link_to": "Purchase Order",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Purchase Receipt",
-   "link_count": 0,
-   "link_to": "Purchase Receipt",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
   },
   {
    "hidden": 0,
@@ -75,9 +45,9 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Material Inspection",
+   "label": "Stock Entry",
    "link_count": 0,
-   "link_to": "Material Inspection",
+   "link_to": "Stock Entry",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -85,9 +55,9 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Penalty Entry",
+   "label": "Item",
    "link_count": 0,
-   "link_to": "Penalty Entry",
+   "link_to": "Item",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -95,9 +65,9 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Quality Inspection",
+   "label": "Supplier",
    "link_count": 0,
-   "link_to": "Quality Inspection",
+   "link_to": "Supplier",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -105,9 +75,9 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Warehouse",
+   "label": "Purchase Order",
    "link_count": 0,
-   "link_to": "Warehouse",
+   "link_to": "Purchase Order",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -194,7 +164,7 @@
   {
    "hidden": 0,
    "is_query_report": 1,
-   "label": "Purchase Order Analysis",
+   "label": "Role Permissions Per Doctype",
    "link_count": 0,
    "link_to": "Role Permissions Per Doctype",
    "link_type": "Report",
@@ -202,10 +172,10 @@
    "type": "Link"
   }
  ],
- "modified": "2026-06-18 17:05:27.344075",
+ "modified": "2026-06-18 17:07:09.291245",
  "modified_by": "Administrator",
  "module": "Masar MCE",
- "name": "\u0627\u0644\u0645\u0633\u062a\u0648\u062f\u0639\u0627\u062a",
+ "name": "Markets",
  "number_cards": [],
  "owner": "Administrator",
  "parent_page": "",
@@ -213,43 +183,25 @@
  "quick_lists": [],
  "roles": [
   {
-   "role": "\u0623\u0645\u064a\u0646 \u0627\u0644\u0645\u0633\u062a\u0648\u062f\u0639"
+   "role": "\u0645\u062f\u064a\u0631 \u0627\u0644\u0633\u0648\u0642"
+  },
+  {
+   "role": "\u0645\u0648\u0638\u0641 \u0627\u0644\u0633\u0648\u0642"
+  },
+  {
+   "role": "\u0645\u0633\u0624\u0648\u0644 \u0644\u062c\u0646\u0629 \u0627\u0644\u0627\u0633\u062a\u0644\u0627\u0645"
   },
   {
    "role": "\u0631\u0626\u064a\u0633 \u0644\u062c\u0646\u0629 \u0627\u0644\u0625\u062a\u0644\u0627\u0641"
   }
  ],
- "sequence_id": 30.0,
+ "sequence_id": 31.0,
  "shortcuts": [
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Stock Entry",
-   "link_to": "Stock Entry",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Purchase Order",
-   "link_to": "Purchase Order",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
   {
    "color": "Grey",
    "doc_view": "List",
    "label": "Market Purchase Request",
    "link_to": "Market Purchase Request",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Purchase Receipt",
-   "link_to": "Purchase Receipt",
    "stats_filter": "[]",
    "type": "DocType"
   },
@@ -264,34 +216,35 @@
   {
    "color": "Grey",
    "doc_view": "List",
-   "label": "Material Inspection",
-   "link_to": "Material Inspection",
+   "label": "Stock Entry",
+   "link_to": "Stock Entry",
    "stats_filter": "[]",
    "type": "DocType"
   },
   {
    "color": "Grey",
    "doc_view": "List",
-   "label": "Penalty Entry",
-   "link_to": "Penalty Entry",
+   "label": "Item",
+   "link_to": "Item",
    "stats_filter": "[]",
    "type": "DocType"
   },
   {
    "color": "Grey",
    "doc_view": "List",
-   "label": "Quality Inspection",
-   "link_to": "Quality Inspection",
+   "label": "Supplier",
+   "link_to": "Supplier",
+   "stats_filter": "[]",
    "type": "DocType"
   },
   {
    "color": "Grey",
    "doc_view": "List",
-   "label": "Warehouse",
-   "link_to": "Warehouse",
+   "label": "Purchase Order",
+   "link_to": "Purchase Order",
    "stats_filter": "[]",
    "type": "DocType"
   }
  ],
- "title": "\u0627\u0644\u0645\u0633\u062a\u0648\u062f\u0639\u0627\u062a"
+ "title": "Markets"
 }
