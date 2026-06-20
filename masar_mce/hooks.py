@@ -227,6 +227,8 @@ override_whitelisted_methods = {
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
 override_doctype_dashboards = {
+    "Purchase Receipt": "masar_mce.custom.purchase_receipt.purchase_receipt_dashboard.custom_purchase_receipt_dashboard", 
+    "Stock Entry": "masar_mce.custom.stock_entry.stock_entry_dashboard.custom_stock_entry_dashboard", 
 	"Blanket Order": "masar_mce.custom.blanket_order.blanket_order_dashboard.custom_blanket_order_dashboard", 
     "Material Request" : "masar_mce.custom.material_request.material_request_dashboard.custom_material_request_dashboard", 
     "Purchase Order" : "masar_mce.custom.purchase_order.purchase_order_dashboard.custom_purchase_order_dashboard"
