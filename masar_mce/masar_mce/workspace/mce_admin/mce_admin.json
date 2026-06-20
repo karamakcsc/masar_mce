@@ -20,7 +20,7 @@
  "idx": 0,
  "indicator_color": "green",
  "is_hidden": 0,
- "label": "MCE Setting",
+ "label": "MCE Admin",
  "links": [
   {
    "dependencies": "",
@@ -615,7 +615,7 @@
  "modified": "2026-06-18 19:31:12.114677",
  "modified_by": "Administrator",
  "module": "Masar MCE",
- "name": "MCE Setting",
+ "name": "MCE Admin",
  "number_cards": [
   {
    "label": "Active Suppliers",
@@ -698,5 +698,5 @@
    "type": "DocType"
   }
  ],
- "title": "MCE Setting"
+ "title": "MCE Admin"
 }
