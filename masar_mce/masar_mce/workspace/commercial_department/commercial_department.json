@@ -105,11 +105,70 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Setup",
+   "label": "\u0627\u0644\u062d\u0631\u0643\u0627\u062a",
    "link_count": 2,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Supplier Agreement",
+   "link_count": 0,
+   "link_to": "Blanket Order",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Pricing Sheet",
+   "link_count": 0,
+   "link_to": "Pricing Sheet",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Setup",
+   "link_count": 7,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Country",
+   "link_count": 0,
+   "link_to": "Country",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "UOM",
+   "link_count": 0,
+   "link_to": "UOM",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Brand",
+   "link_count": 0,
+   "link_to": "Brand",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   },
   {
    "hidden": 0,
@@ -124,9 +183,29 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "UOM",
+   "label": "Supplier Group",
    "link_count": 0,
-   "link_to": "UOM",
+   "link_to": "Supplier Group",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Penalty",
+   "link_count": 0,
+   "link_to": "Penalty",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Terms and Conditions",
+   "link_count": 0,
+   "link_to": "Terms and Conditions",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -169,28 +248,9 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "\u0627\u0644\u062d\u0631\u0643\u0627\u062a",
-   "link_count": 1,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Pricing Sheet",
-   "link_count": 0,
-   "link_to": "Pricing Sheet",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
   }
  ],
- "modified": "2026-06-21 10:32:52.714003",
+ "modified": "2026-06-21 13:34:54.628144",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Commercial Department",
@@ -208,6 +268,9 @@
   },
   {
    "role": "\u0645\u0648\u0638\u0641 \u0627\u0644\u0634\u0639\u0628\u0629 \u0627\u0644\u062a\u062c\u0627\u0631\u064a\u0629"
+  },
+  {
+   "role": "\u0645\u062f\u064a\u0631 \u0627\u0644\u0627\u0635\u0646\u0627\u0641"
   }
  ],
  "sequence_id": 29.0,
