@@ -231,7 +231,7 @@ def check_agreement_items(self):
         """ , as_dict= True)
         if sa_row and sa_row[0]:
             frappe.db.set_value('Blanket Order Item'  , sa_row[0]['name'] , 'custom_inspection_is_required' , 1)
-            frappe.db.set_value('Blanket Order Item'  , sa_row[0]['name'] , 'custom_quality_inspection_quantity' , row.qty)
+            frappe.db.set_value('Blanket Order Item'  , sa_row[0]['name'] , 'custom_quality_inspection_quantity' , flt(row.qty))
             
             
             

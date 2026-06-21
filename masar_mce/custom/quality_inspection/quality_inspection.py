@@ -1,5 +1,6 @@
 from frappe import db , get_doc , msgprint
 import frappe 
+from frappe.utils import flt
 
 def on_submit(self , method):
     update_stock_entry(self)
@@ -11,7 +12,7 @@ def update_stock_entry(self):
     se_doc = get_doc(self.reference_type , self.reference_name)
     for i in se_doc.items:
         if i.item_code == self.item_code:
-            db.set_value(i.doctype , i.name , {'quality_inspection' : self.name , 'custom_quality_inspection_status' : self.status , 'custom_quality_inspection_quantity' : self.sample_size} )
+            db.set_value(i.doctype , i.name , {'quality_inspection' : self.name , 'custom_quality_inspection_status' : self.status , 'custom_quality_inspection_quantity' : flt(self.sample_size)} )
             
     update_blanket_order(self , se_doc.custom_supplier_agreement)
     
@@ -27,14 +28,14 @@ def update_blanket_order(self , sa_name):
                     'custom_quality_inspection' : self.name , 
                     'custom_quality_inspection_status' : self.status , 
                     'custom_quality_inspection_remarks' : self.remarks , 
-                    'custom_quality_inspection_quantity' : self.sample_size,
+                    'custom_quality_inspection_quantity' : flt(self.sample_size),
                     'custom_inspection_is_required' : 1} 
                 )
             else: 
                 i.custom_quality_inspection = self.name
                 i.custom_quality_inspection_status =  self.status 
                 i.custom_quality_inspection_remarks =  self.remarks
-                i.custom_quality_inspection_quantity = self.sample_size
+                i.custom_quality_inspection_quantity = flt(self.sample_size)
                 i.custom_inspection_is_required = 1
                 sa_doc.save()
                 
@@ -118,7 +119,7 @@ def delinked_supplier_agreement(self):
                 'custom_quality_inspection' : None , 
                 'custom_quality_inspection_status' : None , 
                 'custom_quality_inspection_remarks' : None , 
-                'custom_quality_inspection_quantity' : None,
+                'custom_quality_inspection_quantity' : 0,
                 'custom_inspection_is_required' : 0} 
             )
     db.set_value(self.doctype , self.name , 'custom_supplier_agreement' , None)

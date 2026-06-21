@@ -145,7 +145,7 @@ def create_stock_entry_for_inspection(source_name, target_doc=None, args=None):
 
 
 def update_item(source_doc, target_doc, source_parent):
-    target_doc.qty = source_doc.custom_quality_inspection_quantity or 0
+    target_doc.qty = flt(source_doc.custom_quality_inspection_quantity) or 0
 
 
 def set_missing_values(source, target):
