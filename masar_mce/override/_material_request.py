@@ -105,6 +105,7 @@ def make_in_transit_stock_entry(source_name, in_transit_warehouse):
 	ste_doc = make_stock_entry(source_name)
 	ste_doc.add_to_transit = 1
 	ste_doc.to_warehouse = in_transit_warehouse
+	ste_doc.custom_target_location = frappe.db.get_value("Material Request", source_name, "set_warehouse")
 
 	for row in ste_doc.items:
 		row.t_warehouse = in_transit_warehouse

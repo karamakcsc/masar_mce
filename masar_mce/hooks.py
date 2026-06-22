@@ -54,7 +54,9 @@ doctype_js = {
     "Material Request" : "custom/material_request/material_request.js", 
     "Quality Inspection" : "custom/quality_inspection/quality_inspection.js"
     }
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_list_js = {
+    "Purchase Receipt": "custom/purchase_receipt/purchase_receipt_list.js"
+}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 

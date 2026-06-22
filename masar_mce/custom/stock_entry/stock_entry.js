@@ -10,6 +10,10 @@ frappe.ui.form.on("Stock Entry", {
         FilterWarehouseForInspection(frm);
         FilterWarehouseForBonus(frm);
         SetTransitTargetWarehouse(frm);
+        if (frappe.session.user !== 'Administrator'
+            && frappe.user_roles.includes('مسؤول لجنة الاستلام')) {
+            frm.toggle_display("add_to_transit", false);
+        }
     }, 
     setup: function(frm) {
         FilterWarehouseForInspection(frm);

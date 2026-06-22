@@ -9,6 +9,15 @@ frappe.ui.form.on("Purchase Receipt", {
         hide_buttons(frm);
         ChangeLabels(frm);
         CreateMaterialInspection(frm);
+        if (frappe.session.user !== 'Administrator'
+            && !document.getElementById('hide-status-btn-style')) {
+            $(`<style id="hide-status-btn-style">
+                .inner-group-button[data-label="%D8%A7%D9%84%D8%AD%D8%A7%D9%84%D8%A9"],
+                .inner-group-button[data-label="Status"] {
+                    display: none !important;
+                }
+            </style>`).appendTo('head');
+        }
     }, 
     onload(frm) {
         set_item_code_query(frm);

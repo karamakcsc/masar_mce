@@ -612,7 +612,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-06-18 19:23:46.803848",
+ "modified": "2026-06-22 16:36:36.917019",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Home",
@@ -637,10 +637,7 @@
  "restrict_to_domain": "",
  "roles": [
   {
-   "role": "Administrator"
-  },
-  {
-   "role": "\u0645\u062f\u064a\u0631 \u0627\u0644\u0646\u0638\u0627\u0645"
+   "role": "System Manager"
   }
  ],
  "sequence_id": 2.0,

@@ -8,7 +8,7 @@
  "for_user": "",
  "hide_custom": 0,
  "icon": "color-review-points",
- "idx": 0,
+ "idx": 1,
  "indicator_color": "green",
  "is_hidden": 0,
  "label": "Markets",
@@ -152,7 +152,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-06-21 13:37:02.611043",
+ "modified": "2026-06-22 16:36:17.152322",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Markets",
