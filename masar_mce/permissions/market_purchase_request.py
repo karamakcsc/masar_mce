@@ -3,6 +3,7 @@ import frappe
 
 user_role = {
     "مدير السوق",
+    "موظف السوق",
 }
 except_roles = {"System Manager", "Purchase Manager", "Purchase User"}
 

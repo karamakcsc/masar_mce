@@ -3,7 +3,7 @@ import frappe
 
 user_role = {
     "لجنة معاينة المستودع",
-    "لجنة استلام مستودعات",
+    "مأمور المستودع",
     "مدخل بيانات المستودعات",
 }
 except_roles = {"System Manager", "Purchase Manager", "Purchase User"}
