@@ -4,9 +4,13 @@
 frappe.ui.form.on("Market Purchase Request", {
 	refresh(frm) {
         set_item_code_query(frm);
-        GetItemsFromPO(frm);
+        // GetItemsFromPO(frm);
 	},
     setup(frm) {
+        frm.barcode_scanner = new erpnext.utils.BarcodeScanner({
+			frm: frm,
+			uom_field: "stock_uom",
+		});
         set_item_code_query(frm);
     },
     onload(frm) {
@@ -17,7 +21,10 @@ frappe.ui.form.on("Market Purchase Request", {
     },
     set_warehouse(frm) {
         set_item_code_query(frm);
-    }
+    },
+    scan_barcode: function (frm) {
+		frm.barcode_scanner.process_scan();
+	},
 });
 function set_item_code_query(frm) {
     frm.fields_dict['items'].grid.get_field('item_code').get_query = function(doc, cdt, cdn) {
@@ -45,7 +52,10 @@ frappe.ui.form.on('Purchase Request Item', {
     }, 
     items_remove(frm, cdt, cdn) {
         GetTotals(frm);
-    }
+    },
+    on_render(frm, cdt, cdn) {
+        GetItemDetails(frm , cdt , cdn)
+    }, 
 });
 function GetAmount(frm , cdt , cdn){
     const row = locals[cdt][cdn];

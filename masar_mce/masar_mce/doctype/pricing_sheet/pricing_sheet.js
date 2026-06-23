@@ -47,7 +47,10 @@ frappe.ui.form.on("Pricing Sheet", {
             frm.refresh_field("items");
             GetTotals(frm);
         }
-    }
+    },
+    onload: function(frm) {
+        frm.get_field('items').grid.cannot_add_rows = true;
+}
 });
 
 frappe.ui.form.on("Pricing Sheet Items", {

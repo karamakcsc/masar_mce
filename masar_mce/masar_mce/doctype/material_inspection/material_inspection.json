@@ -100,12 +100,14 @@
    "reqd": 1
   },
   {
+   "default": "Inspection Template",
    "fieldname": "material_inspection_type",
    "fieldtype": "Select",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Material Inspection Type",
    "options": "\nInspection Template\nReceiving Verificatied",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -165,7 +167,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-04 16:47:41.743492",
+ "modified": "2026-06-23 23:03:33.758265",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Material Inspection",

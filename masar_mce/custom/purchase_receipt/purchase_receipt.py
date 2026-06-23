@@ -338,7 +338,7 @@ def create_material_inspection(source_name, target_doc=None, args=None):
         target.item_code = source.item_code
         target.item_name = source.item_name
         target.description = source.description
-        target.quantity_supplied = flt(source.qty)
+        target.quantity_supplied = 0
         target.batch_number = source.batch_no
         target.production_date = None
         target.expiry_date = None

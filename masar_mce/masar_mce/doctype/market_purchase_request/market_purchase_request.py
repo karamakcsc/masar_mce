@@ -247,6 +247,7 @@ def make_purchase_receipt_from_purchase_request(source_name, target_doc=None):
 class MarketPurchaseRequest(Document):
 
     def validate(self):
+        self.get_po_details_for_item_on_validate()
         self.validate_po_available_qty()
         self.validate_inspection_status()
         self.validate_some_markets_warehouse()
@@ -257,6 +258,103 @@ class MarketPurchaseRequest(Document):
     def on_cancel(self):
         self.db_set('status', 'Cancelled')
         self.revert_order_qty_in_purchase_order()
+    def get_po_details_for_item_on_validate(self):
+        if not self.supplier:
+            return
+        used_pos_map = {}
+
+        for item in self.items:
+            if not item.item_code:
+                continue
+            if not item.item_name or not item.item_group or not item.description:
+                item_data = frappe.db.get_value(
+                    "Item",
+                    item.item_code,
+                    ["item_name", "item_group", "description"],
+                    as_dict=True,
+                )
+                if item_data:
+                    if not item.item_name:
+                        item.item_name = item_data.item_name
+                    if not item.item_group:
+                        item.item_group = item_data.item_group
+                    if not item.description:
+                        item.description = item_data.description
+            used_pos = used_pos_map.get(item.item_code, [])
+            values = [self.supplier, item.item_code]
+            exclude_clause = ""
+            if used_pos:
+                placeholders = ", ".join(["%s"] * len(used_pos))
+                exclude_clause = f" AND po.name NOT IN ({placeholders})"
+                values.extend(used_pos)
+            result = frappe.db.sql(f"""
+                SELECT
+                    po.name AS purchase_order,
+                    poi.name AS purchase_order_item,
+                    poi.rate AS rate,
+                    poi.stock_uom AS uom
+                FROM `tabPurchase Order` po
+                INNER JOIN `tabPurchase Order Item` poi ON po.name = poi.parent
+                INNER JOIN `tabItem` item ON poi.item_code = item.name
+                WHERE po.supplier = %s
+                  AND po.docstatus = 1
+                  AND po.status NOT IN ('Closed', 'Hold')
+                  AND poi.item_code = %s
+                  AND (
+                        poi.qty - IFNULL(poi.received_qty, 0)
+                        - IFNULL((
+                            SELECT SUM(pri.request_quantity - IFNULL(pri.received_qty, 0))
+                            FROM `tabPurchase Request Item` pri
+                            WHERE pri.purchase_order_item = poi.name AND pri.docstatus = 1
+                        ), 0)
+                        + poi.qty * IFNULL(item.over_delivery_receipt_allowance, 0)
+                  ) > 0
+                {exclude_clause}
+                ORDER BY po.transaction_date, po.name
+                LIMIT 1
+            """, values, as_dict=True)
+            if result:
+                po = result[0]
+                item.purchase_order = po.purchase_order
+                item.purchase_order_item = po.purchase_order_item
+                item.rate = po.rate
+                if not item.uom:
+                    item.uom = po.uom
+                used_pos_map.setdefault(item.item_code, []).append(po.purchase_order)
+            else:
+                if item.purchase_order:
+                    po_supplier = frappe.db.get_value("Purchase Order", item.purchase_order, "supplier")
+                    po_status = frappe.db.get_value("Purchase Order", item.purchase_order, "status")
+                    if po_supplier != self.supplier:
+                        msg = (
+                            _("Row {0}: Purchase Order {1} belongs to supplier <b>{2}</b>, not the selected supplier <b>{3}</b>.").format(
+                                item.idx, item.purchase_order, po_supplier, self.supplier
+                            )
+                        )
+                        if self.docstatus == 1:
+                            frappe.throw(msg)
+                        else:
+                            frappe.msgprint(msg)
+                    if po_status in ("Closed", "On Hold"):
+                        msg = (
+                            _("Row {0}: Purchase Order {1} is <b>{2}</b> and cannot be used.").format(
+                                item.idx, item.purchase_order, po_status
+                            )
+                        )
+                        if self.docstatus == 1:
+                            frappe.throw(msg)
+                        else:
+                            frappe.msgprint(msg)
+                msg = (
+                    _("Row {0}: No available open Purchase Order found for item <b>{1}</b> with supplier <b>{2}</b>.").format(
+                        item.idx, item.item_code, self.supplier
+                    )
+                )
+                if self.docstatus == 1:
+                    frappe.throw(msg)
+                else:
+                    frappe.msgprint(msg)
+
     def get_total_and_total_qty(self):
         total = 0
         total_qty = 0

@@ -80,6 +80,8 @@ class MaterialInspection(Document):
                         frappe.throw(_("Item {0} is not present in Purchase Receipt {1}").format(
 							row.item_code, self.purchase_receipt
 						))
+                if row.quantity_supplied == 0: 
+                    frappe.throw(_("Row {0}: Quantity Supplied for item {1} cannot be zero.").format(row.idx , row.item_code))
         for row in self.get("items"):
             self.calculate_child_row(row)
 @frappe.whitelist()

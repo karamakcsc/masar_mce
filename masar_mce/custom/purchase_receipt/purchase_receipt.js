@@ -92,12 +92,25 @@ function refresh_item_fields(frm) {
     frm.refresh_field("items");
 }
 function hide_buttons(frm) {
+    if (frappe.user_roles.includes('مأمور المستودع')) {
+            frm.set_df_property('items', 'cannot_add_rows', true);
+            frm.set_df_property('items', 'cannot_delete_rows', true); 
+            frm.set_df_property('items', 'cannot_delete_all_rows', true);
+        }
+    else {
+            frm.set_df_property('items', 'cannot_add_rows', false);
+            frm.set_df_property('items', 'cannot_delete_rows', false); 
+            frm.set_df_property('items', 'cannot_delete_all_rows', false);
+    }
+    frm.refresh_field('items');
     setTimeout(() => {
+
         cur_frm.page.remove_inner_button(__('Purchase Invoice'), __('Get Items From'));
         cur_frm.page.remove_inner_button(__('Purchase Order'), __('Get Items From'));
         cur_frm.page.remove_inner_button(__('Make Stock Entry'), __('Create'));
         cur_frm.page.remove_inner_button(__('Landed Cost Voucher'), __('Create'));
         cur_frm.page.remove_inner_button(__('Retention Stock Entry'), __('Create'));
+        cur_frm.page.remove_inner_button(__('Purchase Return'), __('Create'));
     }, 100);
 }
 

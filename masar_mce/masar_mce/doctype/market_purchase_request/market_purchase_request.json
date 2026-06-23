@@ -19,6 +19,8 @@
   "set_warehouse",
   "column_break_gocc",
   "expected_delivery_date",
+  "section_break_ynmt",
+  "scan_barcode",
   "section_break_adpd",
   "items",
   "section_break_wkwn",
@@ -158,6 +160,16 @@
   {
    "fieldname": "column_break_zwwd",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_ynmt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "scan_barcode",
+   "fieldtype": "Data",
+   "label": "Scan Barcode",
+   "options": "Barcode"
   }
  ],
  "grid_page_length": 50,
@@ -170,7 +182,7 @@
    "table_fieldname": "items"
   }
  ],
- "modified": "2026-01-07 14:08:50.940344",
+ "modified": "2026-06-23 15:23:47.461214",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Market Purchase Request",

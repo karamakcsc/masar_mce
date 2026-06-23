@@ -44,6 +44,11 @@ frappe.ui.form.on('Material Inspection', {
         } else {
             set_item_code_filter(frm); 
         }
+    }, 
+    setup: function(frm){
+        frm.set_df_property('items', 'cannot_add_rows', true);
+        frm.set_df_property('items', 'cannot_delete_rows', true); 
+        frm.set_df_property('items', 'cannot_delete_all_rows', true);
     }
 });
 function set_item_code_filter(frm) {
