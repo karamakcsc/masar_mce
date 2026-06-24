@@ -134,6 +134,16 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "Purchase Order",
+   "link_count": 0,
+   "link_to": "Purchase Order",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Setup",
    "link_count": 7,
    "link_type": "DocType",
@@ -250,7 +260,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-06-22 16:36:25.101972",
+ "modified": "2026-06-24 11:55:11.232721",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Commercial Department",
