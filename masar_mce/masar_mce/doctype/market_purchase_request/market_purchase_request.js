@@ -4,7 +4,7 @@
 frappe.ui.form.on("Market Purchase Request", {
 	refresh(frm) {
         set_item_code_query(frm);
-        // GetItemsFromPO(frm);
+        GetItemsFromPO(frm);
 	},
     setup(frm) {
         frm.barcode_scanner = new erpnext.utils.BarcodeScanner({
@@ -109,43 +109,43 @@ function GetItemDetails(frm , cdt , cdn){
         });
     }
 function GetItemsFromPO(frm) {
-    if (frm.doc.docstatus === 0) {
-        frm.add_custom_button(
-            __("Purchase Order"),
-            function () {
+    // if (frm.doc.docstatus === 0) {
+    //     frm.add_custom_button(
+    //         __("Purchase Order"),
+    //         function () {
 
-                if (!frm.doc.supplier) {
-                    frappe.throw({
-                        title: __("Mandatory"),
-                        message: __("Please Select a Supplier"),
-                    });
-                }
+    //             if (!frm.doc.supplier) {
+    //                 frappe.throw({
+    //                     title: __("Mandatory"),
+    //                     message: __("Please Select a Supplier"),
+    //                 });
+    //             }
 
-                erpnext.utils.map_current_doc({
-                    method: "masar_mce.masar_mce.doctype.market_purchase_request.market_purchase_request.make_purchase_request",
-                    source_doctype: "Purchase Order",
-                    target: frm,
-                    setters: {
-                        supplier: frm.doc.supplier,
-                    },
-                    get_query_filters: {
-                        docstatus: 1,
-                        status: ["not in", ["Closed", "On Hold"]],
-                        company: frm.doc.company,
-                    },
-                    allow_child_item_selection: true,
-                    child_fieldname: "items",
-                    child_columns: [
-                        "item_code",
-                        "item_name",
-                        "qty",
-                        "rate"
-                    ],
-                });
-            },
-            __("Get Items From")
-        );
-    }
+    //             erpnext.utils.map_current_doc({
+    //                 method: "masar_mce.masar_mce.doctype.market_purchase_request.market_purchase_request.make_purchase_request",
+    //                 source_doctype: "Purchase Order",
+    //                 target: frm,
+    //                 setters: {
+    //                     supplier: frm.doc.supplier,
+    //                 },
+    //                 get_query_filters: {
+    //                     docstatus: 1,
+    //                     status: ["not in", ["Closed", "On Hold"]],
+    //                     company: frm.doc.company,
+    //                 },
+    //                 allow_child_item_selection: true,
+    //                 child_fieldname: "items",
+    //                 child_columns: [
+    //                     "item_code",
+    //                     "item_name",
+    //                     "qty",
+    //                     "rate"
+    //                 ],
+    //             });
+    //         },
+    //         __("Get Items From")
+    //     );
+    // }
         if (frm.doc.docstatus === 1 && frm.doc.status !== "Closed") {
             frm.add_custom_button(
                 __("Purchase Receipt"),

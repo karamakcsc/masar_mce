@@ -38,7 +38,8 @@
   "global_curr_stock_value",
   "global_new_stock_value",
   "column_break_uikh",
-  "global_val_rate"
+  "global_val_rate",
+  "update_rate_in_po"
  ],
  "fields": [
   {
@@ -263,6 +264,14 @@
    "fieldtype": "Float",
    "label": "New Cost Per Unit",
    "read_only": 1
+  },
+  {
+   "columns": 1,
+   "default": "0",
+   "fieldname": "update_rate_in_po",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Update Rate in PO"
   }
  ],
  "grid_page_length": 50,

@@ -50,7 +50,14 @@ frappe.ui.form.on("Pricing Sheet", {
     },
     onload: function(frm) {
         frm.get_field('items').grid.cannot_add_rows = true;
-}
+    },
+    update_all_rates_in_po(frm) {
+        const val = frm.doc.update_all_rates_in_po ? 1 : 0;
+        (frm.doc.items || []).forEach(function(row) {
+            frappe.model.set_value(row.doctype, row.name, "update_rate_in_po", val);
+        });
+        frm.refresh_field("items");
+    },
 });
 
 frappe.ui.form.on("Pricing Sheet Items", {

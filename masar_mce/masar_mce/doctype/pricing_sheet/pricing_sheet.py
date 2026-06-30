@@ -1,7 +1,8 @@
 # Copyright (c) 2025, KCSC and contributors
 # For license information, please see license.txt
 
-import frappe 
+import frappe
+import json
 from frappe.model.document import Document
 from masar_mce.utils import get_tax_for_item , get_standard_price_list_b_s_sfz , get_current_stock_value_and_quantity , get_item_barcode
 from frappe.utils import flt
@@ -57,9 +58,10 @@ class PricingSheet(Document):
 	def on_cancel(self):
 		self.close_valid_date_in_item_price()
 	
-	def on_submit(self): 
+	def on_submit(self):
 		self.create_item_prices_for_every_item()
 		self.create_pos_item()
+		self._update_linked_purchase_order_rates()
 	def calculate_pricing_after_tax_and_there_totals(self):
 			new_total_quantity = local_sa = free_sa = new_purchase_amount = 0
 			for i in self.items:
@@ -353,3 +355,57 @@ class PricingSheet(Document):
 				"AGR_ENDATE": sa_doc.to_date,
 			}
 			insert_pos_item(payload_local_zone, payload_free_zone)
+
+
+	def _update_linked_purchase_order_rates(self):
+		from erpnext.controllers.accounts_controller import update_child_qty_rate
+		item_price_map = {
+			row.item_code: row.new_purchase_price
+			for row in self.items
+			if row.update_rate_in_po
+		}
+		if not item_price_map:
+			return
+		blanket_order = self.blanket_order
+		po_names = frappe.db.sql("""
+			SELECT DISTINCT po.name
+			FROM `tabPurchase Order` po
+			INNER JOIN `tabPurchase Order Item` poi ON poi.parent = po.name
+			WHERE poi.blanket_order = %s
+			AND (po.status NOT IN ('Closed'  , 'On Hold') OR po.per_received < 100)
+			AND po.docstatus = 1
+		""", (blanket_order,), as_dict=True)
+		if not po_names:
+			return
+		for row in po_names:
+			po_doc = frappe.get_doc("Purchase Order", row.name)
+			trans_items = []
+			any_changed = False
+			for item in po_doc.items:
+				item_data = {
+					"docname": item.name,
+					"item_code": item.item_code,
+					"qty": item.qty,
+					"rate": item.rate,
+					"uom": item.uom,
+					"conversion_factor": item.conversion_factor,
+				}
+				if item.schedule_date:
+					item_data["schedule_date"] = str(item.schedule_date)
+				fully_received = flt(item.received_qty) >= flt(item.qty) and flt(item.qty) > 0
+				if (
+					not fully_received
+					and item.blanket_order == blanket_order
+					and item.item_code in item_price_map
+				):
+					new_rate = flt(item_price_map[item.item_code])
+					if new_rate != flt(item.rate):
+						item_data["rate"] = new_rate
+						any_changed = True
+				trans_items.append(item_data)
+			if any_changed:
+				update_child_qty_rate(
+					parent_doctype="Purchase Order",
+					trans_items=json.dumps(trans_items),
+					parent_doctype_name=row.name,
+				)

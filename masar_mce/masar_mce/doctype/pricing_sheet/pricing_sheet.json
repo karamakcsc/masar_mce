@@ -15,6 +15,7 @@
   "last_sync",
   "pricing_type",
   "from_agreement",
+  "update_all_rates_in_po",
   "section_break_lvjk",
   "items",
   "section_break_ugmy",
@@ -136,6 +137,13 @@
    "hidden": 1,
    "label": "from Agreement",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:!doc.from_agreement",
+   "fieldname": "update_all_rates_in_po",
+   "fieldtype": "Check",
+   "label": "Update All Rates in Purchase Orders"
   }
  ],
  "grid_page_length": 50,
