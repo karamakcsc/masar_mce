@@ -27,7 +27,7 @@ app_license = "mit"
 # include js, css files in header of desk.html
 # app_include_css = "/assets/masar_mce/css/masar_mce.css"
 # app_include_css = "/assets/masar_mce/css/theme.css"
-# app_include_js = "/assets/masar_mce/js/arabic_digits_fix_no_UI_changes.js"
+app_include_js = "/assets/masar_mce/js/global_listview_filter.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/masar_mce/css/masar_mce.css"
@@ -54,9 +54,9 @@ doctype_js = {
     "Material Request" : "custom/material_request/material_request.js", 
     "Quality Inspection" : "custom/quality_inspection/quality_inspection.js"
     }
-doctype_list_js = {
-    "Purchase Receipt": "custom/purchase_receipt/purchase_receipt_list.js"
-}
+# doctype_list_js = {
+#     "*": "public/js/global_listview_filter.js"
+# }
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -129,13 +129,13 @@ doctype_list_js = {
 # -----------
 # Permissions evaluated in scripted ways
 
-permission_query_conditions = {
-	"Purchase Receipt": "masar_mce.permissions.purchase_receipt.get_permission_query_conditions",
-    "Material Inspection": "masar_mce.permissions.material_inspection.get_permission_query_conditions",
-    "Material Request": "masar_mce.permissions.material_request.get_permission_query_conditions",
-    "Market Purchase Request": "masar_mce.permissions.market_purchase_request.get_permission_query_conditions",
-    "Purchase Order": "masar_mce.permissions.purchase_order.get_permission_query_conditions",
-}
+# permission_query_conditions = {
+# 	"Purchase Receipt": "masar_mce.permissions.purchase_receipt.get_permission_query_conditions",
+#     "Material Inspection": "masar_mce.permissions.material_inspection.get_permission_query_conditions",
+#     "Material Request": "masar_mce.permissions.material_request.get_permission_query_conditions",
+#     "Market Purchase Request": "masar_mce.permissions.market_purchase_request.get_permission_query_conditions",
+#     "Purchase Order": "masar_mce.permissions.purchase_order.get_permission_query_conditions",
+# }
 #
 # has_permission = {
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",

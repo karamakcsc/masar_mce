@@ -137,7 +137,6 @@ def get_supplier_account(self):
 def get_items_from_party_specific_item(doctype, txt, searchfield, start, page_len, filters):
     party = filters.get("party")
     party_type = filters.get("party_type", "Supplier")
-
     return frappe.db.sql("""
         SELECT 
             i.name, 
