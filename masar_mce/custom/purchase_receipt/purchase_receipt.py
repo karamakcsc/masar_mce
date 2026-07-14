@@ -214,7 +214,7 @@ def create_auto_penalty_entry(self):
                 'posting_date' : self.posting_date,
                 'penalties' : penalties
             }
-            frappe.new_doc('Penalty Entry').update(entry).insert(ignore_permissions = True).submit()
+            frappe.new_doc('Penalty Entry').update(entry).insert(ignore_permissions = True)#.submit()
 
 def check_request_to_accepted_qty(self): 
     for i in self.items: 
