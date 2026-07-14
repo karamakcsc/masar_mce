@@ -8,6 +8,19 @@ from frappe.utils import getdate
 from dateutil.relativedelta import relativedelta
 
 class MaterialInspection(Document):
+    def on_submit(self):
+        self.db_set('is_active' , 1)
+        self.deactive_previous_purchase_requests()
+    def on_cancel(self):
+        self.db_set('is_active' , 0)
+        
+    def deactive_previous_purchase_requests(self):
+        frappe.db.sql( """
+            UPDATE `tabMaterial Inspection`
+            SET is_active = 0
+            WHERE purchase_receipt = %s
+            AND name != %s""" , 
+            (self.purchase_receipt, self.name))
     def calculate_child_row(self, row):
         """Update delay_period (Int), product_lifespan (Duration), production_exceeded (Percent)"""
         supply_date = getdate(row.supply_date) if row.supply_date else None

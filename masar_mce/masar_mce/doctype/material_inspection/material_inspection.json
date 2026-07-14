@@ -16,6 +16,7 @@
   "material_inspection_type",
   "supply_date",
   "amended_from",
+  "is_active",
   "section_break_czzt",
   "items",
   "signatures_tab",
@@ -161,13 +162,20 @@
    "hidden": 1,
    "label": "Naming",
    "options": "MAT-QM-.YYYY.-."
+  },
+  {
+   "default": "0",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-06-23 23:03:33.758265",
+ "modified": "2026-07-12 10:14:25.431031",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Material Inspection",

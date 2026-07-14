@@ -19,6 +19,44 @@ def on_submit(self , method):
         create_auto_penalty_entry(self)
         check_request_to_accepted_qty(self)
     update_received_qty(self)
+    validate_partial_qty(self)
+    check_material_inspection_status(self)
+    
+def check_material_inspection_status(self):
+    if self.set_warehouse is None:
+        frappe.throw(_("Please select an Accepted Warehouse before submitting the Purchase Receipt."))
+    wh_type = frappe.db.get_value("Warehouse", self.set_warehouse, "warehouse_type") if self.set_warehouse else None
+    if wh_type not in ("Store", "سوق"):
+        return
+    for row in self.items:
+        mi_status_sql = frappe.db.sql("""
+            SELECT mid.laboratory_remarks
+            FROM `tabMaterial Inspection` mi
+            INNER JOIN `tabMaterial Inspection Details` mid
+                ON mi.name = mid.parent
+            WHERE mi.purchase_receipt = %(purchase_receipt)s
+              AND mi.is_active = 1
+              AND mid.pr_row_ref = %(pr_row_ref)s
+        """, {
+            "purchase_receipt": self.name,
+            "pr_row_ref": row.name
+        }, as_dict=True)
+
+        mi_status = mi_status_sql[0].laboratory_remarks if mi_status_sql else None
+
+        if mi_status is None:
+            frappe.throw(_(
+                """Item <b>{0}</b> (Row {1}) does not have an active Material Inspection record.
+                Please create and complete an active Material Inspection for this item before submitting the Purchase Receipt."""
+            ).format(row.item_code, row.idx))
+
+        if mi_status != "Conforming without any issues":
+            frappe.throw(_(
+                "Item <b>{0}</b> (Row {1}) cannot be received because its Material Inspection result is "
+                "<b>'{2}'</b>. Only items with the result <b>'Conforming without any issues'</b> can be received."
+            ).format(row.item_code, row.idx, mi_status))
+        
+
 def before_insert(self , method):
     set_purchase_order_rate(self)
     set_selling_price_list(self)
@@ -326,7 +364,37 @@ def validate_some_markets_warehouse(self):
                 else:
                     frappe.msgprint(msg)
 
-
+def validate_partial_qty(self):
+    diff_rows = list()
+    for row in self.items:
+        if row.custom_purchase_request:
+            central_distribution = frappe.db.get_value("Market Purchase Request", row.custom_purchase_request, "central_distribution")
+            if central_distribution == 1 and row.custom_request_quantity != row.qty:
+                if row.qty > row.custom_request_quantity:
+                    frappe.throw(_("Row {0}: Quantity Accepted ({1}) cannot exceed the Requested Quantity ({2}) for item {3}.").format(row.idx, row.qty, row.custom_request_quantity, row.item_code))
+                if row.qty < row.custom_request_quantity:
+                    # diff_qty = row.custom_request_quantity - row.qty
+                    frappe.throw(_(
+                        """Row {0}: Quantity Accepted ({1}) is less than the Requested Quantity ({2}) for item {3}. 
+                        Please ensure that the accepted quantity matches the requested quantity."""
+                        ).format(row.idx, row.qty, row.custom_request_quantity, row.item_code))
+                    # diff_rows.append(
+                    #     {
+                    #         'item_code': row.item_code,
+                    #         'diff_qty': diff_qty,
+                    #         'uom' : row.uom,
+                    #         'warehouse' : row.warehouse
+                    #     }
+                    # )
+    # if diff_rows:
+    #     se_doc = frappe.new_doc("Stock Entry")
+    #     se_doc.stock_entry_type = "سند استلام"
+    #     se.doc = 
+    #     # damaged_wh = frappe.db.sql("""
+    #     #     SELECT name FROM `tabWarehouse`
+    #     #     WHERE  warehouse_type = 'توالف'
+        #     AND parent_warehouse = SELECT parent_warehouse FROM `tabWarehouse` WHERE name = %s""" , 
+        #     (row.warehouse,) , as_dict = 1)
 
 @frappe.whitelist()
 def create_material_inspection(source_name, target_doc=None, args=None):
@@ -342,6 +410,7 @@ def create_material_inspection(source_name, target_doc=None, args=None):
         target.batch_number = source.batch_no
         target.production_date = None
         target.expiry_date = None
+        target.pr_row_ref = source.name
 
     def select_item(d):
         filtered_items = args.get("filtered_children", [])

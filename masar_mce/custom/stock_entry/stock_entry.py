@@ -63,11 +63,131 @@ def on_submit(self , method):
     if self.stock_entry_type  in ['Material Receipt for Inspection' , 'سند إستلام لفحص الجودة' ]:
         check_agreement_items(self)
         create_quality_inspection(self)
-    if self.stock_entry_type  in ['Return to Supplier' , 'إرجاع إلى المورد' ]:
+    if self.stock_entry_type  in ['Return to Supplier' , 'إرجاع إلى المورد' , 'نقص كميات تم تدويرها من المستودعات']:
         validate_party_specific_item(self)
-        make_gl_entry(self)    
+        make_gl_entry(self) 
+    ## •	كل مستودع ذكر بالنقطة أعلاه, يجب ان يتم اجراء متابعة المواد بشكل منفصل عن الاخر, مثال: في حال كانت المواد تنقل بسيارات الشركة فان أي نقص بالمواد يجب ان يتم الاستلام بشكل كامل, وعمل سند ارجاع للمورد (ضبط) من مستودع الاتلاف بشكل تلقائي للكميات الناقصة وتحت مسمى (نقص كميات تم تدويرها من المستودعات) مع اجراء تنبيه فوري لكل من الشركة والمستخدمين المعنيين, وبنفس الطريقة لباقي الخيارات بحسب ما تم الاتفاق عليه مسبقاً.
+    # if self.outgoing_stock_entry:
+    #      outgoing_stock_entry_submit(self)
     
-        
+def outgoing_stock_entry_submit(self):
+    rows_diff = list()
+    for i in self.items:
+        if not i.s_warehouse or frappe.db.get_value('Warehouse', i.s_warehouse, 'custom_company_transfer') != 1:
+            continue
+        original_qty = flt(frappe.db.get_value('Stock Entry Detail', i.ste_detail, 'qty'))
+        if flt(i.qty) == original_qty:
+            continue
+        qty_diff = original_qty - flt(i.qty)
+        if qty_diff <= 0:
+            frappe.throw(
+                _("Row #{0}: Received qty for item {1} exceeds the transferred qty; Transit cannot be auto-closed.")
+                .format(i.idx, i.item_code)
+            )
+            continue
+        damaged_wh = frappe.db.sql("""
+            SELECT name
+            FROM `tabWarehouse`
+            WHERE warehouse_type= 'توالف'
+              AND parent_warehouse = (
+                    SELECT parent_warehouse
+                    FROM `tabWarehouse`
+                    WHERE name=%s
+              )
+        """, (i.t_warehouse))
+
+        rows_diff.append({
+            'item_code': i.item_code,
+            'qty_diff': qty_diff,
+            'uom': i.uom,
+            's_warehouse': i.s_warehouse,
+            't_warehouse': damaged_wh[0][0]
+        })
+    if rows_diff:
+        close_transit_to_damaged_warehouse(self, rows_diff)
+
+from erpnext.stock.doctype.stock_entry.stock_entry import make_stock_in_entry
+def close_transit_to_damaged_warehouse(self, rows_diff):
+    se = make_stock_in_entry(self.outgoing_stock_entry)
+    se.stock_entry_type = "Material Transfer"
+    se.purpose = "Material Transfer"
+    new_items = []
+    shortage_rows_by_supplier = {}
+
+    for item in self.items:
+        if not item.s_warehouse:
+            continue
+
+        if frappe.db.get_value("Warehouse", item.s_warehouse, "custom_company_transfer") != 1:
+            continue
+
+        original_qty = flt(frappe.db.get_value("Stock Entry Detail", item.ste_detail, "qty"))
+
+        diff_qty = original_qty - flt(item.qty)
+
+        if diff_qty <= 0:
+            continue
+
+        damaged_wh = frappe.db.sql("""
+            SELECT name
+            FROM `tabWarehouse`
+            WHERE warehouse_type='توالف'
+              AND parent_warehouse = (
+                    SELECT parent_warehouse
+                    FROM `tabWarehouse`
+                    WHERE name=%s
+              )
+        """, item.t_warehouse)
+
+        if not damaged_wh or not damaged_wh[0][0]:
+            frappe.throw(
+                _("No Damaged Warehouse found for {0}").format(item.t_warehouse)
+            )
+        damaged_warehouse = damaged_wh[0][0]
+        for d in se.items:
+            if d.ste_detail == item.ste_detail:
+                d.qty = diff_qty
+                d.s_warehouse = item.s_warehouse
+                d.t_warehouse = damaged_warehouse
+                new_items.append(d)
+
+                supplier = d.to_supplier
+                if not supplier or not frappe.db.exists("Supplier", supplier):
+                    frappe.throw(
+                        _("Row #{0}: No valid Supplier (Inventory Dimension) found for item {1} in Warehouse {2}.")
+                        .format(d.idx, d.item_code, damaged_warehouse)
+                    )
+                shortage_rows_by_supplier.setdefault(supplier, []).append({
+                    "item_code": d.item_code,
+                    "qty": diff_qty,
+                    "uom": d.uom,
+                    "s_warehouse": damaged_warehouse,
+                })
+                break
+    se.items = new_items
+
+    if not se.items:
+        return
+    se.insert(ignore_permissions=True)
+    se.submit()
+    frappe.db.commit()
+
+    create_warehouse_shortage_entries(self, shortage_rows_by_supplier)
+
+
+def create_warehouse_shortage_entries(self, shortage_rows_by_supplier):
+    for supplier, rows in shortage_rows_by_supplier.items():
+        issue_se = frappe.new_doc("Stock Entry")
+        issue_se.stock_entry_type = "نقص كميات تم تدويرها من المستودعات"
+        issue_se.purpose = "Material Issue"
+        issue_se.company = self.company
+        issue_se.custom_supplier = supplier
+        for row in rows:
+            issue_se.append("items", row)
+        issue_se.insert(ignore_permissions=True)
+        issue_se.submit()
+        frappe.db.commit()
+
 def validate_bonus_receipt(self):
     if frappe.db.get_value(
         "Warehouse",

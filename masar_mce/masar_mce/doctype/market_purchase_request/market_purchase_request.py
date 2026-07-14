@@ -3,10 +3,11 @@
 
 import frappe, json
 from frappe.model.document import Document
-from frappe.utils import flt
+from frappe.utils import flt, fmt_money , get_datetime
 from frappe.model.mapper import get_mapped_doc
 from masar_mce.utils import get_inspection_status
 from frappe import _
+
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_len, filters):
@@ -61,7 +62,7 @@ def get_items_from_open_purchase_orders(doctype, txt, searchfield, start, page_l
             row.item_code,
             f"<b>Name:</b> {row.item_name}, "
             f"<b>PO:</b> {row.purchase_order}, "
-            f"<b>Qty:</b> {frappe.utils.fmt_money(row.available_qty, currency=None)}<br>"
+            f"<b>Qty:</b> {fmt_money(row.available_qty, currency=None)}<br>"
         )
         for row in result
     ]
@@ -124,12 +125,12 @@ def make_purchase_request(source_name, target_doc=None, args=None):
         args = json.loads(args)
 
     def update_item(source, target, source_parent):
-        over_delivery = flt(frappe.db.get_value("Item", source.item_code, "over_delivery_receipt_allowance") or 0)
-        pending_pr_qty = flt(frappe.db.sql("""
-            SELECT SUM(pri.request_quantity - IFNULL(pri.received_qty,0))
-            FROM `tabPurchase Request Item` pri
-            WHERE pri.purchase_order_item = %s AND pri.docstatus = 1
-        """, source.name)[0][0] or 0)
+        # over_delivery = flt(frappe.db.get_value("Item", source.item_code, "over_delivery_receipt_allowance") or 0)
+        # pending_pr_qty = flt(frappe.db.sql("""
+        #     SELECT SUM(pri.request_quantity - IFNULL(pri.received_qty,0))
+        #     FROM `tabPurchase Request Item` pri
+        #     WHERE pri.purchase_order_item = %s AND pri.docstatus = 1
+        # """, source.name)[0][0] or 0)
         qty =0 # flt(source.qty) - flt(source.received_qty or 0) - pending_pr_qty + flt(source.qty) * over_delivery
         target.request_quantity = qty
         target.rate = flt(source.rate)
@@ -255,6 +256,7 @@ class MarketPurchaseRequest(Document):
     def on_submit(self):
         self.db_set('status', 'To Receive')
         self.set_order_qty_in_purchase_order()
+        self.send_email_to_supplier()
     def on_cancel(self):
         self.db_set('status', 'Cancelled')
         self.revert_order_qty_in_purchase_order()
@@ -499,4 +501,120 @@ class MarketPurchaseRequest(Document):
                         frappe.throw(msg)
                     else:
                         frappe.msgprint(msg)
-                    
+    def send_email_to_supplier(self):
+        if not self.supplier:
+            return
+        supplier_email = (
+            frappe.db.get_value("Supplier", self.supplier, "email_id")
+            or frappe.db.get_value("Supplier", self.supplier, "custom_email")
+        )
+        if not supplier_email:
+            frappe.msgprint(
+                _("Supplier {0} does not have an email address.").format(self.supplier)
+            )
+            return
+        supplier_name = self.supplier_name or self.supplier
+        warehouse = self.set_warehouse or ""
+        request_date = frappe.format(self.request_date, {"fieldtype": "Date"})
+        modified_time = get_datetime(self.modified).strftime("%H:%M")
+        email_message = f"""
+            <html>
+            <body style="margin:0;padding:0;">
+            <div dir="rtl"
+                style="
+                    direction: rtl;
+                    unicode-bidi: embed;
+                    text-align: right;
+                    font-family: Tahoma, Arial, sans-serif;
+                    font-size: 14px;
+                    line-height: 1.8;
+                    color: #1f2937;
+                ">
+
+                <p style="margin:0 0 15px 0;">
+                    السادة <strong>{supplier_name}</strong> المحترمين،
+                </p>
+
+                <p style="margin:0 0 15px 0;">
+                    تحية طيبة وبعد،
+                </p>
+
+                <p style="margin:0 0 20px 0;">
+                    نود إشعاركم بأنه تم إصدار
+                    <strong>وصل استلام طلبية أسواق</strong>
+                    رقم <strong>{self.name}</strong>.
+                </p>
+
+                <table cellpadding="8" cellspacing="0"
+                    style="
+                            width:100%;
+                            border-collapse:collapse;
+                            background:#f8f9fa;
+                            border-right:4px solid #1f2937;
+                            margin:20px 0;
+                            direction:rtl;
+                            text-align:right;
+                    ">
+                    <tr>
+                        <td><strong>المستلم:</strong></td>
+                        <td>{warehouse}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>تاريخ ووقت الطلب:</strong></td>
+                        <td>{request_date} - {modified_time}</td>
+                    </tr>
+                </table>
+
+                <p style="margin:20px 0;">
+                    تجدون مرفقًا نسخة PDF من وصل الاستلام، والتي تتضمن جميع التفاصيل والبيانات الخاصة بالوصل، وذلك للاعتماد والطباعة والاحتفاظ بها كسجل رسمي.
+                </p>
+
+                <br>
+
+                <p style="margin:0;">
+                    مع خالص الشكر والتقدير،
+                </p>
+
+                <p style="margin-top:10px;">
+                    <strong>المؤسسة الاستهلاكية العسكرية</strong><br>
+                    القيادة العامة للقوات المسلحة الأردنية - الجيش العربي
+                </p>
+
+            </div>
+            </body>
+            </html>
+            """
+
+        subject = _("تم اعتماد طلبية الشراء {0}").format(self.name)
+
+        pdf_attachment = frappe.attach_print(self.doctype, self.name, doc=self)
+
+        try:
+            frappe.sendmail(
+                recipients=[supplier_email],
+                subject=subject,
+                message=email_message,
+                reference_doctype=self.doctype,
+                reference_name=self.name,
+                attachments=[pdf_attachment],
+                now=True,
+            )
+            frappe.msgprint(_("Email sent successfully to {0}.").format(supplier_email), alert=True)
+
+        except Exception:
+            frappe.log_error(
+                frappe.get_traceback(),
+                "Market Purchase Request Email"
+            )
+            frappe.sendmail(
+                recipients=[supplier_email],
+                subject=subject,
+                message=email_message,
+                reference_doctype=self.doctype,
+                reference_name=self.name,
+                attachments=[pdf_attachment],
+                now=False,
+            )
+            frappe.msgprint(
+                _("Unable to send the email immediately. It has been queued for delivery."), alert=True
+            )

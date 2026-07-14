@@ -13,6 +13,7 @@
   "column_break_qvzn",
   "company",
   "request_date",
+  "central_distribution",
   "amended_from",
   "status",
   "section_break_kxcv",
@@ -170,6 +171,13 @@
    "fieldtype": "Data",
    "label": "Scan Barcode",
    "options": "Barcode"
+  },
+  {
+   "default": "0",
+   "fieldname": "central_distribution",
+   "fieldtype": "Check",
+   "label": "Central Distribution",
+   "permlevel": 1
   }
  ],
  "grid_page_length": 50,
@@ -182,7 +190,7 @@
    "table_fieldname": "items"
   }
  ],
- "modified": "2026-06-23 15:23:47.461214",
+ "modified": "2026-07-12 11:47:42.926788",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Market Purchase Request",

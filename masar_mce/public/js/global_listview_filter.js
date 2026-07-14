@@ -1,19 +1,30 @@
-const OriginalListView = frappe.views.ListView;
+// public/js/listview_default_filter.js
 
-frappe.views.ListView = class CustomListView extends OriginalListView {
-    before_render() {
-        super.before_render();
+frappe.listview_settings["*"] = {
+    onload(listview) {
+        // Prevent re-application if already processed in this listview instance
+        if (listview.__default_filter_applied) {
+            return;
+        }
 
-        const filters = this.filter_area?.get() || [];
+        // Mark as applied immediately to avoid duplicate calls (even if the filter fails)
+        listview.__default_filter_applied = true;
 
-        const has_docstatus_filter = filters.some(
-            f => f[1] === "docstatus"
+        // Get current filters (array of arrays: [doctype, field, operator, value])
+        const current_filters = listview.filter_area.get() || [];
+
+        // Check if a docstatus filter already exists (from saved filters or default)
+        const has_docstatus_filter = current_filters.some(
+            (f) => f[1] === "docstatus"  // field name is the second element
         );
 
+        // Only add our default if no docstatus filter is present
         if (!has_docstatus_filter) {
-            this.filter_area.add([
-                [this.doctype, "docstatus", "=", 0]
+            listview.filter_area.add([
+                [listview.doctype, "docstatus", "=", 0]
             ]);
+            // After adding, we must refresh the list to apply the filter
+            listview.filter_area.apply();
         }
     }
 };
