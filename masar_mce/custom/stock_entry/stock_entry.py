@@ -10,6 +10,10 @@ def validate(self , method ):
     validate_item_markets_for_stock_entry(self)
     if self.stock_entry_type in ["Bonus Receipt" ,'سند استلام البونص']:
         validate_bonus_receipt(self)
+    if self.stock_entry_type == 'سند تدوير' and self.custom_company_transfer == 1:
+        for i in self.items:
+            i.supplier = self.custom_supplier_dimension
+            i.to_supplier = self.custom_supplier_dimension
 def validate_item_markets_for_stock_entry(self):
     if not self.items:
         return
@@ -101,7 +105,8 @@ def outgoing_stock_entry_submit(self):
             'qty_diff': qty_diff,
             'uom': i.uom,
             's_warehouse': i.s_warehouse,
-            't_warehouse': damaged_wh[0][0]
+            't_warehouse': damaged_wh[0][0], 
+            'supplier': i.to_supplier
         })
     if rows_diff:
         close_transit_to_damaged_warehouse(self, rows_diff)
@@ -149,6 +154,8 @@ def close_transit_to_damaged_warehouse(self, rows_diff):
                 d.qty = diff_qty
                 d.s_warehouse = item.s_warehouse
                 d.t_warehouse = damaged_warehouse
+                d.supplier = item.supplier
+                d.to_supplier = item.supplier
                 new_items.append(d)
 
                 supplier = d.to_supplier
