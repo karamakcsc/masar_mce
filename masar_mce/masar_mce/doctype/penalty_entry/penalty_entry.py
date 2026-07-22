@@ -115,14 +115,19 @@ class PenaltyEntry(AccountsController):
             else:
                 p_amount  = flt(self.pr_total) *  flt(get_value('Penalty', row.penalty, 'penalty_percentage')) / 100 
                 
-            if penalty_doc.based_on_days:
-                pr_doc = frappe.get_doc('Purchase Receipt' , self.purchase_receipt)
-                if pr_doc.posting_date > pr_doc.custom_delivery_date:
-                    extra_days = date_diff(getdate(pr_doc.posting_date), getdate(pr_doc.custom_delivery_date))
-                    if extra_days > 0:
-                        p_amount = p_amount * extra_days
-                else: 
-                    p_amount = 0
+        if penalty_doc.based_on_days:
+            pr_doc = frappe.get_doc("Purchase Receipt", self.purchase_receipt)
+            if not pr_doc.custom_delivery_date:
+                frappe.throw(
+                    _("Purchase Receipt {0} does not have a Delivery Date.")
+                    .format(pr_doc.name)
+                )
+            posting_date = getdate(pr_doc.posting_date)
+            delivery_date = getdate(pr_doc.custom_delivery_date)
+            if posting_date > delivery_date:
+                p_amount *= date_diff(posting_date, delivery_date)
+            else:
+                p_amount = 0
             row.amount = p_amount
     
                 
