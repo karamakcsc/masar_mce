@@ -39,7 +39,22 @@
   "global_new_stock_value",
   "column_break_uikh",
   "global_val_rate",
-  "update_rate_in_po"
+  "update_rate_in_po",
+  "pricing_verification_section",
+  "original_new_purchase_price",
+  "original_local_mp",
+  "original_local_sp",
+  "column_break_pricing_verification",
+  "original_free_mp",
+  "original_free_sp",
+  "difference_section",
+  "difference_new_purchase_price",
+  "difference_local_mp",
+  "difference_local_sp",
+  "column_break_difference",
+  "difference_free_mp",
+  "difference_free_sp",
+  "dual_entry_captured"
  ],
  "fields": [
   {
@@ -272,13 +287,121 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Update Rate in PO"
+  },
+  {
+   "fieldname": "pricing_verification_section",
+   "fieldtype": "Section Break",
+   "label": "Original Entry (First User)"
+  },
+  {
+   "fieldname": "original_new_purchase_price",
+   "fieldtype": "Float",
+   "label": "Original Purchase Price",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "original_local_mp",
+   "fieldtype": "Percent",
+   "label": "Original Markup Percentage (Local Zone)",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "original_local_sp",
+   "fieldtype": "Float",
+   "label": "Original Selling Price (Local Zone)",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_pricing_verification",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "original_free_mp",
+   "fieldtype": "Percent",
+   "label": "Original Markup Percentage (Free Zone)",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "original_free_sp",
+   "fieldtype": "Float",
+   "label": "Original Selling Price (Free Zone)",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "difference_section",
+   "fieldtype": "Section Break",
+   "label": "Difference (Manager Entry vs Original Entry)"
+  },
+  {
+   "fieldname": "difference_new_purchase_price",
+   "fieldtype": "Float",
+   "label": "Difference - Purchase Price",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "difference_local_mp",
+   "fieldtype": "Percent",
+   "label": "Difference - Markup Percentage (Local Zone)",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "difference_local_sp",
+   "fieldtype": "Float",
+   "label": "Difference - Selling Price (Local Zone)",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_difference",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "difference_free_mp",
+   "fieldtype": "Percent",
+   "label": "Difference - Markup Percentage (Free Zone)",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "difference_free_sp",
+   "fieldtype": "Float",
+   "label": "Difference - Selling Price (Free Zone)",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "dual_entry_captured",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Dual Entry Captured",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-21 12:30:11.360278",
+ "modified": "2026-07-26 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Pricing Sheet Items",

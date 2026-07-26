@@ -186,7 +186,7 @@
    "fieldname": "material_inspection_required",
    "fieldtype": "Check",
    "label": "Material Inspection Required",
-   "permlevel": 1
+   "permlevel": 2
   }
  ],
  "grid_page_length": 50,
@@ -199,7 +199,7 @@
    "table_fieldname": "items"
   }
  ],
- "modified": "2026-07-26 09:38:36.229902",
+ "modified": "2026-07-26 11:38:11.103848",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Market Purchase Request",

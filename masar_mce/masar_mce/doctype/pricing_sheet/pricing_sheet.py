@@ -9,6 +9,7 @@ from frappe.utils import flt
 from frappe import _ , get_doc , db
 from datetime import datetime
 from masar_mce.api import insert_pos_item
+from masar_mce.dual_entry import apply_dual_entry_workflow, validate_pricing_matches
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_items_by_blanket_order(doctype, txt, searchfield, start, page_len, filters):
@@ -51,13 +52,22 @@ class PricingSheet(Document):
 		if getattr(self, "from_agreement", 0) and not getattr(frappe.flags, "in_agreement_sync", False):
 			if not self.is_new():
 				frappe.throw(_("This Pricing Sheet is created from Supplier Agreement and cannot be edited. Create a new Pricing Sheet to modify."))
+		# The auto-generated Pricing Sheet (from_agreement) is a live mirror of
+		# the Supplier Agreement - the dual-entry verification happens there,
+		# not here, so this Pricing Sheet never runs its own capture/reset cycle.
+		if not getattr(self, "from_agreement", 0):
+			apply_dual_entry_workflow(self)
 		self.calculate_pricing_after_tax_and_there_totals()
 		self.validate_items_from_blanket_order()
 		self.validate_duplicate_items()
-  
+
+	def before_submit(self):
+		if getattr(self, "from_agreement", 0) == 0 :
+			validate_pricing_matches(self)
+
 	def on_cancel(self):
 		self.close_valid_date_in_item_price()
-	
+
 	def on_submit(self):
 		self.create_item_prices_for_every_item()
 		self.create_pos_item()
@@ -354,7 +364,7 @@ class PricingSheet(Document):
 				"AGR_STDATE": sa_doc.from_date,
 				"AGR_ENDATE": sa_doc.to_date,
 			}
-			insert_pos_item(payload_local_zone, payload_free_zone)
+			# insert_pos_item(payload_local_zone, payload_free_zone)
 
 
 	def _update_linked_purchase_order_rates(self):

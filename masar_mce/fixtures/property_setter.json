@@ -3757,7 +3757,7 @@
   "property": "field_order",
   "property_type": "Data",
   "row_name": null,
-  "value": "[\"item_code\", \"item_name\", \"party_item_code\", \"custom_suggest_accounting_price\", \"column_break_3\", \"qty\", \"rate\", \"custom_purchase_price_after_tax\", \"ordered_qty\", \"custom_markup_percentage\", \"custom_selling_price\", \"custom_selling_price_after_tax\", \"custom_amount\", \"custom_section_break_uoh6p\", \"custom_inspection_is_required\", \"custom_quality_inspection_quantity\", \"custom_quality_inspection\", \"custom_quality_inspection_status\", \"custom_column_break_ijewz\", \"custom_quality_inspection_remarks\", \"section_break_7\", \"terms_and_conditions\"]"
+  "value": "[\"item_code\", \"item_name\", \"party_item_code\", \"custom_suggest_accounting_price\", \"column_break_3\", \"qty\", \"rate\", \"custom_purchase_price_after_tax\", \"ordered_qty\", \"custom_markup_percentage\", \"custom_selling_price\", \"custom_selling_price_after_tax\", \"custom_amount\", \"custom_section_break_uoh6p\", \"custom_inspection_is_required\", \"custom_quality_inspection_quantity\", \"custom_quality_inspection\", \"custom_quality_inspection_status\", \"custom_column_break_ijewz\", \"custom_quality_inspection_remarks\", \"custom_section_break_pricing_verification\", \"original_rate\", \"original_custom_markup_percentage\", \"original_custom_selling_price\", \"original_custom_suggest_accounting_price\", \"custom_column_break_pricing_verification\", \"difference_rate\", \"difference_custom_markup_percentage\", \"difference_custom_selling_price\", \"difference_custom_suggest_accounting_price\", \"dual_entry_captured\", \"section_break_7\", \"terms_and_conditions\"]"
  },
  {
   "default_value": null,

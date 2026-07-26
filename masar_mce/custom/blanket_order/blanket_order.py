@@ -5,8 +5,10 @@ from frappe import _
 from datetime import datetime
 from masar_mce.utils import get_tax_for_item, get_item_barcode, get_tax_rates_bulk
 from masar_mce.api import insert_pos_item
+from masar_mce.dual_entry import apply_dual_entry_workflow, validate_pricing_matches
 def validate(self , method):
     set_none_posting_date(self)
+    apply_dual_entry_workflow(self)
     calculate_amounts_and_total(self)
     if self.is_new():
         get_default_penalty(self)
@@ -14,7 +16,10 @@ def validate(self , method):
     # validate_some_markets(self)
     if self.custom_submit_after_inspection and self.docstatus == 1:
         check_inspection_result(self)
-        
+
+def before_submit(self, method):
+    validate_pricing_matches(self)
+
 def on_update(self, method):
     if self.docstatus == 0:
         _maybe_enqueue_pricing_sync(self, submit_if_needed=False)
@@ -212,6 +217,11 @@ def _sync_pricing_sheet_enqueued(blanket_order_name, submit_if_needed=False):
 
 
 def sync_pricing_sheet_from_agreement(blanket_order_doc, submit_if_needed=False):
+    """Keep the auto-generated Pricing Sheet as a live mirror of the Supplier
+    Agreement's current item pricing - whether it was entered by the first
+    user or the manager. The dual-entry verification itself happens on the
+    Supplier Agreement; this Pricing Sheet is just a live reflection of it,
+    so it never has its own independent entry/reset cycle."""
     ps_name = frappe.db.get_value(
         "Pricing Sheet",
         filters={
@@ -235,36 +245,35 @@ def sync_pricing_sheet_from_agreement(blanket_order_doc, submit_if_needed=False)
     ps.posting_date = blanket_order_doc.from_date or frappe.utils.nowdate()
     ps.pricing_type = blanket_order_doc.custom_pricing_type or "Buying Price Basis"
 
-    ps.set("items", [])
-
+    is_selling_basis = ps.pricing_type == "Selling Price Basis"
     all_items = blanket_order_doc.items or []
     item_codes = [i.item_code for i in all_items]
     tax_map = get_tax_rates_bulk(item_codes, categories=["Free Zone", "Local Zone"])
-    is_selling_basis = ps.pricing_type == "Selling Price Basis"
+
+    # Merge in place, keyed by item_code (unique per validate_duplicate_items),
+    # instead of wiping and re-appending every row from scratch.
+    existing_rows_by_item_code = {row.item_code: row for row in ps.items}
 
     for i in all_items:
         free_tax_rate = tax_map.get((i.item_code, "Free Zone"), 0)
         local_tax_rate = tax_map.get((i.item_code, "Local Zone"), 0)
-        markup_percentage = flt(i.custom_markup_percentage or 0)
-        selling_price = flt(i.custom_selling_price or 0)
-        purchase_price = flt(i.rate or 0)
 
-        row = {
-            "item_code": i.item_code,
-            "item_name": i.item_name,
-            "new_purchase_price": purchase_price,
-            "new_quantity": i.qty,
-            "local_tax_rate": flt(local_tax_rate) * 100,
-            "free_tax_rate": flt(free_tax_rate) * 100,
-            "local_mp": markup_percentage,
-            "free_mp": markup_percentage,
-            "blanket_order_item": i.name,
-        }
+        row = existing_rows_by_item_code.get(i.item_code)
+        if not row:
+            row = ps.append("items", {"item_code": i.item_code})
 
+        row.item_name = i.item_name
+        row.new_quantity = i.qty
+        row.local_tax_rate = flt(local_tax_rate) * 100
+        row.free_tax_rate = flt(free_tax_rate) * 100
+        row.new_purchase_price = flt(i.rate)
+        row.local_mp = flt(i.custom_markup_percentage)
+        row.free_mp = flt(i.custom_markup_percentage)
         if is_selling_basis:
-            row["local_sp"] = selling_price
+            row.local_sp = flt(i.custom_selling_price)
 
-        ps.append("items", row)
+    current_item_codes = {i.item_code for i in all_items}
+    ps.set("items", [r for r in ps.items if r.item_code in current_item_codes])
 
     frappe.flags.in_agreement_sync = True
     try:
