@@ -364,7 +364,7 @@ class PricingSheet(Document):
 				"AGR_STDATE": sa_doc.from_date,
 				"AGR_ENDATE": sa_doc.to_date,
 			}
-			# insert_pos_item(payload_local_zone, payload_free_zone)
+			insert_pos_item(payload_local_zone, payload_free_zone)
 
 
 	def _update_linked_purchase_order_rates(self):
