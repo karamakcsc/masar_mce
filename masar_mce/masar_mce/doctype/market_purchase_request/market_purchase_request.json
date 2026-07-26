@@ -14,6 +14,7 @@
   "company",
   "request_date",
   "central_distribution",
+  "material_inspection_required",
   "amended_from",
   "status",
   "section_break_kxcv",
@@ -178,6 +179,14 @@
    "fieldtype": "Check",
    "label": "Central Distribution",
    "permlevel": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "material_inspection_required",
+   "fieldtype": "Check",
+   "label": "Material Inspection Required",
+   "permlevel": 1
   }
  ],
  "grid_page_length": 50,
@@ -190,7 +199,7 @@
    "table_fieldname": "items"
   }
  ],
- "modified": "2026-07-12 11:47:42.926788",
+ "modified": "2026-07-26 09:38:36.229902",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Market Purchase Request",

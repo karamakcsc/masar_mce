@@ -29,32 +29,35 @@ def check_material_inspection_status(self):
     if wh_type not in ("Store", "سوق"):
         return
     for row in self.items:
-        mi_status_sql = frappe.db.sql("""
-            SELECT mid.laboratory_remarks
-            FROM `tabMaterial Inspection` mi
-            INNER JOIN `tabMaterial Inspection Details` mid
-                ON mi.name = mid.parent
-            WHERE mi.purchase_receipt = %(purchase_receipt)s
-              AND mi.is_active = 1
-              AND mid.pr_row_ref = %(pr_row_ref)s
-        """, {
-            "purchase_receipt": self.name,
-            "pr_row_ref": row.name
-        }, as_dict=True)
+        if row.custom_purchase_request: 
+            is_reuired = frappe.db.get_value("Market Purchase Request", row.custom_purchase_request, "material_inspection_required")
+            if is_reuired == 1:
+                mi_status_sql = frappe.db.sql("""
+                    SELECT mid.laboratory_remarks
+                    FROM `tabMaterial Inspection` mi
+                    INNER JOIN `tabMaterial Inspection Details` mid
+                        ON mi.name = mid.parent
+                    WHERE mi.purchase_receipt = %(purchase_receipt)s
+                    AND mi.is_active = 1
+                    AND mid.pr_row_ref = %(pr_row_ref)s
+                """, {
+                    "purchase_receipt": self.name,
+                    "pr_row_ref": row.name
+                }, as_dict=True)
 
-        mi_status = mi_status_sql[0].laboratory_remarks if mi_status_sql else None
+                mi_status = mi_status_sql[0].laboratory_remarks if mi_status_sql else None
 
-        if mi_status is None:
-            frappe.throw(_(
-                """Item <b>{0}</b> (Row {1}) does not have an active Material Inspection record.
-                Please create and complete an active Material Inspection for this item before submitting the Purchase Receipt."""
-            ).format(row.item_code, row.idx))
+                if mi_status is None:
+                    frappe.throw(_(
+                        """Item <b>{0}</b> (Row {1}) does not have an active Material Inspection record.
+                        Please create and complete an active Material Inspection for this item before submitting the Purchase Receipt."""
+                    ).format(row.item_code, row.idx))
 
-        if mi_status != "Conforming without any issues":
-            frappe.throw(_(
-                "Item <b>{0}</b> (Row {1}) cannot be received because its Material Inspection result is "
-                "<b>'{2}'</b>. Only items with the result <b>'Conforming without any issues'</b> can be received."
-            ).format(row.item_code, row.idx, mi_status))
+                if mi_status != "Conforming without any issues":
+                    frappe.throw(_(
+                        "Item <b>{0}</b> (Row {1}) cannot be received because its Material Inspection result is "
+                        "<b>'{2}'</b>. Only items with the result <b>'Conforming without any issues'</b> can be received."
+                    ).format(row.item_code, row.idx, mi_status))
         
 
 def before_insert(self , method):
