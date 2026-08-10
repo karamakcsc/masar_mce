@@ -300,6 +300,7 @@ fixtures = [
         [
             "dt", "in", [
                 'Warehouse',
+                'POS Profile',
                 'Supplier',
                 'Item Supplier',
                 'Quality Inspection',
@@ -339,6 +340,7 @@ fixtures = [
                 "in",
                 [
                     'Warehouse',
+                    'POS Profile',
                     'Supplier',
                     'Item Supplier',
                     'Quality Inspection',

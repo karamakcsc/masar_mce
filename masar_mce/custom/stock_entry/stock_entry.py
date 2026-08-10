@@ -73,6 +73,8 @@ def on_submit(self , method):
     ## •	كل مستودع ذكر بالنقطة أعلاه, يجب ان يتم اجراء متابعة المواد بشكل منفصل عن الاخر, مثال: في حال كانت المواد تنقل بسيارات الشركة فان أي نقص بالمواد يجب ان يتم الاستلام بشكل كامل, وعمل سند ارجاع للمورد (ضبط) من مستودع الاتلاف بشكل تلقائي للكميات الناقصة وتحت مسمى (نقص كميات تم تدويرها من المستودعات) مع اجراء تنبيه فوري لكل من الشركة والمستخدمين المعنيين, وبنفس الطريقة لباقي الخيارات بحسب ما تم الاتفاق عليه مسبقاً.
     if self.outgoing_stock_entry:
          outgoing_stock_entry_submit(self)
+    if self.stock_entry_type in ['سند تدوير' , 'Material Transfer'] and self.custom_viewd_by_warehouse == 0 :
+            frappe.throw(_("Please get approval from the warehouse manager before submitting the stock entry."))
     
 def outgoing_stock_entry_submit(self):
     rows_diff = list()

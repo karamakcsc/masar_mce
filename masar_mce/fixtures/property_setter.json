@@ -1,6 +1,22 @@
 [
  {
   "default_value": null,
+  "doc_type": "POS Profile",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocType",
+  "field_name": null,
+  "is_system_generated": 0,
+  "modified": "2026-02-04 14:39:28.425239",
+  "module": null,
+  "name": "POS Profile-main-allow_import",
+  "property": "allow_import",
+  "property_type": "Check",
+  "row_name": null,
+  "value": "1"
+ },
+ {
+  "default_value": null,
   "doc_type": "Stock Entry",
   "docstatus": 0,
   "doctype": "Property Setter",
@@ -4247,13 +4263,13 @@
   "doctype_or_field": "DocType",
   "field_name": null,
   "is_system_generated": 0,
-  "modified": "2026-07-15 11:34:16.355342",
+  "modified": "2026-08-05 10:26:13.765500",
   "module": null,
   "name": "Stock Entry-main-field_order",
   "property": "field_order",
   "property_type": "Data",
   "row_name": null,
-  "value": "[\"workflow_state\", \"stock_entry_details_tab\", \"naming_series\", \"stock_entry_type\", \"custom_supplier\", \"custom_supp_name\", \"custom_supplier_agreement\", \"outgoing_stock_entry\", \"source_stock_entry\", \"purpose\", \"add_to_transit\", \"work_order\", \"purchase_order\", \"subcontracting_order\", \"delivery_note_no\", \"sales_invoice_no\", \"pick_list\", \"purchase_receipt_no\", \"asset_repair\", \"col2\", \"company\", \"posting_date\", \"posting_time\", \"column_break_eaoa\", \"set_posting_time\", \"inspection_required\", \"apply_putaway_rule\", \"custom_target_location\", \"bom_info_section\", \"from_bom\", \"use_multi_level_bom\", \"bom_no\", \"cb1\", \"fg_completed_qty\", \"get_items\", \"section_break_7qsm\", \"process_loss_percentage\", \"column_break_e92r\", \"process_loss_qty\", \"section_break_jwgn\", \"from_warehouse\", \"source_warehouse_address\", \"source_address_display\", \"custom_supplier_dimension\", \"company_transfer\", \"cb0\", \"to_warehouse\", \"target_warehouse_address\", \"custom_bonus_warehouse\", \"target_address_display\", \"sb0\", \"scan_barcode\", \"last_scanned_warehouse\", \"items_section\", \"items\", \"get_stock_and_rate\", \"section_break_19\", \"total_outgoing_value\", \"column_break_22\", \"total_incoming_value\", \"value_difference\", \"additional_costs_section\", \"additional_costs\", \"total_additional_costs\", \"supplier_info_tab\", \"contact_section\", \"supplier\", \"supplier_name\", \"supplier_address\", \"address_display\", \"accounting_dimensions_section\", \"project\", \"column_break_wgvc\", \"cost_center\", \"other_info_tab\", \"printing_settings\", \"select_print_heading\", \"print_settings_col_break\", \"letter_head\", \"more_info\", \"is_opening\", \"remarks\", \"col5\", \"per_transferred\", \"total_amount\", \"job_card\", \"amended_from\", \"credit_note\", \"is_return\", \"tab_connections\"]"
+  "value": "[\"workflow_state\", \"stock_entry_details_tab\", \"naming_series\", \"stock_entry_type\", \"custom_supplier\", \"custom_supp_name\", \"custom_supplier_agreement\", \"outgoing_stock_entry\", \"source_stock_entry\", \"purpose\", \"add_to_transit\", \"work_order\", \"purchase_order\", \"subcontracting_order\", \"delivery_note_no\", \"sales_invoice_no\", \"pick_list\", \"purchase_receipt_no\", \"asset_repair\", \"col2\", \"company\", \"posting_date\", \"posting_time\", \"column_break_eaoa\", \"set_posting_time\", \"inspection_required\", \"apply_putaway_rule\", \"custom_target_location\", \"viewed_by_warehouse\", \"bom_info_section\", \"from_bom\", \"use_multi_level_bom\", \"bom_no\", \"cb1\", \"fg_completed_qty\", \"get_items\", \"section_break_7qsm\", \"process_loss_percentage\", \"column_break_e92r\", \"process_loss_qty\", \"section_break_jwgn\", \"from_warehouse\", \"source_warehouse_address\", \"source_address_display\", \"custom_supplier_dimension\", \"custom_company_transfer\", \"cb0\", \"to_warehouse\", \"target_warehouse_address\", \"custom_bonus_warehouse\", \"target_address_display\", \"sb0\", \"scan_barcode\", \"last_scanned_warehouse\", \"items_section\", \"items\", \"get_stock_and_rate\", \"section_break_19\", \"total_outgoing_value\", \"column_break_22\", \"total_incoming_value\", \"value_difference\", \"additional_costs_section\", \"additional_costs\", \"total_additional_costs\", \"supplier_info_tab\", \"contact_section\", \"supplier\", \"supplier_name\", \"supplier_address\", \"address_display\", \"accounting_dimensions_section\", \"project\", \"column_break_wgvc\", \"cost_center\", \"other_info_tab\", \"printing_settings\", \"select_print_heading\", \"print_settings_col_break\", \"letter_head\", \"more_info\", \"is_opening\", \"remarks\", \"col5\", \"per_transferred\", \"total_amount\", \"job_card\", \"amended_from\", \"credit_note\", \"is_return\", \"tab_connections\"]"
  },
  {
   "default_value": null,
@@ -4263,12 +4279,60 @@
   "doctype_or_field": "DocType",
   "field_name": null,
   "is_system_generated": 0,
-  "modified": "2026-01-07 12:47:04.328403",
+  "modified": "2026-08-06 16:10:29.640785",
   "module": null,
   "name": "Warehouse-main-field_order",
   "property": "field_order",
   "property_type": "Data",
   "row_name": null,
-  "value": "[\"warehouse_detail\", \"disabled\", \"warehouse_name\", \"column_break_3\", \"is_group\", \"parent_warehouse\", \"is_rejected_warehouse\", \"custom_territory\", \"column_break_4\", \"account\", \"company\", \"custom_cost_zone\", \"address_and_contact\", \"address_html\", \"column_break_10\", \"contact_html\", \"warehouse_contact_info\", \"email_id\", \"phone_no\", \"mobile_no\", \"column_break0\", \"address_line_1\", \"address_line_2\", \"city\", \"state\", \"pin\", \"transit_section\", \"warehouse_type\", \"column_break_qajx\", \"default_in_transit_warehouse\", \"tree_details\", \"lft\", \"rgt\", \"old_parent\"]"
+  "value": "[\"warehouse_detail\", \"disabled\", \"warehouse_name\", \"custom_column_break_jbmcj\", \"custom_warehouse_no\", \"custom_pos_no\", \"column_break_3\", \"is_group\", \"parent_warehouse\", \"is_rejected_warehouse\", \"custom_company_transfer\", \"custom_territory\", \"column_break_4\", \"account\", \"company\", \"custom_cost_zone\", \"address_and_contact\", \"address_html\", \"column_break_10\", \"contact_html\", \"warehouse_contact_info\", \"email_id\", \"phone_no\", \"mobile_no\", \"column_break0\", \"address_line_1\", \"address_line_2\", \"city\", \"state\", \"pin\", \"transit_section\", \"warehouse_type\", \"column_break_qajx\", \"default_in_transit_warehouse\", \"tree_details\", \"lft\", \"rgt\", \"old_parent\"]"
+ },
+ {
+  "default_value": null,
+  "doc_type": "POS Profile",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocType",
+  "field_name": null,
+  "is_system_generated": 0,
+  "modified": "2026-08-06 16:18:13.891355",
+  "module": null,
+  "name": "POS Profile-main-naming_rule",
+  "property": "naming_rule",
+  "property_type": "Data",
+  "row_name": null,
+  "value": "Expression"
+ },
+ {
+  "default_value": null,
+  "doc_type": "POS Profile",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocType",
+  "field_name": null,
+  "is_system_generated": 0,
+  "modified": "2026-08-06 16:24:36.251695",
+  "module": null,
+  "name": "POS Profile-main-autoname",
+  "property": "autoname",
+  "property_type": "Data",
+  "row_name": null,
+  "value": "format:{custom_pos_no}-{custom_cash_number}"
+ },
+ {
+  "default_value": null,
+  "doc_type": "POS Profile",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocType",
+  "field_name": null,
+  "is_system_generated": 0,
+  "modified": "2026-08-06 16:18:13.941619",
+  "module": null,
+  "name": "POS Profile-main-field_order",
+  "property": "field_order",
+  "property_type": "Data",
+  "row_name": null,
+  "value": "[\"company\", \"customer\", \"country\", \"disabled\", \"column_break_9\", \"warehouse\", \"campaign\", \"company_address\", \"custom_pos_no\", \"custom_cash_number\", \"section_break_15\", \"applicable_for_users\", \"section_break_11\", \"payments\", \"section_break_14\", \"hide_images\", \"hide_unavailable_items\", \"auto_add_item_to_cart\", \"validate_stock_on_save\", \"print_receipt_on_order_complete\", \"column_break_16\", \"ignore_pricing_rule\", \"allow_rate_change\", \"allow_discount_change\", \"disable_grand_total_to_default_mop\", \"allow_partial_payment\", \"section_break_23\", \"item_groups\", \"column_break_25\", \"customer_groups\", \"section_break_16\", \"print_format\", \"letter_head\", \"column_break0\", \"tc_name\", \"select_print_heading\", \"section_break_19\", \"selling_price_list\", \"currency\", \"write_off_account\", \"write_off_cost_center\", \"write_off_limit\", \"account_for_change_amount\", \"disable_rounded_total\", \"column_break_23\", \"income_account\", \"expense_account\", \"taxes_and_charges\", \"tax_category\", \"apply_discount_on\", \"accounting_dimensions_section\", \"cost_center\", \"dimension_col_break\", \"project\"]"
  }
 ]
