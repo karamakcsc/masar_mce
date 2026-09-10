@@ -70,18 +70,20 @@ def calculate_amounts_and_total(self):
     item_codes = [i.item_code for i in self.items]
     tax_map = get_tax_rates_bulk(item_codes, categories=["Local Zone"])
 
-    total, total_qty = 0, 0
+    total, total_qty , total_after_tax = 0, 0 , 0 
     for i in self.items:
         amount = flt(i.qty) * flt(i.rate)
         i.custom_amount = amount
         total += amount
         total_qty += i.qty
         tax_rate = tax_map.get((i.item_code, "Local Zone"), 0)
-        i.custom_purchase_price_after_tax = flt(i.rate) + flt(i.rate) * tax_rate
+        total_after_tax +=  flt(i.rate) + flt(i.rate) * tax_rate
+        i.custom_purchase_price_after_tax = flt(flt(i.rate) + flt(i.rate) * tax_rate) * flt(i.qty)
         i.custom_selling_price_after_tax = flt(i.custom_selling_price) + flt(i.custom_selling_price) * tax_rate
 
     self.custom_total_quantity = total_qty
     self.custom_agreement_total = total
+    self.custom_total_after_tax = total_after_tax
     
 def get_default_penalty(self):
     all_penalty = frappe.db.sql(

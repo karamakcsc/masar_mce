@@ -236,7 +236,11 @@ function update_total(frm) {
     const total = (frm.doc.items || [])
         .reduce((t, d) => t + flt(d.custom_amount), 0);
 
+    const total_after_tax = (frm.doc.items || [])
+        .reduce((t, d) => t + flt(d.custom_purchase_price_after_tax * d.qty), 0);
+
     frm.set_value("custom_agreement_total", total);
+    frm.set_value("custom_total_after_tax", total_after_tax);
 }
 
 function getTaxRate(itemCode, callback) {
