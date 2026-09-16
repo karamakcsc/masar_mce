@@ -4,7 +4,6 @@ from frappe.model.mapper import get_mapped_doc
 from frappe import _
 from datetime import datetime
 from masar_mce.utils import get_tax_for_item, get_item_barcode, get_tax_rates_bulk
-from masar_mce.api import insert_pos_item
 from masar_mce.dual_entry import apply_dual_entry_workflow, validate_pricing_matches
 def validate(self , method):
     set_none_posting_date(self)

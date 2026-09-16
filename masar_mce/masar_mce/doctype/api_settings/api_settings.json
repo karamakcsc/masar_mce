@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "creation": "2026-09-16 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "url",
+  "column_break_request",
+  "request_method",
+  "timeout",
+  "section_break_headers",
+  "headers",
+  "section_break_notes",
+  "description"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "description": "Eg. http://192.168.70.70:85/api/agreement/insert",
+   "fieldname": "url",
+   "fieldtype": "Data",
+   "label": "URL",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_request",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "POST",
+   "fieldname": "request_method",
+   "fieldtype": "Select",
+   "label": "Request Method",
+   "options": "GET\nPOST\nPUT",
+   "reqd": 1
+  },
+  {
+   "default": "30",
+   "description": "The number of seconds to wait for a response before the request fails",
+   "fieldname": "timeout",
+   "fieldtype": "Int",
+   "label": "Timeout (Seconds)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_headers",
+   "fieldtype": "Section Break",
+   "label": "Headers"
+  },
+  {
+   "default": "{\n    \"Content-Type\": \"application/json\"\n}",
+   "description": "HTTP headers to send with the request, as a JSON object",
+   "fieldname": "headers",
+   "fieldtype": "Code",
+   "label": "Headers (JSON)",
+   "options": "JSON"
+  },
+  {
+   "fieldname": "section_break_notes",
+   "fieldtype": "Section Break",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  }
+ ],
+ "icon": "fa fa-cog",
+ "idx": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-09-16 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Masar MCE",
+ "name": "API Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
