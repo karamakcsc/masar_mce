@@ -76,6 +76,7 @@ def calculate_amounts_and_total(self):
         total += amount
         total_qty += i.qty
         tax_rate = tax_map.get((i.item_code, "Local Zone"), 0)
+        i.custom_tax_rate = flt(tax_rate) * 100
         total_after_tax +=  flt(i.rate) + flt(i.rate) * tax_rate
         i.custom_purchase_price_after_tax = flt(flt(i.rate) + flt(i.rate) * tax_rate) * flt(i.qty)
         i.custom_selling_price_after_tax = flt(i.custom_selling_price) + flt(i.custom_selling_price) * tax_rate

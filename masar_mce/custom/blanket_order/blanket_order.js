@@ -85,6 +85,13 @@ frappe.ui.form.on("Blanket Order", {
 });
 
 frappe.ui.form.on("Blanket Order Item", {
+    item_code(frm, cdt, cdn) {
+        const row = locals[cdt][cdn];
+        getTaxRate(row.item_code, tax => {
+            frappe.model.set_value(cdt, cdn, "custom_tax_rate", flt(tax) * 100);
+        });
+    },
+
     rate(frm, cdt, cdn) {
         const row = locals[cdt][cdn];
         getTaxRate(row.item_code, tax => {
