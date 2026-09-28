@@ -189,8 +189,8 @@ doc_events = {
         "validate" : "masar_mce.custom.material_request.material_request.validate"
     }, 
     "Supplier" :{
-        #"autoname" : "masar_mce.custom.supplier.supplier.autoname",
-        "after_insert" : "masar_mce.custom.supplier.supplier.after_insert"
+        "autoname" : "masar_mce.custom.supplier.supplier.autoname",
+        # "after_insert" : "masar_mce.custom.supplier.supplier.after_insert"
     }
     
 }
