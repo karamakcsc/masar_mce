@@ -14,6 +14,10 @@ frappe.ui.form.on("Purchase Invoice", {
 });
 
 function FilterItems(frm) {
+    if (masar_mce.buying_cycle.is_normal(frm)) {
+        masar_mce.buying_cycle.set_item_query(frm, () => ({}));
+        return;
+    }
     setTimeout(() => {    
             cur_frm.page.remove_inner_button(__('Purchase Order'),  __('Get Items From'));
         },100);
@@ -59,13 +63,7 @@ function FilterItems(frm) {
             });
         }, __('Get Items From'));
     
-    const grid = frm.fields_dict.items.grid;
-    const item_code_field = grid.get_field("item_code");
-    if (!item_code_field.hasOwnProperty('original_get_query')) {
-        item_code_field.original_get_query = item_code_field.get_query;
-    }
-    
-    item_code_field.get_query = function() {
+    masar_mce.buying_cycle.set_item_query(frm, function(...args) {
         if (frm.doc.custom_supplier_agreement) {
             return {
                 query: "masar_mce.custom.stock_entry.stock_entry.get_items_from_blanket_order",
@@ -74,9 +72,9 @@ function FilterItems(frm) {
                 }
             };
         } else {
-            return item_code_field.original_get_query ? item_code_field.original_get_query() : {};
+            return masar_mce.buying_cycle.standard_item_query(frm, args);
         }
-    };
+    });
 }
 function GetTermsandPenalitesFromAgreement(frm) {
     if (frm.doc.custom_supplier_agreement) {
@@ -108,10 +106,4 @@ function GetTermsandPenalitesFromAgreement(frm) {
         frm.set_value("custom_special_terms", "");
     }
 }
-frappe.form.link_formatters['Item'] = function(value, doc) {
-    if(doc.item_code && doc.item_name !== value) {
-        return doc.item_code;
-    } else {
-        return value;
-    }
-};
+frappe.form.link_formatters['Item'] = masar_mce.buying_cycle.item_link_formatter;

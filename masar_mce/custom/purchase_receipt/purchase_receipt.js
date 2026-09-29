@@ -9,7 +9,9 @@ frappe.ui.form.on("Purchase Receipt", {
         hide_buttons(frm);
         ChangeLabels(frm);
         CreateMaterialInspection(frm);
-        if (frappe.session.user !== 'Administrator'
+        if (masar_mce.buying_cycle.is_normal(frm)) {
+            $('#hide-status-btn-style').remove();
+        } else if (frappe.session.user !== 'Administrator'
             && !document.getElementById('hide-status-btn-style')) {
             $(`<style id="hide-status-btn-style">
                 .inner-group-button[data-label="%D8%A7%D9%84%D8%AD%D8%A7%D9%84%D8%A9"],
@@ -23,7 +25,8 @@ frappe.ui.form.on("Purchase Receipt", {
         set_item_code_query(frm);
         hide_buttons(frm);
         ChangeLabels(frm);
-        if (frm.doc.is_return && frm.doc.docstatus === 0 && frm.is_new()) {
+        if (frm.doc.is_return && frm.doc.docstatus === 0 && frm.is_new()
+            && !masar_mce.buying_cycle.is_normal(frm)) {
             frm.doc.items.forEach(row => {
                 row.custom_request_quantity = row.qty;
                 row.qty = -1;
@@ -40,12 +43,12 @@ frappe.ui.form.on("Purchase Receipt", {
         CreateMaterialInspection(frm);
     },
     workflow_state(frm) {
-        if (frm.doc.docstatus === 0) {
+        if (frm.doc.docstatus === 0 && !masar_mce.buying_cycle.is_normal(frm)) {
             refresh_item_fields(frm);   
         }
     },
     after_workflow_action(frm) {
-        if (frm.doc.docstatus === 0) {
+        if (frm.doc.docstatus === 0 && !masar_mce.buying_cycle.is_normal(frm)) {
             refresh_item_fields(frm);   
         }
     },
@@ -58,6 +61,7 @@ frappe.ui.form.on("Purchase Receipt", {
     } 
 });
 function calculate_delivery_date(frm) {
+    if (masar_mce.buying_cycle.is_normal(frm)) return;
     if (!frm.doc.custom_request_date || !frm.doc.set_warehouse || !frm.doc.supplier) {
         frm.set_value("custom_delivery_date", null);
         return;
@@ -92,7 +96,8 @@ function refresh_item_fields(frm) {
     frm.refresh_field("items");
 }
 function hide_buttons(frm) {
-    if (frappe.user_roles.includes('مأمور المستودع')) {
+    const is_normal = masar_mce.buying_cycle.is_normal(frm);
+    if (!is_normal && frappe.user_roles.includes('مأمور المستودع')) {
             frm.set_df_property('items', 'cannot_add_rows', true);
             frm.set_df_property('items', 'cannot_delete_rows', true); 
             frm.set_df_property('items', 'cannot_delete_all_rows', true);
@@ -103,6 +108,7 @@ function hide_buttons(frm) {
             frm.set_df_property('items', 'cannot_delete_all_rows', false);
     }
     frm.refresh_field('items');
+    if (is_normal) return;
     setTimeout(() => {
 
         cur_frm.page.remove_inner_button(__('Purchase Invoice'), __('Get Items From'));
@@ -114,16 +120,10 @@ function hide_buttons(frm) {
     }, 100);
 }
 
-frappe.form.link_formatters['Item'] = function(value, doc) {
-    if(doc.item_code && doc.item_name !== value) {
-        return doc.item_code;
-    } else {
-        return value;
-    }
-};
+frappe.form.link_formatters['Item'] = masar_mce.buying_cycle.item_link_formatter;
 
 function set_item_code_query(frm) {
-    frm.fields_dict['items'].grid.get_field('item_code').get_query = function(doc, cdt, cdn) {
+    masar_mce.buying_cycle.set_item_query(frm, function(doc, cdt, cdn) {
         return {
             query: "masar_mce.custom.purchase_receipt.purchase_receipt.get_items_from_open_purchase_orders",
             filters: {
@@ -131,7 +131,7 @@ function set_item_code_query(frm) {
                 warehouse : frm.doc.set_warehouse
             }
         };
-    };
+    });
 }
 
 frappe.ui.form.on('Purchase Receipt Item', {
@@ -141,7 +141,7 @@ frappe.ui.form.on('Purchase Receipt Item', {
 });
 function GetItemDetails(frm , cdt , cdn){
     const row = locals[cdt][cdn];
-        if (!row.item_code || !frm.doc.supplier) return;
+        if (masar_mce.buying_cycle.is_normal(frm) || !row.item_code || !frm.doc.supplier) return;
         
         let used_pos = [];
         frm.doc.items.forEach(r => {
@@ -171,6 +171,7 @@ function GetItemDetails(frm , cdt , cdn){
         });
     }
 function ChangeLabels(frm) {
+    if (masar_mce.buying_cycle.is_normal(frm)) return;
     const isReturn = frm.doc.is_return === 1;
     frm.set_df_property("custom_delivery_date", "label", isReturn ? "Expected Return Date" : "Expected Delivery Date");
     frm.set_df_property("posting_date", "label", isReturn ? "Return Date" : "Receipt Date");
@@ -182,7 +183,7 @@ function ChangeLabels(frm) {
     });
 }
 function CreateMaterialInspection(frm) {
-    if (frm.doc.docstatus === 0 
+    if (frm.doc.docstatus === 0 && !masar_mce.buying_cycle.is_normal(frm)
         // && ["Store", "سوق"].includes(frm.doc.custom_accepted_warehouse_type)
         ) {
             frm.add_custom_button(__('Material Inspection'), function() {

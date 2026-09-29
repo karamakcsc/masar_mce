@@ -3,17 +3,22 @@ from erpnext.buying.utils import (
     set_stock_levels,
     validate_item_and_get_basic_data,
     validate_end_of_life,
+    validate_stock_item_warehouse as standard_validate_stock_item_warehouse,
 )
+from masar_mce.custom.normal_cycle.normal_cycle import is_normal_cycle
 from frappe import _
 from frappe.utils import cint, cstr
 
 
 def validate_for_items(doc) -> None:
 	items = []
+	validate_warehouse = (
+		standard_validate_stock_item_warehouse if is_normal_cycle(doc) else validate_stock_item_warehouse
+	)
 	for d in doc.get("items"):
 		set_stock_levels(row=d)  # update with latest quantities
 		item = validate_item_and_get_basic_data(row=d)
-		validate_stock_item_warehouse(row=d, item=item)
+		validate_warehouse(row=d, item=item)
 		validate_end_of_life(d.item_code, item.end_of_life, item.disabled)
 
 		items.append(cstr(d.item_code))

@@ -1,8 +1,8 @@
 import frappe , json
 from frappe.utils import flt ,date_diff, add_days
 from frappe.model.mapper import get_mapped_doc
-# from erpnext.buying.doctype.purchase_order.purchase_order import set_missing_values
 from masar_mce.utils import get_inspection_status
+from masar_mce.custom.normal_cycle.normal_cycle import skip_if_normal_cycle
 from frappe import _
 @frappe.whitelist()
 def get_blanket_order_for_item(item_code, supplier):
@@ -101,6 +101,7 @@ def create_purchase_request_from_purchase_order(source_name, target_doc=None, ar
 
     return doc
     
+@skip_if_normal_cycle
 def on_submit(self , method):
     set_agreement_date(self)
     
@@ -131,6 +132,7 @@ def set_agreement_date(self):
                 "to_date": new_to_date
             })
             
+@skip_if_normal_cycle
 def before_insert(self, method):
 
     item_codes = [d.item_code for d in self.items]
@@ -159,6 +161,7 @@ def before_insert(self, method):
     for i in self.items:
         i.rate = price_map.get(i.item_code, 0)
         
+@skip_if_normal_cycle
 def validate(self, method):
     validate_inspection_status(self)
     

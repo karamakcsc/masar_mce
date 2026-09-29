@@ -2,9 +2,16 @@
 import frappe 
 from frappe.utils import flt 
 from frappe import _
+from erpnext.manufacturing.doctype.blanket_order.blanket_order import (
+	validate_against_blanket_order as standard_validate_against_blanket_order,
+)
+from masar_mce.custom.normal_cycle.normal_cycle import is_normal_cycle
 
 
 def validate_against_blanket_order(order_doc):
+	if is_normal_cycle(order_doc):
+		return standard_validate_against_blanket_order(order_doc)
+
 	if order_doc.doctype in ("Sales Order", "Purchase Order"):
 		order_data = {}
 

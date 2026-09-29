@@ -4,16 +4,20 @@ from frappe import _
 from frappe.utils import flt, get_link_to_form, getdate , date_diff
 from erpnext.controllers.status_updater import StatusUpdater
 from masar_mce.utils import get_inspection_status
+from masar_mce.custom.normal_cycle.normal_cycle import skip_if_normal_cycle
 from frappe.model.mapper import get_mapped_doc
 
 check_overflow_with_allowance = StatusUpdater.check_overflow_with_allowance
 limits_crossed_error = StatusUpdater.limits_crossed_error
+@skip_if_normal_cycle
 def validate(self , method ):
     validate_qty(self)
     validate_inspection_status(self)
     validate_some_markets_warehouse(self)
+@skip_if_normal_cycle
 def on_cancel(self , method):
     update_received_qty_on_cancel(self)  
+@skip_if_normal_cycle
 def on_submit(self , method):
     if self.is_return == 0 :
         create_auto_penalty_entry(self)
@@ -60,6 +64,7 @@ def check_material_inspection_status(self):
                     ).format(row.item_code, row.idx, mi_status))
         
 
+@skip_if_normal_cycle
 def before_insert(self , method):
     set_purchase_order_rate(self)
     set_selling_price_list(self)

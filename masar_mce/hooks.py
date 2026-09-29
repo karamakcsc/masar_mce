@@ -48,8 +48,9 @@ app_license = "mit"
 doctype_js = {
     "Blanket Order" : "custom/blanket_order/blanket_order.js", 
     "Stock Entry" : "custom/stock_entry/stock_entry.js", 
-    "Purchase Order" : "custom/purchase_order/purchase_order.js", 
-    "Purchase Receipt" : "custom/purchase_receipt/purchase_receipt.js",
+    "Purchase Order" : ["custom/normal_cycle/normal_cycle.js", "custom/purchase_order/purchase_order.js"], 
+    "Purchase Receipt" : ["custom/normal_cycle/normal_cycle.js", "custom/purchase_receipt/purchase_receipt.js"],
+    "Purchase Invoice" : "custom/normal_cycle/normal_cycle.js",
     # "Purchase Invoice" : "custom/purchase_invoice/purchase_invoice.js", 
     "Material Request" : "custom/material_request/material_request.js", 
     "Quality Inspection" : "custom/quality_inspection/quality_inspection.js"
@@ -323,6 +324,9 @@ fixtures = [
                 'Item',
                 'Customer'
             ]
+        ],
+        [
+                "name", "!=", "Warehouse-custom_cost_zone"
         ]
     ]},
     {"dt": "Translation", "filters": [

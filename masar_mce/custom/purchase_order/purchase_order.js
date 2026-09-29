@@ -17,13 +17,7 @@ frappe.ui.form.on("Purchase Order", {
 });
 
 function FilterItems(frm) {
-    const grid = frm.fields_dict.items.grid;
-    const item_code_field = grid.get_field("item_code");
-    if (!item_code_field.hasOwnProperty('original_get_query')) {
-        item_code_field.original_get_query = item_code_field.get_query;
-    }
-    
-    item_code_field.get_query = function() {
+    masar_mce.buying_cycle.set_item_query(frm, function(...args) {
         if (frm.doc.supplier) {
             return {
                 query: "masar_mce.custom.purchase_order.purchase_order.get_items_from_active_blanket_order",
@@ -32,9 +26,10 @@ function FilterItems(frm) {
                 }
             };
         } else {
-            return item_code_field.original_get_query ? item_code_field.original_get_query() : {};
+            return masar_mce.buying_cycle.standard_item_query(frm, args);
         }
-    };
+    });
+    if (masar_mce.buying_cycle.is_normal(frm)) return;
     setTimeout(() => {    
             frm.remove_custom_button("Link to Material Request", "Tools");
             frm.remove_custom_button("Update Rate as per Last Purchase", "Tools");
@@ -56,7 +51,7 @@ frappe.ui.form.on('Purchase Order Item', {
 });
 function GetItemDetails(frm , cdt , cdn){
     const row = locals[cdt][cdn];
-        if (!frm.doc.supplier || !row.item_code) {
+        if (masar_mce.buying_cycle.is_normal(frm) || !frm.doc.supplier || !row.item_code) {
             return;
         }
         frappe.call({
@@ -76,15 +71,9 @@ function GetItemDetails(frm , cdt , cdn){
             }
         });
 }
-frappe.form.link_formatters['Item'] = function(value, doc) {
-    if(doc.item_code && doc.item_name !== value) {
-        return doc.item_code;
-    } else {
-        return value;
-    }
-};
+frappe.form.link_formatters['Item'] = masar_mce.buying_cycle.item_link_formatter;
 function CreatePurchaseRequest(frm) {
-    if (frm.doc.docstatus === 1 ) {
+    if (frm.doc.docstatus === 1 && !masar_mce.buying_cycle.is_normal(frm)) {
             frm.add_custom_button(__('Market Purchase Request'), function() {
                 frappe.model.open_mapped_doc({
                     method: "masar_mce.custom.purchase_order.purchase_order.create_purchase_request_from_purchase_order",
