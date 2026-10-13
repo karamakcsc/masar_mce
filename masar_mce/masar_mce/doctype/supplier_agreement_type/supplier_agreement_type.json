@@ -1,5 +1,7 @@
 {
  "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
  "autoname": "field:supplier_agreement_type",
  "creation": "2026-01-27 16:13:07.917392",
  "doctype": "DocType",
@@ -38,7 +40,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-27 16:14:16.598148",
+ "modified": "2026-10-13 16:08:51.051648",
  "modified_by": "Administrator",
  "module": "Masar MCE",
  "name": "Supplier Agreement Type",
